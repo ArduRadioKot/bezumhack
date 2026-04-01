@@ -271,7 +271,7 @@
 </head>
 <body>
 <header>
-    <div class="logo" id="backToAuth">LUXARY</div>
+    <div class="logo" id="backToIndex">LUXARY</div>
     <div class="nav-links">
         <a id="navShop">Главная</a>
         <a id="navFav">Избранное</a>
@@ -329,6 +329,14 @@
             ];
         }
         categories = [...new Set(products.map(p => p.type))];
+        
+        // Применяем фильтр из URL, если он есть
+        const urlParams = new URLSearchParams(window.location.search);
+        const catParam = urlParams.get('category');
+        if (catParam && categories.includes(catParam)) {
+            activeCategory = catParam;
+        }
+        
         renderProducts();
         renderCategoryChips();
     }
@@ -379,7 +387,7 @@
     }
 
     async function addToCart(productId) {
-        if (!currentUser) { alert('Войдите в аккаунт'); window.location.href = 'tets.html'; return; }
+        if (!currentUser) { alert('Войдите в аккаунт'); window.location.href = 'auth.html'; return; }
         await fetch(`${API_BASE}/cart`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId, quantity: 1 }) });
         alert('Товар добавлен в корзину');
     }
@@ -412,15 +420,15 @@
     function updateFilters() { searchQuery = document.getElementById('searchInput').value; sortType = document.getElementById('sortSelect').value; renderProducts(); }
     function showSection(section) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(section + 'Section').classList.add('active'); if (section === 'favorites') renderFavorites(); if (section === 'cart') renderCart(); if (section === 'orders') fetchOrders(); }
 
-    function logout() { localStorage.removeItem('luxary_current_user'); window.location.href = 'tets.html'; }
+    function logout() { localStorage.removeItem('luxary_current_user'); window.location.href = 'auth.html'; }
     function updateUserUI() { if (currentUser) { document.getElementById('userName').innerText = currentUser.name; document.getElementById('userBalance').innerText = `${(currentUser.balance || 0).toLocaleString()} ₽`; } else { window.location.href = 'auth.html'; } }
 
-    document.getElementById('backToAuth').addEventListener('click', () => window.location.href = 'tets.html');
+    document.getElementById('backToIndex').addEventListener('click', () => window.location.href = 'index.html');
     document.getElementById('navShop').addEventListener('click', () => showSection('main'));
     document.getElementById('navFav').addEventListener('click', () => showSection('favorites'));
     document.getElementById('navCart').addEventListener('click', () => showSection('cart'));
     document.getElementById('navOrders').addEventListener('click', () => showSection('orders'));
-    document.getElementById('profileBtn').addEventListener('click', () => window.location.href = 'tets.html');
+    document.getElementById('profileBtn').addEventListener('click', () => window.location.href = 'auth.html');
     document.getElementById('logoutBtn').addEventListener('click', logout);
     document.getElementById('checkoutBtn').addEventListener('click', createOrder);
     document.getElementById('searchInput').addEventListener('input', updateFilters);
@@ -430,7 +438,7 @@
     document.getElementById('themeToggle').addEventListener('click', () => { const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark'; applyTheme(newTheme); });
     const savedTheme = localStorage.getItem('luxary_theme') || 'light'; applyTheme(savedTheme);
 
-    if (!currentUser) window.location.href = 'tets.html';
+    if (!currentUser) window.location.href = 'auth.html';
     else { updateUserUI(); fetchProducts(); fetchOrders(); }
 </script>
 </body>
