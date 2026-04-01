@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать услугу</title>
+    <link rel="stylesheet" href="../static/css/services.css">
+</head>
+<body>
+    <header class="profile-header">
+        <img src="{% static 'images/logotype.svg' %}" alt="Study Size" class="logo">
+        <div class="header-actions">
+            <a href="/" class="home-link">На главную</a>
+            <a href="/logout/" class="logout-btn">Выйти</a>
+        </div>
+    </header>
+    <h2 style="text-align: center;">Создать услугу</h2>
+    <form method="post" enctype="multipart/form-data" class="create-service-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="title">Название:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="price">Цена:</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" required>
+        </div>
+        <div class="form-group">
+            <label for="image">Изображение:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <button type="submit" class="submit-btn">Создать</button>
+    </form>
+</body>
+</html>

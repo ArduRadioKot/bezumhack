@@ -1,0 +1,70 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+<div class="notification-container"></div>
+
+<div class="container fade-in">
+    <div class="form-container">
+        <div class="login-form">
+            <img src="{% static 'images/logotype.svg' %}" alt="Study Size" class="logo">
+            <h2 class="form-title">Вход</h2>
+            <p class="register-link">Еще нет аккаунта? <a href="/register/">Зарегистрироваться</a></p>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="input-label">Логин</label>
+                    <input type="text" name="username" placeholder="Введите логин" required>
+                </div>
+
+                <div class="form-group password-group">
+                    <label class="input-label">Пароль</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password-field" placeholder="Введите пароль"
+                               required>
+                        <span class="password-toggle">
+                                <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                     height="20">
+                                    <path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5z"/>
+                                </svg>
+                            </span>
+                    </div>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Запомнить меня</label>
+                </div>
+
+                <button type="submit" class="submit-btn">Войти</button>
+            </form>
+        </div>
+
+        <div class="welcome-section">
+            <img src="{% static 'images/round.svg' %}" alt="" class="round-image">
+            <h2>Добро пожаловать</h2>
+            <p class="welcome-text">
+                Биржа взаимопомощи для студентов и специалистов: <span class="highlight">найди репетитора</span>,
+                <span class="highlight">закажи перевод</span>, <span class="highlight">оформи лабораторную</span>
+                или <span class="highlight">презентацию</span>. Всё — с безопасной оплатой и проверенными исполнителями.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="error-container"></div>
+
+<script src="{% static 'js/login.js' %}"></script>
+</body>
+</html>

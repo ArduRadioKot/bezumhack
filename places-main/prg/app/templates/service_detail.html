@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/detali.css' %}">
+    <title>{{ service.title }}</title>
+</head>
+<body>
+<header class="header">
+    <img src="{% static 'images/logotype.svg' %}" alt="Study Size" class="logo">
+    <div class="header-actions">
+        <a href="/" class="home-link">На главную</a>
+        <a href="/logout/" class="logout-btn">Выйти</a>
+    </div>
+</header>
+
+<div class="service-detail-container">
+    <h1>{{ service.title }}</h1>
+    <img src="{{ service.image.url }}" alt="{{ service.title }}">
+    <p>Цена: {{ service.price }} руб.</p>
+    <p>Описание: {{ service.description }}</p>
+
+    <h2>Исполнитель:</h2>
+    <div class="author-info">
+        <p>Имя: {{ service.author.get_full_name }}</p>
+        <p>Email: {{ service.author.email }}</p>
+        <p>Телефон: {{ service.author.profile.phone }}</p>
+    </div>
+    {% if is_customer %}
+    <form method="post" action="{% url 'process_payment' service.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-buy">Оплатить услугу</button>
+    </form>
+    {% endif %}
+    {% if is_customer %}
+    {% if not feedback_submitted %}
+    <form method="post" class="feedback-form">
+        {% csrf_token %}
+        <textarea name="feedback_text" rows="4" cols="50" required></textarea><br>
+        <button type="submit">Оставить отзыв</button>
+    </form>
+    {% else %}
+    <p>Вы уже оставили отзыв для этого сервиса.</p>
+    {% endif %}
+    {% endif %}
+
+    {% if is_customer %}
+    <form method="post" action="{% url 'request_service' service.id %}">
+        {% csrf_token %}
+        <button type="submit" class="respond-button"
+                {% if request.user.wallet.balance
+        < service.price %}disabled{% endif %}>
+        Запросить услугу
+        </button>
+        {% if request.user.wallet.balance < service.price %}
+        <p class="balance-warning">Недостаточно средств на балансе</p>
+
+    </form>
+    {% endif %}
+
+    <h2>Отзывы:</h2>
+    <div class="feedback-list">
+        {% for feedback in service.feedbacks.all %}
+        <p><strong>{{ feedback.author.username }}:</strong> {{ feedback.text }} ({{ feedback.created_at }})</p>
+        {% empty %}
+        <p class="no-feedbacks">Пока нет отзывов.</p>
+        {% endfor %}
+    </div>
+
+    <a href="/">На главную</a>
+</div>
+</body>
+</html>

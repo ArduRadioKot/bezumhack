@@ -1,0 +1,10 @@
+{% block content %}
+<div class="confirmation-container">
+    <h2>✅ Заказ успешно отправлен!</h2>
+    <p>Исполнитель получил ваш запрос и скоро свяжется с вами</p>
+    <div class="actions">
+        <a href="{% url 'profile' %}" class="btn">Перейти в профиль</a>
+        <a href="{% url 'home' %}" class="btn">На главную</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,273 @@
+:root {
+    --primary-color: #7E57C2;
+    --secondary-color: #a777e3;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px; /* Add some padding around the content */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Form Styles */
+form {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Button Styles */
+.btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* To ensure links styled as buttons don't have underlines */
+    display: inline-block; /* To allow setting padding and margins */
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    text-decoration: none;
+}
+
+/* List Styles */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+/* Card Styles */
+.card {
+    background: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Specific Styles (adjust as needed) */
+.confirmation-container {
+    text-align: center;
+    padding: 30px;
+}
+
+.confirmation-container h2 {
+    color: green;
+}
+
+.actions {
+    margin-top: 20px;
+}
+
+.requests-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.requests-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.request-card {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.request-card:last-child {
+    border-bottom: none;
+}
+
+.status-in_progress {
+    color: darkorange;
+}
+
+.status-completed {
+    color: green;
+}
+
+.status-rejected {
+    color: red;
+}
+
+.request-details {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.request-info p {
+    margin-bottom: 8px;
+}
+
+.request-management {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.form-group.file-upload {
+    margin-top: 20px;
+}
+
+.file-upload-visible {
+    display: block;
+}
+
+.file-upload-hidden {
+    display: none;
+}
+
+/* manage_request.html */
+/* You might want to move the form styles here from the general form styles */
+/* and customize them further for this specific template */
+
+/* update_request.html */
+.status-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.btn-save {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+    background-color: var(--secondary-color);
+}
+
+/* my_feedbacks.html */
+/* Add specific styles for the feedback list if needed */
+
+/* activation_email.html */
+/* Since this is an email template, keep the styles very basic and inline */
+/* Email clients have limited CSS support */
+/* Consider using a CSS inliner tool for email templates */
+
+/* Header Styles */
+.profile-header {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    height: 40px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-link, .logout-btn {
+    background: white;
+    border: 1px solid #E0E0E0;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.logout-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* Кнопки в хедере */
+.home-link:hover, .logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}

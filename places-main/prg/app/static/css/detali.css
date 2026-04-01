@@ -1,0 +1,189 @@
+:root {
+    --primary-color: #6e8efb;
+    --secondary-color: #a777e3;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --border-radius: 10px;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Хедер */
+.header {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    height: 40px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-link {
+    background: white;
+    border: 1px solid #E0E0E0;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.logout-btn {
+    background-color: #7E57C2;
+    color: #E0E0E0;
+    border: 1px solid #E0E0E0;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.home-link:hover,
+.logout-btn:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.service-detail-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+}
+
+.service-detail-container h1 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.service-detail-container img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+.service-detail-container p {
+    margin-bottom: 15px;
+}
+
+.service-detail-container h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: var(--secondary-color);
+}
+
+.author-info p {
+    margin-bottom: 8px;
+}
+
+.feedback-form {
+    margin-top: 20px;
+}
+
+.feedback-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.feedback-form button[type="submit"],
+.respond-button {
+    padding: 12px 24px;
+    background-color: #7E57C2;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.feedback-form button[type="submit"]:hover,
+.respond-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.feedback-list {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--light-bg);
+    border-radius: var(--border-radius);
+}
+
+.feedback-list p {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.feedback-list p:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.no-feedbacks {
+    font-style: italic;
+    color: #777;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.service-detail-container a {
+    display: inline-block; /* Make it a block-level element for padding/margin */
+    padding: 12px 24px;
+    background-color: #7E57C2;
+    color: white;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.3s ease;
+    margin-top: 20px; /* Add some space above the button */
+}
+
+.service-detail-container a:hover {
+    background-color: var(--secondary-color);
+}

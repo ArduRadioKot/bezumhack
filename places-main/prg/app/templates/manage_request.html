@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Request</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <select name="status">
+        <option value="in_progress">Принять в работу</option>
+        <option value="rejected">Отклонить</option>
+        <option value="completed">Завершить</option>
+    </select>
+    
+    {% if service_request.status == 'completed' %}
+        <input type="file" name="result_file" required>
+    {% endif %}
+    
+    <button type="submit">Обновить статус</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,59 @@
+:root {
+    --primary-color: #6e8efb;
+    --secondary-color: #a777e3;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* Or any base font size you prefer */
+}
+
+body {
+    font-family: 'Roboto', sans-serif !important;
+    background-color: var(--light-bg) !important;
+    color: var(--text-color) !important;
+    line-height: 1.6 !important;
+    padding: 20px !important;
+}
+
+form {
+    background-color: var(--card-bg) !important;
+    border-radius: 10px !important;
+    padding: 20px !important;
+    box-shadow: var(--shadow) !important;
+    max-width: 500px !important;
+    margin: 0 auto !important;
+}
+
+select,
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: darken(var(--primary-color), 10%);
+}
