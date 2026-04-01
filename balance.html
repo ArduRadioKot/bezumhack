@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>LUXARY — Пополнение баланса</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        :root {
+            --bg-primary: #faf9f7;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e1e2a;
+            --text-secondary: #5a5a6e;
+            --accent: #c9a03d;
+            --accent-dark: #a87c2c;
+            --border: rgba(0, 0, 0, 0.08);
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+            --input-bg: #fff;
+        }
+        body.dark {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #13131a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #e6b422;
+            --accent-dark: #c9991e;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(10, 10, 20, 0.7);
+            --glass-border: 1px solid rgba(230, 180, 34, 0.2);
+            --input-bg: #1e1e2a;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--accent);
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 32px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+            animation: fadeInUp 0.4s ease;
+        }
+        .card-header {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            padding: 2rem;
+            text-align: center;
+            color: #111;
+        }
+        .card-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .card-body {
+            padding: 2rem;
+        }
+        .balance-info {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(230, 180, 34, 0.2);
+        }
+        .balance-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(230, 180, 34, 0.2);
+        }
+        .row {
+            display: flex;
+            gap: 1rem;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #111;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(201, 160, 61, 0.3);
+        }
+        .amount-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .amount-preset {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--accent);
+            padding: 10px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .amount-preset:hover {
+            background: var(--accent);
+            color: #111;
+        }
+        .message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .message.success {
+            display: block;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        .message.error {
+            display: block;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: var(--glass-border);
+            margin-top: auto;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .card-body { padding: 1.5rem; }
+            .row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="index.html" class="logo">LUXARY</a>
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1>Пополнение баланса</h1>
+            <p>Безопасный платёж через защищённый шлюз</p>
+        </div>
+        <div class="card-body">
+            <div class="balance-info">
+                <div class="balance-label">Текущий баланс</div>
+                <div class="balance-amount" id="currentBalance">0 ₽</div>
+            </div>
+
+            <div class="amount-buttons">
+                <div class="amount-preset" data-amount="100000">100 000 ₽</div>
+                <div class="amount-preset" data-amount="500000">500 000 ₽</div>
+                <div class="amount-preset" data-amount="1000000">1 000 000 ₽</div>
+                <div class="amount-preset" data-amount="5000000">5 000 000 ₽</div>
+            </div>
+
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label>Сумма пополнения (₽)</label>
+                    <input type="number" id="amount" placeholder="Введите сумму" required min="1000" step="1000">
+                </div>
+
+                <div class="form-group">
+                    <label>Номер карты</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Срок действия</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CVV/CVC</label>
+                        <input type="password" id="cardCvv" placeholder="***" maxlength="3" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Имя владельца</label>
+                    <input type="text" id="cardName" placeholder="IVAN IVANOV" required>
+                </div>
+
+                <button type="submit" class="btn">Пополнить баланс</button>
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 Luxary — Премиальный маркетплейс</p>
+</footer>
+
+<script>
+    const USERS_KEY = 'luxary_users';
+    const CURRENT_USER_KEY = 'luxary_current_user';
+    const THEME_KEY = 'luxary_theme';
+
+    // ========== Получение текущего пользователя ==========
+    function getCurrentUser() {
+        const userJson = localStorage.getItem(CURRENT_USER_KEY);
+        return userJson ? JSON.parse(userJson) : null;
+    }
+
+    function updateUserBalance(email, newBalance) {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+        const index = users.findIndex(u => u.email === email);
+        if (index !== -1) {
+            users[index].balance = newBalance;
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            // Обновляем текущего пользователя в сессии
+            const currentUser = getCurrentUser();
+            if (currentUser && currentUser.email === email) {
+                currentUser.balance = newBalance;
+                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // ========== Проверка авторизации ==========
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.mode === 'guest') {
+        // Если не авторизован или гость — перенаправляем на страницу входа
+        window.location.href = 'auth.html';
+    }
+
+    // Отображаем баланс
+    const balanceSpan = document.getElementById('currentBalance');
+    const userBalance = currentUser.balance || 0;
+    balanceSpan.innerText = `${userBalance.toLocaleString()} ₽`;
+
+    // ========== Форматирование номера карты ==========
+    const cardNumberInput = document.getElementById('cardNumber');
+    cardNumberInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 16) value = value.slice(0, 16);
+        const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        e.target.value = formatted.trim();
+    });
+
+    // ========== Форматирование срока действия ==========
+    const expiryInput = document.getElementById('cardExpiry');
+    expiryInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        if (value.length >= 2) {
+            value = value.slice(0,2) + '/' + value.slice(2);
+        }
+        e.target.value = value;
+    });
+
+    // ========== Предустановки суммы ==========
+    const amountInput = document.getElementById('amount');
+    document.querySelectorAll('.amount-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+            amountInput.value = btn.dataset.amount;
+        });
+    });
+
+    // ========== Обработка формы ==========
+    const form = document.getElementById('paymentForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const amount = parseInt(amountInput.value);
+        const cardNumber = cardNumberInput.value.replace(/\s/g, '');
+        const cardExpiry = expiryInput.value;
+        const cardCvv = document.getElementById('cardCvv').value;
+        const cardName = document.getElementById('cardName').value.trim();
+
+        // Валидация
+        if (isNaN(amount) || amount < 1000) {
+            showMessage('Минимальная сумма пополнения 1000 ₽', 'error');
+            return;
+        }
+
+        if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
+            showMessage('Введите корректный номер карты (16 цифр)', 'error');
+            return;
+        }
+
+        if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+            showMessage('Введите срок действия в формате ММ/ГГ', 'error');
+            return;
+        }
+
+        const [month, year] = cardExpiry.split('/');
+        const currentYear = new Date().getFullYear() % 100;
+        const currentMonth = new Date().getMonth() + 1;
+        const expYear = parseInt(year);
+        const expMonth = parseInt(month);
+
+        if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+            showMessage('Срок действия карты истёк', 'error');
+            return;
+        }
+
+        if (!/^\d{3}$/.test(cardCvv)) {
+            showMessage('CVV должен состоять из 3 цифр', 'error');
+            return;
+        }
+
+        if (cardName.length < 2) {
+            showMessage('Введите имя владельца карты', 'error');
+            return;
+        }
+
+        // Имитация успешной оплаты
+        const newBalance = userBalance + amount;
+        if (updateUserBalance(currentUser.email, newBalance)) {
+            showMessage(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽! Перенаправление...`, 'success');
+            setTimeout(() => {
+                window.location.href = 'shop.html';
+            }, 2000);
+        } else {
+            showMessage('Ошибка пополнения. Попробуйте позже.', 'error');
+        }
+    });
+
+    function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${type}`;
+        setTimeout(() => {
+            messageDiv.textContent = '';
+            messageDiv.className = 'message';
+        }, 4000);
+    }
+
+    // ========== Тема ==========
+    function applyTheme(theme) {
+        if (theme === 'dark') document.body.classList.add('dark');
+        else document.body.classList.remove('dark');
+        localStorage.setItem(THEME_KEY, theme);
+    }
+
+    function toggleTheme() {
+        const isDark = document.body.classList.contains('dark');
+        applyTheme(isDark ? 'light' : 'dark');
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', toggleTheme);
+
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+    applyTheme(savedTheme);
+</script>
+</body>
+</html>
