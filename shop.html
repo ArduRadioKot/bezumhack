@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>LUXARY — Элитный маркетплейс</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        :root {
+            --bg-primary: #faf9f7;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e1e2a;
+            --text-secondary: #5a5a6e;
+            --accent: #c9a03d;
+            --accent-dark: #a87c2c;
+            --border: rgba(0, 0, 0, 0.08);
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+            --input-bg: #fff;
+        }
+        body.dark {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #13131a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #e6b422;
+            --accent-dark: #c9991e;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(10, 10, 20, 0.7);
+            --glass-border: 1px solid rgba(230, 180, 34, 0.2);
+            --input-bg: #1e1e2a;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--accent);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #111;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(201, 160, 61, 0.3);
+        }
+        .section {
+            display: none;
+            padding: 2rem;
+        }
+        .section.active {
+            display: block;
+        }
+        .filters-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .search-box {
+            flex: 2;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .sort-select select {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: var(--text-primary);
+        }
+        .category-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .chip.active {
+            background: var(--accent);
+            color: #111;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .product-card {
+            background: var(--bg-secondary);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+        }
+        .card-img {
+            height: 220px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .fav-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .fav-btn.active {
+            color: gold;
+        }
+        .card-content {
+            padding: 1.5rem;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 0.5rem 0;
+        }
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .card-actions button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .cart-item, .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .cart-total {
+            text-align: right;
+            font-size: 1.4rem;
+            margin-top: 1rem;
+        }
+        footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: var(--glass-border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .section { padding: 1rem; }
+            .filters-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo" id="backToAuth">LUXARY</div>
+    <div class="nav-links">
+        <a id="navShop">Главная</a>
+        <a id="navFav">Избранное</a>
+        <a id="navCart">Корзина</a>
+        <a id="navOrders">История</a>
+    </div>
+    <div class="user-area">
+        <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+        <div id="userInfo">
+            <i class="fas fa-user-circle" style="font-size: 1.8rem;"></i>
+            <span id="userName"></span>
+            <span id="userBalance" style="color: var(--accent); font-weight: 600; margin-left: 0.5rem;"></span>
+            <button id="profileBtn" class="btn-outline" style="background: none; border: 1px solid var(--accent); padding: 4px 12px;">Профиль</button>
+            <button id="logoutBtn" class="btn-outline" style="background: none; border: 1px solid var(--accent); padding: 4px 12px;">Выйти</button>
+        </div>
+    </div>
+</header>
+
+<div id="mainSection" class="section active">
+    <div class="filters-bar">
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div>
+        <div class="sort-select"><select id="sortSelect"><option value="default">По умолчанию</option><option value="price_asc">Цена ↑</option><option value="price_desc">Цена ↓</option></select></div>
+        <div class="category-chips" id="categoryFilters"></div>
+    </div>
+    <div id="productsContainer" class="products-grid"></div>
+</div>
+<div id="favoritesSection" class="section"><h2>Избранное</h2><div id="favoritesContainer" class="products-grid"></div></div>
+<div id="cartSection" class="section"><h2>Корзина</h2><div id="cartItemsContainer"></div><div class="cart-total" id="cartTotal"></div><button id="checkoutBtn" class="btn">Оформить заказ</button></div>
+<div id="ordersSection" class="section"><h2>История заказов</h2><div id="ordersContainer"></div></div>
+
+<footer><p>© 2025 Luxary — Премиальный маркетплейс</p></footer>
+
+<script>
+    const API_BASE = 'http://localhost:5000/api';
+    let products = [];
+    let categories = [];
+    let favorites = JSON.parse(localStorage.getItem('luxary_fav')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('luxary_current_user')) || null;
+    let activeCategory = "Все";
+    let searchQuery = "";
+    let sortType = "default";
+
+    async function fetchProducts() {
+        try {
+            const res = await fetch(`${API_BASE}/products`);
+            const data = await res.json();
+            products = data;
+        } catch(e) {
+            products = [
+                { id: "yacht-001", title: "Azimut 77 Yacht", type: "Yacht", price: 3500000, image: "https://picsum.photos/id/104/400/300", description: "Роскошная 77-футовая моторная яхта" },
+                { id: "jet-001", title: "Gulfstream G700", type: "Plane", price: 75000000, image: "https://picsum.photos/id/179/400/300", description: "Бизнес-джет дальнего радиуса" },
+                { id: "island-001", title: "Остров Мальдивы", type: "Island", price: 12500000, image: "https://picsum.photos/id/16/400/300", description: "Частный остров 2.5 га" },
+                { id: "mansion-001", title: "Пентхаус в Москва-Сити", type: "Mansion", price: 3200000, image: "https://picsum.photos/id/106/400/300", description: "Вид на Москву, 350м²" },
+                { id: "space-001", title: "SpaceX Starship Tour", type: "Space", price: 55000000, image: "https://picsum.photos/id/29/400/300", description: "Суборбитальный полёт" },
+            ];
+        }
+        categories = [...new Set(products.map(p => p.type))];
+        renderProducts();
+        renderCategoryChips();
+    }
+
+    function renderProducts() {
+        let filtered = products.filter(p => {
+            if (activeCategory !== "Все" && p.type !== activeCategory) return false;
+            if (searchQuery && !p.title.toLowerCase().includes(searchQuery.toLowerCase()) && !p.description.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            return true;
+        });
+        if (sortType === "price_asc") filtered.sort((a,b)=>a.price - b.price);
+        if (sortType === "price_desc") filtered.sort((a,b)=>b.price - a.price);
+        const container = document.getElementById('productsContainer');
+        if (filtered.length === 0) { container.innerHTML = "<div style='text-align:center;'>Товары не найдены</div>"; return; }
+        container.innerHTML = filtered.map(p => `<div class="product-card"><div class="card-img" style="background-image:url('${p.image}');"><div class="fav-btn ${favorites.includes(p.id) ? 'active' : ''}" data-id="${p.id}"><i class="fas fa-star"></i></div></div><div class="card-content"><div class="card-title">${p.title}</div><div class="price">${p.price.toLocaleString()} ₽</div><p>${p.description.substring(0,80)}</p><div class="card-actions"><button class="add-to-cart" data-id="${p.id}"><i class="fas fa-shopping-cart"></i> В корзину</button></div></div></div>`).join('');
+        attachEvents();
+    }
+
+    function renderFavorites() {
+        let favProducts = products.filter(p => favorites.includes(p.id));
+        const container = document.getElementById('favoritesContainer');
+        if (favProducts.length === 0) { container.innerHTML = "<div style='text-align:center;'>Нет избранных</div>"; return; }
+        container.innerHTML = favProducts.map(p => `<div class="product-card"><div class="card-img" style="background-image:url('${p.image}');"><div class="fav-btn active" data-id="${p.id}"><i class="fas fa-star"></i></div></div><div class="card-content"><div class="card-title">${p.title}</div><div class="price">${p.price.toLocaleString()} ₽</div><button class="add-to-cart" data-id="${p.id}">В корзину</button></div></div>`).join('');
+        attachEvents();
+    }
+
+    async function renderCart() {
+        try {
+            const res = await fetch(`${API_BASE}/cart`);
+            const cart = await res.json();
+            const container = document.getElementById('cartItemsContainer');
+            if (!cart.items || cart.items.length === 0) { container.innerHTML = "<div style='text-align:center;'>Корзина пуста</div>"; document.getElementById('cartTotal').innerHTML = ''; return; }
+            container.innerHTML = cart.items.map(item => `<div class="cart-item"><div><strong>${item.product.title}</strong><br>${item.product.price.toLocaleString()} ₽</div><div><input type="number" value="${item.quantity}" min="1" data-id="${item.id}" style="width:70px;"><button class="remove-cart-item" data-id="${item.id}"><i class="fas fa-trash"></i></button></div><div>${(item.product.price * item.quantity).toLocaleString()} ₽</div></div>`).join('');
+            document.getElementById('cartTotal').innerHTML = `Итого: ${cart.total.toLocaleString()} ₽`;
+            document.querySelectorAll('.cart-item input').forEach(inp => inp.addEventListener('change', (e) => updateCartItem(inp.dataset.id, parseInt(inp.value))));
+            document.querySelectorAll('.remove-cart-item').forEach(btn => btn.addEventListener('click', (e) => removeCartItem(btn.dataset.id)));
+        } catch(e) {}
+    }
+
+    async function fetchOrders() {
+        try {
+            const res = await fetch(`${API_BASE}/orders`);
+            const orders = await res.json();
+            const container = document.getElementById('ordersContainer');
+            if (orders.length === 0) { container.innerHTML = "<div style='text-align:center;'>Нет заказов</div>"; return; }
+            container.innerHTML = orders.map(order => `<div style="margin-bottom:2rem;"><h3>Заказ #${order.id} от ${new Date(order.created_at).toLocaleDateString()}</h3><p>Сумма: ${order.total.toLocaleString()} ₽</p>${order.items.map(i => `<div>${i.product.title} x ${i.quantity} = ${(i.price * i.quantity).toLocaleString()} ₽</div>`).join('')}</div>`).join('');
+        } catch(e) {}
+    }
+
+    async function addToCart(productId) {
+        if (!currentUser) { alert('Войдите в аккаунт'); window.location.href = 'tets.html'; return; }
+        await fetch(`${API_BASE}/cart`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId, quantity: 1 }) });
+        alert('Товар добавлен в корзину');
+    }
+
+    async function updateCartItem(itemId, quantity) { await fetch(`${API_BASE}/cart/${itemId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantity }) }); renderCart(); }
+    async function removeCartItem(itemId) { await fetch(`${API_BASE}/cart/${itemId}`, { method: 'DELETE' }); renderCart(); }
+    async function createOrder() { if (!currentUser) return; const res = await fetch(`${API_BASE}/orders`, { method: 'POST' }); if (res.status === 200) { alert('Заказ оформлен'); renderCart(); fetchOrders(); } else { alert('Корзина пуста'); } }
+
+    function toggleFav(id) {
+        if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+        else favorites.push(id);
+        localStorage.setItem('luxary_fav', JSON.stringify(favorites));
+        renderProducts();
+        if (document.getElementById('favoritesSection').classList.contains('active')) renderFavorites();
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.fav-btn').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); toggleFav(btn.dataset.id); }));
+        document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); addToCart(btn.dataset.id); }));
+    }
+
+    function renderCategoryChips() {
+        const container = document.getElementById('categoryFilters');
+        let chips = `<div class="chip ${activeCategory === "Все" ? "active" : ""}" data-cat="Все">Все</div>`;
+        categories.forEach(cat => chips += `<div class="chip ${activeCategory === cat ? "active" : ""}" data-cat="${cat}">${cat}</div>`);
+        container.innerHTML = chips;
+        document.querySelectorAll('.chip').forEach(chip => chip.addEventListener('click', () => { activeCategory = chip.dataset.cat; renderProducts(); renderCategoryChips(); }));
+    }
+
+    function updateFilters() { searchQuery = document.getElementById('searchInput').value; sortType = document.getElementById('sortSelect').value; renderProducts(); }
+    function showSection(section) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(section + 'Section').classList.add('active'); if (section === 'favorites') renderFavorites(); if (section === 'cart') renderCart(); if (section === 'orders') fetchOrders(); }
+
+    function logout() { localStorage.removeItem('luxary_current_user'); window.location.href = 'tets.html'; }
+    function updateUserUI() { if (currentUser) { document.getElementById('userName').innerText = currentUser.name; document.getElementById('userBalance').innerText = `${(currentUser.balance || 0).toLocaleString()} ₽`; } else { window.location.href = 'auth.html'; } }
+
+    document.getElementById('backToAuth').addEventListener('click', () => window.location.href = 'tets.html');
+    document.getElementById('navShop').addEventListener('click', () => showSection('main'));
+    document.getElementById('navFav').addEventListener('click', () => showSection('favorites'));
+    document.getElementById('navCart').addEventListener('click', () => showSection('cart'));
+    document.getElementById('navOrders').addEventListener('click', () => showSection('orders'));
+    document.getElementById('profileBtn').addEventListener('click', () => window.location.href = 'tets.html');
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('checkoutBtn').addEventListener('click', createOrder);
+    document.getElementById('searchInput').addEventListener('input', updateFilters);
+    document.getElementById('sortSelect').addEventListener('change', updateFilters);
+
+    function applyTheme(theme) { if (theme === 'dark') document.body.classList.add('dark'); else document.body.classList.remove('dark'); localStorage.setItem('luxary_theme', theme); }
+    document.getElementById('themeToggle').addEventListener('click', () => { const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark'; applyTheme(newTheme); });
+    const savedTheme = localStorage.getItem('luxary_theme') || 'light'; applyTheme(savedTheme);
+
+    if (!currentUser) window.location.href = 'tets.html';
+    else { updateUserUI(); fetchProducts(); fetchOrders(); }
+</script>
+</body>
+</html>

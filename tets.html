@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>LUXARY — Вход, регистрация и пополнение баланса</title>
-    <!-- Font Awesome 6 -->
+    <title>LUXARY — Авторизация</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -27,8 +25,6 @@
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: 1px solid rgba(255, 255, 255, 0.3);
             --input-bg: #fff;
-            --error: #e74c3c;
-            --success: #2ecc71;
         }
         body.dark {
             --bg-primary: #0a0a0f;
@@ -52,6 +48,12 @@
             display: flex;
             flex-direction: column;
         }
+        /* Glass header */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+        }
         header {
             position: sticky;
             top: 0;
@@ -70,7 +72,6 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--accent);
-            cursor: pointer;
             text-decoration: none;
         }
         .theme-toggle {
@@ -109,7 +110,6 @@
             font-weight: 600;
             cursor: pointer;
             color: var(--text-secondary);
-            transition: all 0.2s;
         }
         .tab-btn.active {
             color: var(--accent);
@@ -136,11 +136,10 @@
             padding: 12px 16px;
             border-radius: 40px;
             border: 1px solid var(--border);
-            background: var(--input-bg);    
+            background: var(--input-bg);
             color: var(--text-primary);
             font-size: 1rem;
             outline: none;
-            transition: border 0.2s;
         }
         .form-group input:focus {
             border-color: var(--accent);
@@ -159,7 +158,6 @@
             cursor: pointer;
             width: 100%;
             font-size: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
         .btn:hover {
             transform: translateY(-2px);
@@ -174,11 +172,11 @@
         }
         .message.error {
             background: rgba(231, 76, 60, 0.1);
-            color: var(--error);
+            color: #e74c3c;
         }
         .message.success {
             background: rgba(46, 204, 113, 0.1);
-            color: var(--success);
+            color: #2ecc71;
         }
         .profile-info {
             text-align: center;
@@ -210,30 +208,6 @@
             color: var(--accent);
             margin: 1rem 0;
         }
-        .edit-field {
-            margin-top: 1rem;
-            text-align: left;
-        }
-        .edit-field input {
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
-        .inline-btn {
-            background: none;
-            border: none;
-            color: var(--accent);
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
-        footer {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            padding: 1.5rem;
-            text-align: center;
-            border-top: var(--glass-border);
-            margin-top: auto;
-        }
-        /* Модальное окно для пополнения */
         .modal {
             display: none;
             position: fixed;
@@ -269,11 +243,18 @@
             border-radius: 40px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
         }
         .amount-btn:hover {
             background: var(--accent);
             color: #111;
+        }
+        footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: var(--glass-border);
+            margin-top: auto;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -287,12 +268,11 @@
 </head>
 <body>
 <header>
-    <a href="land.html" class="logo">LUXARY</a>
+    <a href="shop.html" class="logo">LUXARY</a>
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
 </header>
 
 <div class="container">
-    <!-- Панель входа/регистрации -->
     <div class="auth-card" id="authCard">
         <div class="tabs">
             <button class="tab-btn active" data-tab="login">Вход</button>
@@ -336,16 +316,14 @@
         </div>
     </div>
 
-    <!-- Панель профиля (после входа) с балансом и кнопкой пополнения -->
     <div id="profileCard" class="auth-card" style="display: none;">
         <div class="profile-info">
-            <div class="avatar" id="profileAvatar">
-                <i class="fas fa-user"></i>
-            </div>
+            <div class="avatar"><i class="fas fa-user"></i></div>
             <div class="profile-name" id="profileName"></div>
             <div class="profile-email" id="profileEmail"></div>
             <div class="profile-balance" id="profileBalance">Баланс: 0 ₽</div>
             <button id="topupBalanceBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); margin-bottom: 1rem;">Пополнить баланс</button>
+            <button id="goToShopBtn" class="btn" style="margin-bottom: 1rem;">Перейти в магазин</button>
             <button id="editProfileBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">Редактировать профиль</button>
             <button id="logoutBtn" class="btn" style="margin-top: 1rem;">Выйти</button>
         </div>
@@ -363,8 +341,7 @@
                 <input type="password" id="editPassword">
             </div>
             <div class="form-group">
-                <label>Уведомления о новинках</label>
-                <input type="checkbox" id="editNotifications"> <span>Получать уведомления</span>
+                <label><input type="checkbox" id="editNotifications"> Получать уведомления</label>
             </div>
             <button id="saveProfileChangesBtn" class="btn">Сохранить</button>
             <button id="cancelEditBtn" class="btn-outline" style="background: none; border: 1px solid var(--border); margin-top: 0.5rem;">Отмена</button>
@@ -372,7 +349,6 @@
     </div>
 </div>
 
-<!-- Модальное окно пополнения баланса -->
 <div id="topupModal" class="modal">
     <div class="modal-content">
         <h3>Пополнение баланса</h3>
@@ -391,12 +367,10 @@
 </footer>
 
 <script>
-    // --- Хранилище пользователей (localStorage) ---
     const USERS_KEY = 'luxary_users';
     const CURRENT_USER_KEY = 'luxary_current_user';
     const THEME_KEY = 'luxary_theme';
 
-    // Инициализация пользователей (добавляем баланс 500 000)
     function initUsers() {
         if (!localStorage.getItem(USERS_KEY)) {
             const demoUser = {
@@ -409,7 +383,6 @@
             };
             localStorage.setItem(USERS_KEY, JSON.stringify([demoUser]));
         } else {
-            // Обновляем существующих пользователей, добавляя баланс, если его нет
             const users = getUsers();
             let updated = false;
             const newUsers = users.map(u => {
@@ -465,7 +438,6 @@
         }
     }
 
-    // --- UI элементы ---
     const authCard = document.getElementById('authCard');
     const profileCard = document.getElementById('profileCard');
     const loginPane = document.getElementById('loginPane');
@@ -487,8 +459,8 @@
     const topupModal = document.getElementById('topupModal');
     const closeTopupModal = document.getElementById('closeTopupModal');
     const amountBtns = document.querySelectorAll('.amount-btn');
+    const goToShopBtn = document.getElementById('goToShopBtn');
 
-    // --- Переключение вкладок ---
     function switchTab(tabId) {
         if (tabId === 'login') {
             loginPane.classList.add('active');
@@ -505,9 +477,7 @@
     }
 
     tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            switchTab(btn.dataset.tab);
-        });
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
     function clearMessages() {
@@ -528,7 +498,6 @@
         }, 3000);
     }
 
-    // --- Функция входа ---
     function handleLogin(email, password) {
         if (!email || !password) {
             showMessage(loginMessage, 'Заполните все поля', 'error');
@@ -545,7 +514,6 @@
         return true;
     }
 
-    // --- Регистрация (с балансом 500 000) ---
     function handleRegister(name, email, password, confirm) {
         if (!name || !email || !password || !confirm) {
             showMessage(registerMessage, 'Заполните все поля', 'error');
@@ -584,7 +552,6 @@
         return false;
     }
 
-    // --- Отображение панели профиля ---
     function showProfilePanel(user) {
         authCard.style.display = 'none';
         profileCard.style.display = 'block';
@@ -616,7 +583,6 @@
         switchTab('login');
     }
 
-    // --- Редактирование профиля ---
     function toggleEditForm() {
         editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
     }
@@ -661,7 +627,6 @@
         }
     }
 
-    // --- Пополнение баланса ---
     function topupBalance(amount) {
         const currentUser = getCurrentUser();
         if (!currentUser) return;
@@ -677,13 +642,9 @@
         topupModal.style.display = 'none';
     }
 
-    // --- Тема ---
     function applyTheme(theme) {
-        if (theme === 'dark') {
-            document.body.classList.add('dark');
-        } else {
-            document.body.classList.remove('dark');
-        }
+        if (theme === 'dark') document.body.classList.add('dark');
+        else document.body.classList.remove('dark');
         localStorage.setItem(THEME_KEY, theme);
     }
 
@@ -692,7 +653,6 @@
         applyTheme(isDark ? 'light' : 'dark');
     }
 
-    // --- Обработчики событий ---
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         handleLogin(document.getElementById('loginEmail').value.trim(), document.getElementById('loginPassword').value);
@@ -722,30 +682,22 @@
         }
     });
 
-    topupBalanceBtn.addEventListener('click', () => {
-        topupModal.style.display = 'flex';
-    });
-
-    closeTopupModal.addEventListener('click', () => {
-        topupModal.style.display = 'none';
-    });
-
+    topupBalanceBtn.addEventListener('click', () => topupModal.style.display = 'flex');
+    closeTopupModal.addEventListener('click', () => topupModal.style.display = 'none');
     amountBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const amount = parseInt(btn.dataset.amount);
-            topupBalance(amount);
-        });
+        btn.addEventListener('click', () => topupBalance(parseInt(btn.dataset.amount)));
     });
-
-    // Закрытие модалки по клику вне
     window.addEventListener('click', (e) => {
         if (e.target === topupModal) topupModal.style.display = 'none';
+    });
+
+    goToShopBtn.addEventListener('click', () => {
+        window.location.href = 'shop.html';
     });
 
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.addEventListener('click', toggleTheme);
 
-    // --- Инициализация ---
     function init() {
         initUsers();
         const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
