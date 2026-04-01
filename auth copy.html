@@ -13,6 +13,7 @@
             box-sizing: border-box;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
+
         :root {
             --bg-primary: #faf9f7;
             --bg-secondary: #ffffff;
@@ -26,6 +27,7 @@
             --glass-border: 1px solid rgba(255, 255, 255, 0.3);
             --input-bg: #fff;
         }
+
         body.dark {
             --bg-primary: #0a0a0f;
             --bg-secondary: #13131a;
@@ -39,6 +41,7 @@
             --glass-border: 1px solid rgba(230, 180, 34, 0.2);
             --input-bg: #1e1e2a;
         }
+
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--bg-primary);
@@ -48,12 +51,7 @@
             display: flex;
             flex-direction: column;
         }
-        /* Glass header */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: var(--glass-border);
-        }
+
         header {
             position: sticky;
             top: 0;
@@ -67,6 +65,7 @@
             align-items: center;
             flex-wrap: wrap;
         }
+
         .logo {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
@@ -74,6 +73,7 @@
             color: var(--accent);
             text-decoration: none;
         }
+
         .theme-toggle {
             background: none;
             border: none;
@@ -81,6 +81,7 @@
             cursor: pointer;
             color: var(--accent);
         }
+
         .container {
             flex: 1;
             display: flex;
@@ -88,6 +89,7 @@
             justify-content: center;
             padding: 2rem;
         }
+
         .auth-card {
             background: var(--bg-secondary);
             border-radius: 32px;
@@ -97,10 +99,12 @@
             overflow: hidden;
             backdrop-filter: blur(4px);
         }
+
         .tabs {
             display: flex;
             border-bottom: 1px solid var(--border);
         }
+
         .tab-btn {
             flex: 1;
             background: none;
@@ -111,26 +115,32 @@
             cursor: pointer;
             color: var(--text-secondary);
         }
+
         .tab-btn.active {
             color: var(--accent);
             border-bottom: 2px solid var(--accent);
         }
+
         .form-pane {
             padding: 2rem;
             display: none;
             animation: fadeIn 0.3s ease;
         }
+
         .form-pane.active {
             display: block;
         }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
         }
+
         .form-group input {
             width: 100%;
             padding: 12px 16px;
@@ -141,9 +151,11 @@
             font-size: 1rem;
             outline: none;
         }
+
         .form-group input:focus {
             border-color: var(--accent);
         }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -159,28 +171,84 @@
             width: 100%;
             font-size: 1rem;
         }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(201, 160, 61, 0.3);
         }
+
+        .btn-subtle {
+            background: var(--bg-secondary);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-subtle:hover {
+            background: rgba(201, 160, 61, 0.08);
+            color: var(--accent);
+            box-shadow: none;
+        }
+
+        body.dark .btn-subtle {
+            background: var(--bg-secondary);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-ghost {
+            margin-top: 0.75rem;
+            background: transparent;
+            color: var(--accent);
+            border: none;
+            box-shadow: none;
+        }
+
+        .btn-ghost:hover {
+            background: transparent;
+            color: var(--accent-dark);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .message {
             margin-top: 1rem;
             padding: 0.75rem;
-            border-radius: 40px;
+            border-radius: 18px;
             text-align: center;
             font-size: 0.9rem;
+            display: none;
         }
+
         .message.error {
+            display: block;
             background: rgba(231, 76, 60, 0.1);
             color: #e74c3c;
         }
+
         .message.success {
+            display: block;
             background: rgba(46, 204, 113, 0.1);
             color: #2ecc71;
         }
+
+        .message.info {
+            display: block;
+            background: rgba(201, 160, 61, 0.12);
+            color: var(--accent-dark);
+        }
+
         .profile-info {
             text-align: center;
+            padding: 2rem;
         }
+
         .avatar {
             width: 100px;
             height: 100px;
@@ -193,34 +261,43 @@
             font-size: 3rem;
             color: white;
         }
+
         .profile-name {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
+
         .profile-email {
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
         }
+
         .profile-balance {
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--accent);
             margin: 1rem 0;
         }
+
+        .action-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin-top: 1rem;
+        }
+
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: rgba(0,0,0,0.7);
             backdrop-filter: blur(8px);
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
+
         .modal-content {
             background: var(--bg-secondary);
             max-width: 400px;
@@ -229,6 +306,7 @@
             padding: 2rem;
             text-align: center;
         }
+
         .amount-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -236,6 +314,7 @@
             justify-content: center;
             margin: 1.5rem 0;
         }
+
         .amount-btn {
             background: var(--bg-primary);
             border: 1px solid var(--accent);
@@ -244,10 +323,12 @@
             cursor: pointer;
             font-weight: 600;
         }
+
         .amount-btn:hover {
             background: var(--accent);
             color: #111;
         }
+
         footer {
             background: var(--glass-bg);
             backdrop-filter: blur(8px);
@@ -256,19 +337,22 @@
             border-top: var(--glass-border);
             margin-top: auto;
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         @media (max-width: 600px) {
             .container { padding: 1rem; }
             .form-pane { padding: 1.5rem; }
+            .profile-info { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
 <header>
-    <a href="shop.html" class="logo">LUXARY</a>
+    <a href="index.html" class="logo">LUXARY</a>
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
 </header>
 
@@ -278,6 +362,7 @@
             <button class="tab-btn active" data-tab="login">Вход</button>
             <button class="tab-btn" data-tab="register">Регистрация</button>
         </div>
+
         <div id="loginPane" class="form-pane active">
             <form id="loginForm">
                 <div class="form-group">
@@ -288,10 +373,12 @@
                     <label>Пароль</label>
                     <input type="password" id="loginPassword" required placeholder="••••••">
                 </div>
-                <button type="submit" class="btn">Войти</button>
+                <button type="submit" class="btn btn-subtle">Войти</button>
+                <button type="button" class="btn btn-ghost" id="guestLoginBtn">Войти как гость</button>
                 <div id="loginMessage" class="message"></div>
             </form>
         </div>
+
         <div id="registerPane" class="form-pane">
             <form id="registerForm">
                 <div class="form-group">
@@ -321,13 +408,21 @@
             <div class="avatar"><i class="fas fa-user"></i></div>
             <div class="profile-name" id="profileName"></div>
             <div class="profile-email" id="profileEmail"></div>
-            <div class="profile-balance" id="profileBalance">Баланс: 0 ₽</div>
-            <button id="topupBalanceBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); margin-bottom: 1rem;">Пополнить баланс</button>
-            <button id="goToShopBtn" class="btn" style="margin-bottom: 1rem;">Перейти в магазин</button>
-            <button id="editProfileBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">Редактировать профиль</button>
-            <button id="logoutBtn" class="btn" style="margin-top: 1rem;">Выйти</button>
+            <div class="profile-balance" id="profileBalance"></div>
+
+            <div class="action-stack">
+                <button id="topupBalanceBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
+                    Пополнить баланс
+                </button>
+                <button id="goToShopBtn" class="btn">Перейти в магазин</button>
+                <button id="editProfileBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
+                    Редактировать профиль
+                </button>
+                <button id="logoutBtn" class="btn">Выйти</button>
+            </div>
         </div>
-        <div id="editForm" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+
+        <div id="editForm" style="display: none; margin-top: 1rem; padding: 1rem 2rem 2rem; border-top: 1px solid var(--border);">
             <div class="form-group">
                 <label>Имя</label>
                 <input type="text" id="editName">
@@ -344,7 +439,9 @@
                 <label><input type="checkbox" id="editNotifications"> Получать уведомления</label>
             </div>
             <button id="saveProfileChangesBtn" class="btn">Сохранить</button>
-            <button id="cancelEditBtn" class="btn-outline" style="background: none; border: 1px solid var(--border); margin-top: 0.5rem;">Отмена</button>
+            <button id="cancelEditBtn" type="button" class="btn-subtle" style="margin-top: 0.75rem; width: 100%;">
+                Отмена
+            </button>
         </div>
     </div>
 </div>
@@ -358,7 +455,9 @@
             <button class="amount-btn" data-amount="1000000">1 000 000 ₽</button>
             <button class="amount-btn" data-amount="5000000">5 000 000 ₽</button>
         </div>
-        <button id="closeTopupModal" class="btn" style="background: none; border: 1px solid var(--border);">Отмена</button>
+        <button id="closeTopupModal" class="btn" style="background: none; border: 1px solid var(--border); color: var(--text-primary);">
+            Отмена
+        </button>
     </div>
 </div>
 
@@ -367,13 +466,22 @@
 </footer>
 
 <script>
+    const API_BASE = 'http://localhost:5000/api';
+
     const USERS_KEY = 'luxary_users';
     const CURRENT_USER_KEY = 'luxary_current_user';
     const THEME_KEY = 'luxary_theme';
 
+    const USER_MODE = {
+        AUTH: 'auth',
+        GUEST: 'guest'
+    };
+
     function initUsers() {
         if (!localStorage.getItem(USERS_KEY)) {
             const demoUser = {
+                id: 'local-admin',
+                mode: USER_MODE.AUTH,
                 name: 'Алексей Смирнов',
                 email: 'admin@example.com',
                 password: '123456',
@@ -386,11 +494,16 @@
             const users = getUsers();
             let updated = false;
             const newUsers = users.map(u => {
-                if (u.balance === undefined) {
+                const next = { ...u };
+                if (next.balance === undefined) {
+                    next.balance = 500000;
                     updated = true;
-                    return { ...u, balance: 500000 };
                 }
-                return u;
+                if (!next.mode) {
+                    next.mode = USER_MODE.AUTH;
+                    updated = true;
+                }
+                return next;
             });
             if (updated) saveUsers(newUsers);
         }
@@ -426,16 +539,70 @@
     }
 
     function getCurrentUser() {
-        const userJson = localStorage.getItem(CURRENT_USER_KEY);
-        return userJson ? JSON.parse(userJson) : null;
+        const raw = localStorage.getItem(CURRENT_USER_KEY);
+        return raw ? JSON.parse(raw) : null;
     }
 
     function setCurrentUser(user) {
-        if (user) {
-            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-        } else {
-            localStorage.removeItem(CURRENT_USER_KEY);
+        if (user) localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+        else localStorage.removeItem(CURRENT_USER_KEY);
+    }
+
+    function isGuestUser(user = getCurrentUser()) {
+        return !!user && user.mode === USER_MODE.GUEST;
+    }
+
+    function createGuestSession() {
+        return {
+            id: 'guest-session',
+            mode: USER_MODE.GUEST,
+            name: 'Гость',
+            createdAt: new Date().toISOString()
+        };
+    }
+
+    async function apiGetProducts() {
+        const response = await fetch(`${API_BASE}/products`);
+        if (!response.ok) throw new Error('Не удалось загрузить товары');
+        return response.json();
+    }
+
+    async function apiGetProductById(productId) {
+        const response = await fetch(`${API_BASE}/products/${productId}`);
+        if (!response.ok) throw new Error('Не удалось загрузить товар');
+        return response.json();
+    }
+
+    async function apiGetCart() {
+        if (isGuestUser()) {
+            throw new Error('Гостевой режим не поддерживает корзину');
         }
+        const response = await fetch(`${API_BASE}/cart`);
+        if (!response.ok) throw new Error('Не удалось загрузить корзину');
+        return response.json();
+    }
+
+    async function apiGetOrders() {
+        if (isGuestUser()) {
+            throw new Error('Гостевой режим не поддерживает заказы');
+        }
+        const response = await fetch(`${API_BASE}/orders`);
+        if (!response.ok) throw new Error('Не удалось загрузить историю заказов');
+        return response.json();
+    }
+
+    async function apiCreateOrder() {
+        if (isGuestUser()) {
+            throw new Error('Гостевой режим не поддерживает оформление заказа');
+        }
+        const response = await fetch(`${API_BASE}/orders`, {
+            method: 'POST'
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Не удалось оформить заказ');
+        }
+        return response.json();
     }
 
     const authCard = document.getElementById('authCard');
@@ -460,6 +627,8 @@
     const closeTopupModal = document.getElementById('closeTopupModal');
     const amountBtns = document.querySelectorAll('.amount-btn');
     const goToShopBtn = document.getElementById('goToShopBtn');
+    const guestLoginBtn = document.getElementById('guestLoginBtn');
+    const themeToggle = document.getElementById('themeToggle');
 
     function switchTab(tabId) {
         if (tabId === 'login') {
@@ -481,21 +650,70 @@
     });
 
     function clearMessages() {
-        loginMessage.innerHTML = '';
-        registerMessage.innerHTML = '';
-        loginMessage.className = 'message';
-        registerMessage.className = 'message';
+        [loginMessage, registerMessage].forEach(el => {
+            el.textContent = '';
+            el.className = 'message';
+        });
     }
 
     function showMessage(element, text, type) {
-        element.innerHTML = text;
+        element.textContent = text;
         element.className = `message ${type}`;
         setTimeout(() => {
-            if (element.innerHTML === text) {
-                element.innerHTML = '';
+            if (element.textContent === text) {
+                element.textContent = '';
                 element.className = 'message';
             }
-        }, 3000);
+        }, 3500);
+    }
+
+    function setGuestUIState(isGuest) {
+    profileEmailSpan.style.display = isGuest ? 'none' : 'block';
+    profileBalanceSpan.style.display = isGuest ? 'none' : 'block';
+
+    topupBalanceBtn.style.display = isGuest ? 'none' : 'inline-flex';
+    editProfileBtn.style.display = isGuest ? 'none' : 'inline-flex';
+
+    if (isGuest) {
+        editForm.style.display = 'none';
+    }
+    }
+
+    function showProfilePanel(user) {
+        const guest = isGuestUser(user);
+
+        authCard.style.display = 'none';
+        profileCard.style.display = 'block';
+
+        profileNameSpan.textContent = guest ? 'Гостевой режим' : (user.name || 'Пользователь');
+        profileEmailSpan.textContent = guest ? '' : (user.email || '');
+        profileBalanceSpan.textContent = guest ? '' : `Баланс: ${(user.balance || 0).toLocaleString()} ₽`;
+
+        document.getElementById('editName').value = user.name || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editNotifications').checked = user.notifications || false;
+
+        setGuestUIState(guest);
+        editForm.style.display = 'none';
+    }
+
+    function showAuthPanel() {
+        authCard.style.display = 'block';
+        profileCard.style.display = 'none';
+
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('regName').value = '';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regConfirmPassword').value = '';
+        document.getElementById('editName').value = '';
+        document.getElementById('editEmail').value = '';
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editNotifications').checked = false;
+
+        clearMessages();
     }
 
     function handleLogin(email, password) {
@@ -503,14 +721,20 @@
             showMessage(loginMessage, 'Заполните все поля', 'error');
             return false;
         }
+
         const user = findUserByEmail(email);
         if (!user || user.password !== password) {
             showMessage(loginMessage, 'Неверный email или пароль', 'error');
             return false;
         }
-        setCurrentUser(user);
-        showProfilePanel(user);
-        showMessage(loginMessage, 'Вход выполнен успешно!', 'success');
+
+        const sessionUser = {
+            ...user,
+            mode: USER_MODE.AUTH
+        };
+
+        setCurrentUser(sessionUser);
+        showProfilePanel(sessionUser);
         return true;
     }
 
@@ -519,19 +743,25 @@
             showMessage(registerMessage, 'Заполните все поля', 'error');
             return false;
         }
+
         if (password !== confirm) {
             showMessage(registerMessage, 'Пароли не совпадают', 'error');
             return false;
         }
+
         if (password.length < 6) {
             showMessage(registerMessage, 'Пароль должен быть не менее 6 символов', 'error');
             return false;
         }
+
         if (findUserByEmail(email)) {
             showMessage(registerMessage, 'Пользователь с таким email уже существует', 'error');
             return false;
         }
+
         const newUser = {
+            id: `local-${Date.now()}`,
+            mode: USER_MODE.AUTH,
             name,
             email,
             password,
@@ -539,42 +769,22 @@
             notifications: false,
             createdAt: new Date().toISOString()
         };
-        if (addUser(newUser)) {
-            showMessage(registerMessage, 'Регистрация успешна! Теперь войдите.', 'success');
-            setTimeout(() => {
-                switchTab('login');
-                document.getElementById('loginEmail').value = email;
-                document.getElementById('loginPassword').value = '';
-                clearMessages();
-            }, 1500);
-            return true;
+
+        if (!addUser(newUser)) {
+            showMessage(registerMessage, 'Ошибка регистрации', 'error');
+            return false;
         }
-        return false;
-    }
 
-    function showProfilePanel(user) {
-        authCard.style.display = 'none';
-        profileCard.style.display = 'block';
-        profileNameSpan.innerText = user.name;
-        profileEmailSpan.innerText = user.email;
-        profileBalanceSpan.innerText = `Баланс: ${(user.balance || 0).toLocaleString()} ₽`;
-        document.getElementById('editName').value = user.name;
-        document.getElementById('editEmail').value = user.email;
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editNotifications').checked = user.notifications || false;
-        editForm.style.display = 'none';
-    }
+        showMessage(registerMessage, 'Регистрация успешна. Теперь войдите.', 'success');
 
-    function showAuthPanel() {
-        authCard.style.display = 'block';
-        profileCard.style.display = 'none';
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('regName').value = '';
-        document.getElementById('regEmail').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regConfirmPassword').value = '';
-        clearMessages();
+        setTimeout(() => {
+            switchTab('login');
+            document.getElementById('loginEmail').value = email;
+            document.getElementById('loginPassword').value = '';
+            clearMessages();
+        }, 1200);
+
+        return true;
     }
 
     function logout() {
@@ -584,12 +794,17 @@
     }
 
     function toggleEditForm() {
+        const currentUser = getCurrentUser();
+        if (!currentUser || isGuestUser(currentUser)) return;
         editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
     }
 
     function saveProfileChanges() {
         const currentUser = getCurrentUser();
-        if (!currentUser) return;
+        if (!currentUser || isGuestUser(currentUser)) {
+            alert('Гостевой профиль нельзя редактировать');
+            return;
+        }
 
         const newName = document.getElementById('editName').value.trim();
         const newEmail = document.getElementById('editEmail').value.trim();
@@ -600,6 +815,7 @@
             alert('Имя и email обязательны');
             return;
         }
+
         if (newEmail !== currentUser.email) {
             const existing = findUserByEmail(newEmail);
             if (existing && existing.email !== currentUser.email) {
@@ -609,6 +825,7 @@
         }
 
         const updatedData = { name: newName, email: newEmail, notifications };
+
         if (newPassword) {
             if (newPassword.length < 6) {
                 alert('Новый пароль должен быть не менее 6 символов');
@@ -617,28 +834,41 @@
             updatedData.password = newPassword;
         }
 
-        if (updateUser(currentUser.email, updatedData)) {
-            const updatedUser = findUserByEmail(newEmail);
-            setCurrentUser(updatedUser);
-            showProfilePanel(updatedUser);
-            alert('Профиль успешно обновлён');
-        } else {
+        if (!updateUser(currentUser.email, updatedData)) {
             alert('Ошибка обновления');
+            return;
         }
+
+        const updatedUser = findUserByEmail(newEmail);
+        const sessionUser = { ...updatedUser, mode: USER_MODE.AUTH };
+        setCurrentUser(sessionUser);
+        showProfilePanel(sessionUser);
+        alert('Профиль успешно обновлён');
     }
 
     function topupBalance(amount) {
         const currentUser = getCurrentUser();
         if (!currentUser) return;
-        const newBalance = (currentUser.balance || 0) + amount;
-        if (updateUser(currentUser.email, { balance: newBalance })) {
-            const updatedUser = findUserByEmail(currentUser.email);
-            setCurrentUser(updatedUser);
-            showProfilePanel(updatedUser);
-            alert(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽`);
-        } else {
-            alert('Ошибка пополнения');
+
+        if (isGuestUser(currentUser)) {
+            alert('В гостевом режиме пополнение баланса недоступно');
+            topupModal.style.display = 'none';
+            return;
         }
+
+        const newBalance = (currentUser.balance || 0) + amount;
+        if (!updateUser(currentUser.email, { balance: newBalance })) {
+            alert('Ошибка пополнения');
+            topupModal.style.display = 'none';
+            return;
+        }
+
+        const updatedUser = findUserByEmail(currentUser.email);
+        const sessionUser = { ...updatedUser, mode: USER_MODE.AUTH };
+        setCurrentUser(sessionUser);
+        showProfilePanel(sessionUser);
+
+        alert(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽`);
         topupModal.style.display = 'none';
     }
 
@@ -649,13 +879,21 @@
     }
 
     function toggleTheme() {
-        const isDark = document.body.classList.contains('dark');
-        applyTheme(isDark ? 'light' : 'dark');
+        applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
+    }
+
+    function enterGuestMode() {
+        const guestUser = createGuestSession();
+        setCurrentUser(guestUser);
+        showProfilePanel(guestUser);
     }
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        handleLogin(document.getElementById('loginEmail').value.trim(), document.getElementById('loginPassword').value);
+        handleLogin(
+            document.getElementById('loginEmail').value.trim(),
+            document.getElementById('loginPassword').value
+        );
     });
 
     registerForm.addEventListener('submit', (e) => {
@@ -668,49 +906,71 @@
         );
     });
 
+    guestLoginBtn.addEventListener('click', enterGuestMode);
     logoutBtn.addEventListener('click', logout);
     editProfileBtn.addEventListener('click', toggleEditForm);
     saveProfileChangesBtn.addEventListener('click', saveProfileChanges);
+
     cancelEditBtn.addEventListener('click', () => {
         editForm.style.display = 'none';
         const user = getCurrentUser();
-        if (user) {
-            document.getElementById('editName').value = user.name;
-            document.getElementById('editEmail').value = user.email;
+        if (user && !isGuestUser(user)) {
+            document.getElementById('editName').value = user.name || '';
+            document.getElementById('editEmail').value = user.email || '';
             document.getElementById('editPassword').value = '';
             document.getElementById('editNotifications').checked = user.notifications || false;
         }
     });
 
-    topupBalanceBtn.addEventListener('click', () => topupModal.style.display = 'flex');
-    closeTopupModal.addEventListener('click', () => topupModal.style.display = 'none');
-    amountBtns.forEach(btn => {
-        btn.addEventListener('click', () => topupBalance(parseInt(btn.dataset.amount)));
+    topupBalanceBtn.addEventListener('click', () => {
+        if (isGuestUser()) {
+            alert('В гостевом режиме пополнение баланса недоступно');
+            return;
+        }
+        topupModal.style.display = 'flex';
     });
+
+    closeTopupModal.addEventListener('click', () => {
+        topupModal.style.display = 'none';
+    });
+
+    amountBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            topupBalance(parseInt(btn.dataset.amount, 10));
+        });
+    });
+
     window.addEventListener('click', (e) => {
         if (e.target === topupModal) topupModal.style.display = 'none';
     });
 
     goToShopBtn.addEventListener('click', () => {
-        window.location.href = 'shop.html';
+    window.location.href = 'shop.html';
     });
 
-    const themeToggle = document.getElementById('themeToggle');
     themeToggle.addEventListener('click', toggleTheme);
 
     function init() {
         initUsers();
+
         const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
         applyTheme(savedTheme);
+
         const currentUser = getCurrentUser();
-        if (currentUser) {
-            showProfilePanel(currentUser);
-        } else {
-            showAuthPanel();
-        }
+        if (currentUser) showProfilePanel(currentUser);
+        else showAuthPanel();
     }
 
     init();
+
+    window.LuxaryAPI = {
+        getProducts: apiGetProducts,
+        getProductById: apiGetProductById,
+        getCart: apiGetCart,
+        getOrders: apiGetOrders,
+        createOrder: apiCreateOrder,
+        isGuestUser
+    };
 </script>
 </body>
 </html>
