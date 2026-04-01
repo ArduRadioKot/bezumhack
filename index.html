@@ -81,15 +81,11 @@
             justify-content: center;
             text-align: center;
             overflow: hidden;
-        }
-        .hero-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -2;
+            /* Фоновое изображение: тёмные и тёплые тона */
+            background-image: url('https://images.pexels.com/photos/2619819/pexels-photo-2619819.jpeg?auto=compress&cs=tinysrgb&w=1920');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         .hero-overlay {
             position: absolute;
@@ -97,21 +93,23 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.55);
+            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(230,180,34,0.2) 100%);
             backdrop-filter: brightness(0.7);
-            z-index: -1;
+            z-index: 0;
         }
         .hero-content {
             max-width: 800px;
             padding: 2rem;
             z-index: 1;
             animation: fadeInUp 1s ease;
+            position: relative;
         }
         .hero-content h1 {
             font-family: 'Playfair Display', serif;
             font-size: 4rem;
             margin-bottom: 1rem;
             letter-spacing: 2px;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.5);
         }
         .hero-content p {
             font-size: 1.2rem;
@@ -217,6 +215,9 @@
             section {
                 padding: 4rem 1rem;
             }
+            .hero {
+                background-attachment: scroll;
+            }
         }
     </style>
 </head>
@@ -233,9 +234,6 @@
     </header>
 
     <section class="hero">
-        <video class="hero-video" autoplay muted loop playsinline>
-            <source src="https://cdn.pixabay.com/video/2022/01/25/105997-670498284_large.mp4" type="video/mp4">
-        </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Искусство роскоши</h1>

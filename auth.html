@@ -211,12 +211,6 @@
             box-shadow: none;
         }
 
-        .btn-disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
         .message {
             margin-top: 1rem;
             padding: 0.75rem;
@@ -278,6 +272,16 @@
             font-weight: 600;
             color: var(--accent);
             margin: 1rem 0;
+        }
+
+        .profile-role {
+            font-size: 0.85rem;
+            background: var(--accent);
+            color: #111;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            margin-top: 0.5rem;
         }
 
         .action-stack {
@@ -409,6 +413,7 @@
             <div class="profile-name" id="profileName"></div>
             <div class="profile-email" id="profileEmail"></div>
             <div class="profile-balance" id="profileBalance"></div>
+            <div class="profile-role" id="profileRole" style="display: none;"></div>
 
             <div class="action-stack">
                 <button id="topupBalanceBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
@@ -466,8 +471,6 @@
 </footer>
 
 <script>
-    const API_BASE = 'http://localhost:5000/api';
-
     const USERS_KEY = 'luxary_users';
     const CURRENT_USER_KEY = 'luxary_current_user';
     const THEME_KEY = 'luxary_theme';
@@ -477,6 +480,7 @@
         GUEST: 'guest'
     };
 
+    // ========== Работа с пользователями ==========
     function initUsers() {
         if (!localStorage.getItem(USERS_KEY)) {
             const demoUser = {
@@ -487,6 +491,7 @@
                 password: '123456',
                 balance: 500000,
                 notifications: true,
+                role: 'admin',
                 createdAt: new Date().toISOString()
             };
             localStorage.setItem(USERS_KEY, JSON.stringify([demoUser]));
@@ -501,6 +506,10 @@
                 }
                 if (!next.mode) {
                     next.mode = USER_MODE.AUTH;
+                    updated = true;
+                }
+                if (!next.role) {
+                    next.role = (next.email === 'admin@example.com') ? 'admin' : 'user';
                     updated = true;
                 }
                 return next;
@@ -561,50 +570,7 @@
         };
     }
 
-    async function apiGetProducts() {
-        const response = await fetch(`${API_BASE}/products`);
-        if (!response.ok) throw new Error('Не удалось загрузить товары');
-        return response.json();
-    }
-
-    async function apiGetProductById(productId) {
-        const response = await fetch(`${API_BASE}/products/${productId}`);
-        if (!response.ok) throw new Error('Не удалось загрузить товар');
-        return response.json();
-    }
-
-    async function apiGetCart() {
-        if (isGuestUser()) {
-            throw new Error('Гостевой режим не поддерживает корзину');
-        }
-        const response = await fetch(`${API_BASE}/cart`);
-        if (!response.ok) throw new Error('Не удалось загрузить корзину');
-        return response.json();
-    }
-
-    async function apiGetOrders() {
-        if (isGuestUser()) {
-            throw new Error('Гостевой режим не поддерживает заказы');
-        }
-        const response = await fetch(`${API_BASE}/orders`);
-        if (!response.ok) throw new Error('Не удалось загрузить историю заказов');
-        return response.json();
-    }
-
-    async function apiCreateOrder() {
-        if (isGuestUser()) {
-            throw new Error('Гостевой режим не поддерживает оформление заказа');
-        }
-        const response = await fetch(`${API_BASE}/orders`, {
-            method: 'POST'
-        });
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Не удалось оформить заказ');
-        }
-        return response.json();
-    }
-
+    // ========== UI элементы ==========
     const authCard = document.getElementById('authCard');
     const profileCard = document.getElementById('profileCard');
     const loginPane = document.getElementById('loginPane');
@@ -622,6 +588,7 @@
     const profileNameSpan = document.getElementById('profileName');
     const profileEmailSpan = document.getElementById('profileEmail');
     const profileBalanceSpan = document.getElementById('profileBalance');
+    const profileRoleSpan = document.getElementById('profileRole');
     const topupBalanceBtn = document.getElementById('topupBalanceBtn');
     const topupModal = document.getElementById('topupModal');
     const closeTopupModal = document.getElementById('closeTopupModal');
@@ -630,6 +597,7 @@
     const guestLoginBtn = document.getElementById('guestLoginBtn');
     const themeToggle = document.getElementById('themeToggle');
 
+    // ========== Утилиты ==========
     function switchTab(tabId) {
         if (tabId === 'login') {
             loginPane.classList.add('active');
@@ -644,10 +612,6 @@
         }
         clearMessages();
     }
-
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
 
     function clearMessages() {
         [loginMessage, registerMessage].forEach(el => {
@@ -668,15 +632,15 @@
     }
 
     function setGuestUIState(isGuest) {
-    profileEmailSpan.style.display = isGuest ? 'none' : 'block';
-    profileBalanceSpan.style.display = isGuest ? 'none' : 'block';
+        profileEmailSpan.style.display = isGuest ? 'none' : 'block';
+        profileBalanceSpan.style.display = isGuest ? 'none' : 'block';
+        profileRoleSpan.style.display = 'none';
+        topupBalanceBtn.style.display = isGuest ? 'none' : 'inline-flex';
+        editProfileBtn.style.display = isGuest ? 'none' : 'inline-flex';
 
-    topupBalanceBtn.style.display = isGuest ? 'none' : 'inline-flex';
-    editProfileBtn.style.display = isGuest ? 'none' : 'inline-flex';
-
-    if (isGuest) {
-        editForm.style.display = 'none';
-    }
+        if (isGuest) {
+            editForm.style.display = 'none';
+        }
     }
 
     function showProfilePanel(user) {
@@ -688,6 +652,13 @@
         profileNameSpan.textContent = guest ? 'Гостевой режим' : (user.name || 'Пользователь');
         profileEmailSpan.textContent = guest ? '' : (user.email || '');
         profileBalanceSpan.textContent = guest ? '' : `Баланс: ${(user.balance || 0).toLocaleString()} ₽`;
+        
+        if (!guest && user.role === 'admin') {
+            profileRoleSpan.textContent = 'Администратор';
+            profileRoleSpan.style.display = 'inline-block';
+        } else {
+            profileRoleSpan.style.display = 'none';
+        }
 
         document.getElementById('editName').value = user.name || '';
         document.getElementById('editEmail').value = user.email || '';
@@ -708,14 +679,11 @@
         document.getElementById('regEmail').value = '';
         document.getElementById('regPassword').value = '';
         document.getElementById('regConfirmPassword').value = '';
-        document.getElementById('editName').value = '';
-        document.getElementById('editEmail').value = '';
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editNotifications').checked = false;
 
         clearMessages();
     }
 
+    // ========== Бизнес-логика ==========
     function handleLogin(email, password) {
         if (!email || !password) {
             showMessage(loginMessage, 'Заполните все поля', 'error');
@@ -767,6 +735,7 @@
             password,
             balance: 500000,
             notifications: false,
+            role: 'user',
             createdAt: new Date().toISOString()
         };
 
@@ -872,6 +841,13 @@
         topupModal.style.display = 'none';
     }
 
+    function enterGuestMode() {
+        const guestUser = createGuestSession();
+        setCurrentUser(guestUser);
+        showProfilePanel(guestUser);
+    }
+
+    // ========== Тема ==========
     function applyTheme(theme) {
         if (theme === 'dark') document.body.classList.add('dark');
         else document.body.classList.remove('dark');
@@ -882,12 +858,7 @@
         applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
     }
 
-    function enterGuestMode() {
-        const guestUser = createGuestSession();
-        setCurrentUser(guestUser);
-        showProfilePanel(guestUser);
-    }
-
+    // ========== Обработчики ==========
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         handleLogin(
@@ -945,11 +916,12 @@
     });
 
     goToShopBtn.addEventListener('click', () => {
-    window.location.href = 'shop.html';
+        window.location.href = 'shop.html';
     });
 
     themeToggle.addEventListener('click', toggleTheme);
 
+    // ========== Инициализация ==========
     function init() {
         initUsers();
 
@@ -962,15 +934,6 @@
     }
 
     init();
-
-    window.LuxaryAPI = {
-        getProducts: apiGetProducts,
-        getProductById: apiGetProductById,
-        getCart: apiGetCart,
-        getOrders: apiGetOrders,
-        createOrder: apiCreateOrder,
-        isGuestUser
-    };
 </script>
 </body>
 </html>
