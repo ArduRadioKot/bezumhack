@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* все стили без изменений (как в предыдущем ответе) */
         * {
             margin: 0;
             padding: 0;
@@ -272,19 +271,18 @@
             font-size: 0.8rem;
             color: var(--text-primary);
         }
-        /* Модальные окна */
+
+        /* ========== ПРЕМИАЛЬНЫЕ МОДАЛЬНЫЕ ОКНА ========== */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.25s ease;
         }
         .modal-content {
             background: var(--bg-secondary);
@@ -292,16 +290,28 @@
             width: 90%;
             border-radius: 32px;
             overflow: hidden;
-            animation: fadeInUp 0.3s;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(230, 180, 34, 0.3);
+            animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
         .modal-content.large {
             max-width: 900px;
         }
         .modal-image {
             width: 100%;
-            height: 300px;
+            height: 320px;
             background-size: cover;
             background-position: center;
+            position: relative;
+        }
+        .modal-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, var(--bg-secondary), transparent);
         }
         .modal-details {
             padding: 2rem;
@@ -309,23 +319,45 @@
         .modal-title {
             font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
         }
         .modal-price {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: 700;
             color: var(--accent);
-            margin: 1rem 0;
+            margin: 1rem 0 0.5rem;
+            letter-spacing: 1px;
         }
         .modal-description {
             color: var(--text-secondary);
             line-height: 1.6;
             margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        .modal .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #111;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 40px;
+        }
+        .modal .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(230, 180, 34, 0.4);
         }
         .modal-close {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             border: none;
             color: white;
             font-size: 1.5rem;
@@ -336,11 +368,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
         }
-        /* Админ-панель */
+        .modal-close:hover {
+            background: var(--accent);
+            color: #111;
+            transform: rotate(90deg);
+        }
+        /* Админ-панель внутри модалки */
         .admin-product-list {
             max-height: 400px;
             overflow-y: auto;
+            margin-top: 1rem;
         }
         .admin-product-item {
             display: flex;
@@ -348,16 +388,49 @@
             align-items: center;
             padding: 1rem;
             border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
         }
-        .admin-form input, .admin-form select, .admin-form textarea {
+        .admin-product-item:hover {
+            background: rgba(230, 180, 34, 0.08);
+        }
+        .admin-form input,
+        .admin-form select,
+        .admin-form textarea {
             width: 100%;
-            padding: 8px 12px;
+            padding: 12px 16px;
             margin-bottom: 1rem;
             border-radius: 40px;
             border: 1px solid var(--border);
             background: var(--input-bg);
             color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.2s;
         }
+        .admin-form input:focus,
+        .admin-form select:focus,
+        .admin-form textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(230, 180, 34, 0.2);
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Корзина и заказы */
         .cart-item, .order-item {
             display: flex;
             justify-content: space-between;
@@ -380,14 +453,13 @@
             border-top: var(--glass-border);
             margin-top: 2rem;
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
         @media (max-width: 768px) {
             .section { padding: 1rem; }
             .filters-bar { flex-direction: column; align-items: stretch; }
-            .modal-image { height: 200px; }
+            .modal-image { height: 220px; }
+            .modal-details { padding: 1.5rem; }
+            .modal-title { font-size: 1.4rem; }
+            .modal-price { font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -614,17 +686,58 @@
     }
 
     async function createOrderAPI() {
+        // Проверяем, что пользователь авторизован и не гость
+        if (!currentUser || !currentUser.email) {
+            alert('Войдите в аккаунт для оформления заказа');
+            window.location.href = 'auth.html';
+            return;
+        }
+
+        // Получаем актуальную корзину
+        const cart = await fetchCart();
+        if (!cart.items || cart.items.length === 0) {
+            alert('Корзина пуста');
+            return;
+        }
+
+        const total = cart.total;
+
+        // Получаем актуальные данные пользователя из хранилища (могли измениться)
+        const users = JSON.parse(localStorage.getItem('luxary_users')) || [];
+        const userInStore = users.find(u => u.email === currentUser.email);
+        if (!userInStore) {
+            alert('Ошибка: пользователь не найден');
+            return;
+        }
+
+        const userBalance = userInStore.balance || 0;
+
+        // Проверка баланса
+        if (userBalance < total) {
+            alert(`Недостаточно средств. Ваш баланс: ${userBalance.toLocaleString()} ₽. Необходимо: ${total.toLocaleString()} ₽`);
+            return;
+        }
+
+        // Выполняем списание средств
+        const newBalance = userBalance - total;
+        const updatedUsers = users.map(u =>
+            u.email === currentUser.email ? { ...u, balance: newBalance } : u
+        );
+        localStorage.setItem('luxary_users', JSON.stringify(updatedUsers));
+
+        // Обновляем текущего пользователя
+        const updatedUser = updatedUsers.find(u => u.email === currentUser.email);
+        currentUser = { ...updatedUser };
+        localStorage.setItem('luxary_current_user', JSON.stringify(currentUser));
+
+        // Теперь создаём заказ (локально или через API)
         if (useLocalCart) {
-            if (localCart.items.length === 0) {
-                alert('Корзина пуста');
-                return;
-            }
             const order = {
                 id: Date.now(),
-                total: localCart.total,
+                total: total,
                 status: 'completed',
                 created_at: new Date().toISOString(),
-                items: localCart.items.map(item => ({
+                items: cart.items.map(item => ({
                     product_id: item.product_id,
                     quantity: item.quantity,
                     price: item.product.price,
@@ -638,24 +751,22 @@
             localCart.total = 0;
             localStorage.setItem('luxary_local_cart', JSON.stringify(localCart));
             alert('Заказ оформлен!');
-            await renderCart();
-            await fetchOrders();
-            await updateCartBadge();
-            return;
-        }
-        try {
-            const res = await fetch('http://localhost:5000/api/orders', { method: 'POST' });
-            if (res.status === 200) {
+        } else {
+            try {
+                const res = await fetch('http://localhost:5000/api/orders', { method: 'POST' });
+                if (res.status !== 200) throw new Error();
                 alert('Заказ оформлен');
-                await renderCart();
-                await fetchOrders();
-            } else {
-                alert('Корзина пуста');
+            } catch(e) {
+                alert('Ошибка при оформлении заказа через API');
+                return;
             }
-        } catch(e) {
-            useLocalCart = true;
-            await createOrderAPI();
         }
+
+        // Обновляем интерфейс
+        await renderCart();
+        await fetchOrders();
+        await updateCartBadge();
+        updateUserUI(); // обновляем отображение баланса в шапке
     }
 
     async function updateCartBadge() {
@@ -810,19 +921,26 @@
     function showSection(section) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.getElementById(section + 'Section').classList.add('active'); if (section === 'favorites') renderFavorites(); if (section === 'cart') renderCart(); if (section === 'orders') fetchOrders(); }
 
     function logout() { localStorage.removeItem('luxary_current_user'); window.location.href = 'auth.html'; }
-    function updateUserUI() { 
-        if (currentUser) { 
-            document.getElementById('userName').innerText = currentUser.name; 
-            document.getElementById('userBalance').innerText = `${(currentUser.balance || 0).toLocaleString()} ₽`;
+    function updateUserUI() {
+        if (currentUser) {
+            document.getElementById('userName').innerText = currentUser.name;
+            const balance = currentUser.balance || 0;
+            const balanceSpan = document.getElementById('userBalance');
+            if (balance === 0) {
+                balanceSpan.style.display = 'none';
+            } else {
+                balanceSpan.style.display = 'inline';
+                balanceSpan.innerText = `${balance.toLocaleString()} ₽`;
+            }
             const adminBtn = document.getElementById('adminPanelBtn');
             if (currentUser.role === 'admin') {
                 adminBtn.style.display = 'inline-block';
             } else {
                 adminBtn.style.display = 'none';
             }
-        } else { 
-            window.location.href = 'auth.html'; 
-        } 
+        } else {
+            window.location.href = 'auth.html';
+        }
     }
 
     // ========== Админ-панель ==========
@@ -943,13 +1061,13 @@
 
     // Запуск
     if (!currentUser) window.location.href = 'auth.html';
-    else { 
+    else {
         loadProducts();
-        updateUserUI(); 
-        renderProducts(); 
+        updateUserUI();
+        renderProducts();
         renderCategoryChips();
-        fetchOrders(); 
-        updateCartBadge(); 
+        fetchOrders();
+        updateCartBadge();
     }
 </script>
 </body>
