@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Debug — полный дамп</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --ok: #3fb950;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(180deg, var(--bg) 80%, transparent);
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 0.75rem;
+    }
+    button, label.file {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+    }
+    button:hover, label.file:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .status.ok { color: var(--ok); }
+    .status.err { color: #f85149; }
+    main { padding: 0 1.25rem 2rem; }
+    pre {
+      margin: 0;
+      padding: 1rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.45;
+      overflow: auto;
+      max-height: calc(100vh - 140px);
+      white-space: pre;
+      word-wrap: normal;
+    }
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.5rem 0 0.75rem;
+    }
+    input[type="checkbox"] { accent-color: var(--accent); vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>/debug/data — полный JSON</h1>
+    <p class="hint">
+      Без обрезки: все таблицы, переменные окружения, снимки согласия (включая распарсенные JSON),
+      sqlite_master, заголовки текущего запроса к этому endpoint.
+    </p>
+    <div class="toolbar">
+      <button type="button" id="btnRefresh">Обновить</button>
+      <button type="button" id="btnCopy">Копировать весь JSON</button>
+      <label class="file">
+        <input type="checkbox" id="autoRefresh" />
+        авто каждые 5 с
+      </label>
+      <span class="status" id="status"></span>
+    </div>
+  </header>
+  <main>
+    <pre id="out">Загрузка…</pre>
+  </main>
+  <script>
+    const out = document.getElementById("out");
+    const status = document.getElementById("status");
+    let lastPayload = null;
+    let timer = null;
+
+    function setStatus(text, cls) {
+      status.textContent = text;
+      status.className = "status " + (cls || "");
+    }
+
+    async function loadData() {
+      setStatus("загрузка…");
+      try {
+        const res = await fetch("/debug/data", {
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          out.textContent = text;
+          setStatus("HTTP " + res.status + " (не JSON)", "err");
+          return;
+        }
+        lastPayload = data;
+        out.textContent = JSON.stringify(data, null, 2);
+        setStatus("OK · HTTP " + res.status + " · " + new Date().toLocaleString("ru-RU"), "ok");
+      } catch (e) {
+        out.textContent = String(e);
+        setStatus("ошибка сети", "err");
+      }
+    }
+
+    document.getElementById("btnRefresh").addEventListener("click", loadData);
+    document.getElementById("btnCopy").addEventListener("click", async () => {
+      if (!lastPayload) return;
+      const t = JSON.stringify(lastPayload, null, 2);
+      try {
+        await navigator.clipboard.writeText(t);
+        setStatus("скопировано в буфер", "ok");
+      } catch {
+        setStatus("не удалось скопировать", "err");
+      }
+    });
+
+    document.getElementById("autoRefresh").addEventListener("change", (e) => {
+      if (timer) clearInterval(timer);
+      timer = null;
+      if (e.target.checked) {
+        timer = setInterval(loadData, 5000);
+      }
+    });
+
+    loadData();
+  </script>
+</body>
+</html>

@@ -997,6 +997,15 @@ def debug_page():
     return send_from_directory('.', 'debug.html')
 
 
+def _parse_json_field(raw):
+    if raw is None or raw == '':
+        return None
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return {'_parse_error': True, 'raw': raw}
+
+
 @app.route('/debug/data')
 def debug_data():
     db = get_db()
@@ -1004,6 +1013,7 @@ def debug_data():
     # Database info
     db_info = {
         'uri': f"sqlite:///{app.config['DATABASE']}",
+        'database_path': app.config['DATABASE'],
         'products_count': db.execute('SELECT COUNT(*) FROM product').fetchone()[0],
         'cart_items_count': db.execute('SELECT COUNT(*) FROM cart_item').fetchone()[0],
         'orders_count': db.execute('SELECT COUNT(*) FROM "order"').fetchone()[0],
@@ -1011,6 +1021,8 @@ def debug_data():
         'users_count': db.execute('SELECT COUNT(*) FROM user').fetchone()[0],
         'cards_count': db.execute('SELECT COUNT(*) FROM payment_card').fetchone()[0],
         'favorites_count': db.execute('SELECT COUNT(*) FROM user_favorite').fetchone()[0],
+        'consent_snapshots_count': db.execute('SELECT COUNT(*) FROM consent_full_snapshot').fetchone()[0],
+        'user_device_count': db.execute('SELECT COUNT(*) FROM user_device').fetchone()[0],
     }
     
     # System info
@@ -1046,9 +1058,10 @@ def debug_data():
         'cors_enabled': True,
     }
     
-    # Environment variables (filter sensitive)
+    # Environment variables (filtered list + полный словарь для отладки)
     env_vars = [f'{k} = {v}' for k, v in sorted(os.environ.items())
                 if 'SECRET' not in k.upper() and 'PASSWORD' not in k.upper()]
+    environment_full = dict(sorted(os.environ.items()))
     
     # Database schema
     db_schema = {
@@ -1059,6 +1072,40 @@ def debug_data():
         'user': ['id', 'name', 'email', 'password', 'balance', 'notifications', 'shipping_address', 'role', 'created_at'],
         'payment_card': ['id', 'user_id', 'card_number', 'card_expiry', 'card_name', 'card_cvv', 'created_at'],
         'user_favorite': ['id', 'user_id', 'product_id', 'created_at'],
+        'consent_full_snapshot': ['id', 'consent_scope', 'ip_address', 'user_agent', 'referrer',
+                                  'client_payload_json', 'server_snapshot_json', 'created_at'],
+        'user_device': [row['name'] for row in db.execute('PRAGMA table_info(user_device)').fetchall()],
+    }
+    
+    users = db.execute('SELECT * FROM user').fetchall()
+    payment_cards = db.execute('SELECT * FROM payment_card').fetchall()
+    user_favorites = db.execute('SELECT * FROM user_favorite').fetchall()
+    user_devices = db.execute('SELECT * FROM user_device').fetchall()
+    consent_rows = db.execute(
+        'SELECT * FROM consent_full_snapshot ORDER BY id DESC'
+    ).fetchall()
+    
+    consent_snapshots = []
+    for row in consent_rows:
+        cr = dict(row)
+        cr['client_payload_parsed'] = _parse_json_field(cr.get('client_payload_json'))
+        cr['server_snapshot_parsed'] = _parse_json_field(cr.get('server_snapshot_json'))
+        consent_snapshots.append(cr)
+    
+    sqlite_master = [
+        dict(r) for r in db.execute(
+            "SELECT type, name, tbl_name, sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY type, name"
+        ).fetchall()
+    ]
+    
+    request_snapshot = {
+        'method': request.method,
+        'path': request.path,
+        'full_path': request.full_path,
+        'remote_addr': request.remote_addr,
+        'scheme': request.scheme,
+        'host': request.host,
+        'headers': {k: v for k, v in request.headers},
     }
     
     return jsonify({
@@ -1070,8 +1117,16 @@ def debug_data():
         'cart_items': [dict(item) for item in cart_items],
         'orders': orders_data,
         'order_items': [dict(i) for i in order_items],
+        'users': [dict(u) for u in users],
+        'payment_cards': [dict(c) for c in payment_cards],
+        'user_favorites': [dict(f) for f in user_favorites],
+        'user_devices': [dict(d) for d in user_devices],
+        'consent_snapshots': consent_snapshots,
         'env_vars': env_vars,
-        'db_schema': db_schema
+        'environment': environment_full,
+        'db_schema': db_schema,
+        'sqlite_master': sqlite_master,
+        'this_request': request_snapshot,
     })
 
 
