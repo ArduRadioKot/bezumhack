@@ -6,7 +6,8 @@ import os
 import sqlite3
 
 app = Flask(__name__, static_folder='.')
-app.config['DATABASE'] = 'shop.db'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.config['DATABASE'] = os.path.join(BASE_DIR, 'shop.db')
 CORS(app)
 
 
@@ -72,13 +73,57 @@ def init_db():
             FOREIGN KEY (product_id) REFERENCES product(id)
         )
     ''')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            balance INTEGER DEFAULT 500000,
+            notifications INTEGER DEFAULT 0,
+            shipping_address TEXT,
+            role TEXT DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS payment_card (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            card_number TEXT NOT NULL,
+            card_expiry TEXT NOT NULL,
+            card_name TEXT NOT NULL,
+            card_cvv TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES user(id)
+        )
+    ''')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user_favorite (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            product_id TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, product_id),
+            FOREIGN KEY (user_id) REFERENCES user(id),
+            FOREIGN KEY (product_id) REFERENCES product(id)
+        )
+    ''')
+
+    # Migration for existing DBs
+    user_columns = [row['name'] for row in c.execute("PRAGMA table_info(user)").fetchall()]
+    if 'shipping_address' not in user_columns:
+        c.execute('ALTER TABLE user ADD COLUMN shipping_address TEXT')
     
     db.commit()
     
     # Initialize products if empty
     c.execute('SELECT COUNT(*) FROM product')
     if c.fetchone()[0] == 0:
-        with open('data.json', 'r') as f:
+        with open(os.path.join(BASE_DIR, 'data.json'), 'r') as f:
             data = json.load(f)
         for p in data['products']:
             c.execute(
@@ -105,6 +150,16 @@ def init_db():
                 )
             db.commit()
             print('✓ Sample orders initialized')
+
+    # Initialize default admin user
+    c.execute('SELECT COUNT(*) FROM user')
+    if c.fetchone()[0] == 0:
+        c.execute(
+            'INSERT INTO user (name, email, password, balance, notifications, role) VALUES (?, ?, ?, ?, ?, ?)',
+            ('Алексей Смирнов', 'admin@example.com', '123456', 500000, 1, 'admin')
+        )
+        db.commit()
+        print('✓ Default admin user initialized')
     
     # Print summary
     c.execute('SELECT COUNT(*) FROM product')
@@ -115,14 +170,30 @@ def init_db():
     orders_count = c.fetchone()[0]
     c.execute('SELECT COUNT(*) FROM order_item')
     order_items_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM user')
+    users_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM payment_card')
+    cards_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM user_favorite')
+    favorites_count = c.fetchone()[0]
     
     print(f'\n📊 Database Summary:')
     print(f'   Products: {products_count}')
     print(f'   Cart Items: {cart_count}')
     print(f'   Orders: {orders_count}')
     print(f'   Order Items: {order_items_count}\n')
+    print(f'   Users: {users_count}\n')
+    print(f'   Cards: {cards_count}')
+    print(f'   Favorites: {favorites_count}\n')
     
     db.close()
+
+
+@app.before_request
+def ensure_db_initialized():
+    if not app.config.get('_DB_INITIALIZED', False):
+        init_db()
+        app.config['_DB_INITIALIZED'] = True
 
 
 # === Static Files ===
@@ -164,6 +235,247 @@ def create_product():
     db.commit()
     product = db.execute('SELECT * FROM product WHERE id = ?', (data.get('id'),)).fetchone()
     return jsonify(dict(product)), 201
+
+
+@app.route('/api/products/<product_id>', methods=['PUT'])
+def update_product(product_id):
+    data = request.get_json() or {}
+    db = get_db()
+    existing = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
+    if existing is None:
+        return jsonify({'error': 'Product not found'}), 404
+
+    title = data.get('title', existing['title'])
+    p_type = data.get('type', existing['type'])
+    price = data.get('price', existing['price'])
+    image = data.get('image', existing['image'])
+    description = data.get('description', existing['description'])
+
+    db.execute(
+        'UPDATE product SET title = ?, type = ?, price = ?, image = ?, description = ? WHERE id = ?',
+        (title, p_type, price, image, description, product_id)
+    )
+    db.commit()
+
+    updated = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
+    return jsonify(dict(updated)), 200
+
+
+@app.route('/api/products/<product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    db = get_db()
+    existing = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
+    if existing is None:
+        return jsonify({'error': 'Product not found'}), 404
+
+    db.execute('DELETE FROM cart_item WHERE product_id = ?', (product_id,))
+    db.execute('DELETE FROM order_item WHERE product_id = ?', (product_id,))
+    db.execute('DELETE FROM product WHERE id = ?', (product_id,))
+    db.commit()
+    return jsonify({'message': 'Deleted'}), 200
+
+
+def user_to_dict(user_row):
+    user = dict(user_row)
+    user['notifications'] = bool(user.get('notifications'))
+    user.pop('password', None)
+    return user
+
+
+# === API: Auth/Users ===
+@app.route('/api/auth/register', methods=['POST'])
+def register_user():
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+    shipping_address = (data.get('shipping_address') or '').strip() or None
+
+    if not name or not email or not password:
+        return jsonify({'error': 'Missing required fields'}), 400
+    if len(password) < 6:
+        return jsonify({'error': 'Password must be at least 6 characters'}), 400
+
+    db = get_db()
+    exists = db.execute('SELECT id FROM user WHERE email = ?', (email,)).fetchone()
+    if exists:
+        return jsonify({'error': 'User with this email already exists'}), 409
+
+    db.execute(
+        'INSERT INTO user (name, email, password, balance, notifications, shipping_address, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        (name, email, password, 500000, 0, shipping_address, 'user')
+    )
+    db.commit()
+
+    user = db.execute('SELECT * FROM user WHERE email = ?', (email,)).fetchone()
+    return jsonify(user_to_dict(user)), 201
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def login_user():
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+
+    if not email or not password:
+        return jsonify({'error': 'Missing email or password'}), 400
+
+    db = get_db()
+    user = db.execute(
+        'SELECT * FROM user WHERE email = ? AND password = ?',
+        (email, password)
+    ).fetchone()
+
+    if not user:
+        return jsonify({'error': 'Invalid credentials'}), 401
+
+    return jsonify(user_to_dict(user)), 200
+
+
+@app.route('/api/users/<path:email>', methods=['GET'])
+def get_user(email):
+    normalized_email = (email or '').strip().lower()
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    return jsonify(user_to_dict(user))
+
+
+@app.route('/api/users/<path:email>', methods=['PUT'])
+def update_user(email):
+    normalized_email = (email or '').strip().lower()
+    data = request.get_json() or {}
+
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    new_name = (data.get('name') or user['name']).strip()
+    new_email = (data.get('email') or user['email']).strip().lower()
+    new_password = data.get('password') if data.get('password') else user['password']
+    new_notifications = 1 if bool(data.get('notifications', bool(user['notifications']))) else 0
+    new_shipping_address = data.get('shipping_address', user['shipping_address'])
+    if new_shipping_address is not None:
+        new_shipping_address = str(new_shipping_address).strip()
+    if new_shipping_address == '':
+        new_shipping_address = None
+
+    if not new_name or not new_email:
+        return jsonify({'error': 'Name and email are required'}), 400
+    if data.get('password') and len(data.get('password')) < 6:
+        return jsonify({'error': 'Password must be at least 6 characters'}), 400
+
+    existing = db.execute('SELECT id FROM user WHERE email = ? AND id != ?', (new_email, user['id'])).fetchone()
+    if existing:
+        return jsonify({'error': 'Email already in use'}), 409
+
+    db.execute(
+        'UPDATE user SET name = ?, email = ?, password = ?, notifications = ?, shipping_address = ? WHERE id = ?',
+        (new_name, new_email, new_password, new_notifications, new_shipping_address, user['id'])
+    )
+    db.commit()
+
+    updated = db.execute('SELECT * FROM user WHERE id = ?', (user['id'],)).fetchone()
+    return jsonify(user_to_dict(updated)), 200
+
+
+@app.route('/api/users/<path:email>/topup', methods=['POST'])
+def topup_user_balance(email):
+    normalized_email = (email or '').strip().lower()
+    data = request.get_json() or {}
+    amount = data.get('amount')
+    card_number = str(data.get('card_number') or '').strip()
+    card_expiry = str(data.get('card_expiry') or '').strip()
+    card_name = str(data.get('card_name') or '').strip()
+    card_cvv = str(data.get('card_cvv') or '').strip()
+
+    try:
+        amount = int(amount)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid amount'}), 400
+
+    if amount < 1000:
+        return jsonify({'error': 'Minimum top up is 1000'}), 400
+    if len(card_number) != 16 or not card_number.isdigit():
+        return jsonify({'error': 'Invalid card number'}), 400
+    if len(card_cvv) != 3 or not card_cvv.isdigit():
+        return jsonify({'error': 'Invalid card CVV'}), 400
+    if not card_expiry or not card_name:
+        return jsonify({'error': 'Card data is required'}), 400
+
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    new_balance = user['balance'] + amount
+    db.execute('UPDATE user SET balance = ? WHERE id = ?', (new_balance, user['id']))
+    db.execute(
+        'INSERT INTO payment_card (user_id, card_number, card_expiry, card_name, card_cvv) VALUES (?, ?, ?, ?, ?)',
+        (user['id'], card_number, card_expiry, card_name, card_cvv)
+    )
+    db.commit()
+
+    updated = db.execute('SELECT * FROM user WHERE id = ?', (user['id'],)).fetchone()
+    return jsonify(user_to_dict(updated)), 200
+
+
+@app.route('/api/users/<path:email>/favorites', methods=['GET'])
+def get_user_favorites(email):
+    normalized_email = (email or '').strip().lower()
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    favorites = db.execute('''
+        SELECT p.*
+        FROM user_favorite uf
+        JOIN product p ON uf.product_id = p.id
+        WHERE uf.user_id = ?
+        ORDER BY uf.created_at DESC
+    ''', (user['id'],)).fetchall()
+    return jsonify([dict(p) for p in favorites]), 200
+
+
+@app.route('/api/users/<path:email>/favorites', methods=['POST'])
+def add_user_favorite(email):
+    normalized_email = (email or '').strip().lower()
+    data = request.get_json() or {}
+    product_id = data.get('product_id')
+    if not product_id:
+        return jsonify({'error': 'product_id is required'}), 400
+
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    product = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+
+    db.execute(
+        'INSERT OR IGNORE INTO user_favorite (user_id, product_id) VALUES (?, ?)',
+        (user['id'], product_id)
+    )
+    db.commit()
+    return jsonify({'message': 'Added'}), 201
+
+
+@app.route('/api/users/<path:email>/favorites/<product_id>', methods=['DELETE'])
+def remove_user_favorite(email, product_id):
+    normalized_email = (email or '').strip().lower()
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    db.execute('DELETE FROM user_favorite WHERE user_id = ? AND product_id = ?', (user['id'], product_id))
+    db.commit()
+    return jsonify({'message': 'Removed'}), 200
 
 
 # === API: Cart ===
@@ -322,6 +634,66 @@ def create_order():
     return jsonify(order_dict), 201
 
 
+@app.route('/api/orders/checkout', methods=['POST'])
+def create_order_with_balance():
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    db = get_db()
+    user = db.execute('SELECT * FROM user WHERE email = ?', (email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    if not user['shipping_address'] or not str(user['shipping_address']).strip():
+        return jsonify({'error': 'Shipping address is required before checkout'}), 400
+
+    cart_items = db.execute('SELECT * FROM cart_item').fetchall()
+    if not cart_items:
+        return jsonify({'error': 'Cart is empty'}), 400
+
+    total = 0
+    for item in cart_items:
+        product = db.execute('SELECT price FROM product WHERE id = ?', (item['product_id'],)).fetchone()
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+        total += product['price'] * item['quantity']
+
+    if user['balance'] < total:
+        return jsonify({
+            'error': 'Insufficient balance',
+            'balance': user['balance'],
+            'required': total
+        }), 400
+
+    db.execute('UPDATE user SET balance = balance - ? WHERE id = ?', (total, user['id']))
+    db.execute('INSERT INTO "order" (total, status) VALUES (?, ?)', (total, 'completed'))
+    order_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
+
+    for item in cart_items:
+        product = db.execute('SELECT price FROM product WHERE id = ?', (item['product_id'],)).fetchone()
+        db.execute(
+            'INSERT INTO order_item (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
+            (order_id, item['product_id'], item['quantity'], product['price'])
+        )
+
+    db.execute('DELETE FROM cart_item')
+    db.commit()
+
+    order = db.execute('SELECT * FROM "order" WHERE id = ?', (order_id,)).fetchone()
+    items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order_id,)).fetchall()
+    updated_user = db.execute('SELECT * FROM user WHERE id = ?', (user['id'],)).fetchone()
+
+    order_dict = dict(order)
+    order_dict['items'] = [dict(i) for i in items]
+
+    return jsonify({
+        'order': order_dict,
+        'user': user_to_dict(updated_user)
+    }), 201
+
+
 # === Debug Page ===
 @app.route('/debug')
 def debug_page():
@@ -339,6 +711,9 @@ def debug_data():
         'cart_items_count': db.execute('SELECT COUNT(*) FROM cart_item').fetchone()[0],
         'orders_count': db.execute('SELECT COUNT(*) FROM "order"').fetchone()[0],
         'order_items_count': db.execute('SELECT COUNT(*) FROM order_item').fetchone()[0],
+        'users_count': db.execute('SELECT COUNT(*) FROM user').fetchone()[0],
+        'cards_count': db.execute('SELECT COUNT(*) FROM payment_card').fetchone()[0],
+        'favorites_count': db.execute('SELECT COUNT(*) FROM user_favorite').fetchone()[0],
     }
     
     # System info
@@ -384,6 +759,9 @@ def debug_data():
         'cart_item': ['id', 'product_id', 'quantity', 'created_at'],
         'order': ['id', 'total', 'status', 'created_at'],
         'order_item': ['id', 'order_id', 'product_id', 'quantity', 'price'],
+        'user': ['id', 'name', 'email', 'password', 'balance', 'notifications', 'shipping_address', 'role', 'created_at'],
+        'payment_card': ['id', 'user_id', 'card_number', 'card_expiry', 'card_name', 'card_cvv', 'created_at'],
+        'user_favorite': ['id', 'user_id', 'product_id', 'created_at'],
     }
     
     return jsonify({

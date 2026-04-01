@@ -309,9 +309,9 @@
 </footer>
 
 <script>
-    const USERS_KEY = 'luxary_users';
     const CURRENT_USER_KEY = 'luxary_current_user';
     const THEME_KEY = 'luxary_theme';
+    const API_BASE = '';
 
     // ========== Получение текущего пользователя ==========
     function getCurrentUser() {
@@ -319,21 +319,11 @@
         return userJson ? JSON.parse(userJson) : null;
     }
 
-    function updateUserBalance(email, newBalance) {
-        const users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-        const index = users.findIndex(u => u.email === email);
-        if (index !== -1) {
-            users[index].balance = newBalance;
-            localStorage.setItem(USERS_KEY, JSON.stringify(users));
-            // Обновляем текущего пользователя в сессии
-            const currentUser = getCurrentUser();
-            if (currentUser && currentUser.email === email) {
-                currentUser.balance = newBalance;
-                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
-            }
-            return true;
+    function updateUserSession(user) {
+        const currentUser = getCurrentUser();
+        if (currentUser && currentUser.email === user.email) {
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ ...user, mode: 'auth' }));
         }
-        return false;
     }
 
     // ========== Проверка авторизации ==========
@@ -419,23 +409,39 @@
         if (!/^\d{3}$/.test(cardCvv)) {
             showMessage('CVV должен состоять из 3 цифр', 'error');
             return;
-        }ё
+        }
 
         if (cardName.length < 2) {
             showMessage('Введите имя владельца карты', 'error');
             return;
         }
 
-        // Имитация успешной оплаты
-        const newBalance = userBalance + amount;
-        if (updateUserBalance(currentUser.email, newBalance)) {
-            showMessage(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽! Перенаправление...`, 'success');
-            setTimeout(() => {
-                window.location.href = 'shop.html';
-            }, 2000);
-        } else {
-            showMessage('Ошибка пополнения. Попробуйте позже.', 'error');
-        }
+        fetch(`${API_BASE}/api/users/${encodeURIComponent(currentUser.email)}/topup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount,
+                card_number: cardNumber,
+                card_expiry: cardExpiry,
+                card_name: cardName,
+                card_cvv: cardCvv
+            })
+        })
+            .then(async (res) => ({ ok: res.ok, data: await res.json() }))
+            .then(({ ok, data }) => {
+                if (!ok) {
+                    showMessage(data.error || 'Ошибка пополнения. Попробуйте позже.', 'error');
+                    return;
+                }
+                updateUserSession(data);
+                showMessage(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽! Перенаправление...`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'shop.html';
+                }, 2000);
+            })
+            .catch(() => {
+                showMessage('Ошибка соединения с сервером', 'error');
+            });
     });
 
     function showMessage(text, type) {
