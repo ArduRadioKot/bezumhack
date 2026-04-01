@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root {
+    /* Color Tokens */
+    --color-white: rgba(255, 255, 255, 1);
+    --color-black: rgba(20, 20, 20, 1);
+    --color-cream: rgba(245, 245, 245, 1);
+    --color-gray: rgba(60, 60, 60, 1);
+    --color-gray-light: rgba(160, 160, 160, 1);
+    --color-charcoal: rgba(38, 40, 40, 1);
+    --color-slate: rgba(19, 52, 59, 1);
+    --color-teal-light: rgba(50, 184, 198, 1);
+    --color-teal-semilight: rgb(41, 159, 172);
+    --color-teal-dark: rgba(33, 128, 141, 1);
+    --color-teal-semidark: rgb(27, 105, 115);
+    --color-red-light: rgba(255, 84, 89, 1);
+    --color-red-dark: rgba(192, 21, 47, 1);
+
+    /* RGB versions for opacity control */
+    --color-black-rgb: 20, 20, 20;
+    --color-cream-rgb: 245, 245, 245;
+    --color-gray-rgb: 60, 60, 60;
+    --color-teal-light-rgb: 50, 184, 198;
+    --color-teal-dark-rgb: 33, 128, 141;
+    --color-red-light-rgb: 255, 84, 89;
+    --color-red-dark-rgb: 192, 21, 47;
+
+    /* Opacity */
+    --opacity-2: 0.2;
+    --opacity-4: 0.4;
+    --opacity-6: 0.6;
+    --opacity-8: 0.8;
+
+    /* Typography */
+    --font-family: 'Inter', sans-serif;
+    --font-size-sm: 12px;
+    --font-size-base: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 20px;
+    --font-size-3xl: 24px;
+    --font-size-4xl: 30px;
+    --font-weight-normal: 500;
+    --font-weight-bold: 700;
+    --line-height: 1.5;
+    --letter-spacing-sm: 0.05em;
+    --letter-spacing-md: 0.1em;
+
+    /* Spacing */
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+    --space-24: 24px;
+    --space-32: 32px;
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+
+    /* Sizing */
+    --size-12: 12px;
+    --size-16: 16px;
+    --size-18: 18px;
+    --size-20: 20px;
+    --size-24: 24px;
+    --size-32: 32px;
+    --size-60: 60px;
+    --size-80: 80px;
+    --size-100: 100px;
+    --size-120: 120px;
+    --size-150: 150px;
+    --size-200: 200px;
+    --size-220: 220px;
+    --size-240: 240px;
+    --size-300: 300px;
+    --size-320: 320px;
+    --size-400: 400px;
+    --size-500: 500px;
+    --size-600: 600px;
+    --size-1200: 1200px;
+
+    /* Border Width */
+    --border-width: 2px;
+
+    /* Shadow */
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+html {
+    --color-background: var(--color-cream);
+    --color-surface: var(--color-white);
+
+    --color-text: var(--color-slate);
+    --color-text-secondary: var(--color-gray);
+
+    --color-primary: var(--color-teal-dark);
+    --color-primary-hover: var(--color-teal-semidark);
+    --color-primary-active: var(--color-teal-semidark);
+    --color-btn-primary-text: var(--color-cream);
+
+    --color-secondary: rgba(var(--color-teal-light-rgb), var(--opacity-2));
+    --color-secondary-hover: rgba(var(--color-gray-rgb), var(--opacity-4));
+    --color-secondary-active: rgba(var(--color-gray-rgb), var(--opacity-4));
+
+    --color-border: rgba(var(--color-gray-rgb), var(--opacity-2));
+    --color-modal-border: rgba(var(--color-black-rgb), var(--opacity-6));
+
+    --color-error: var(--color-red-dark);
+    --color-success: var(--color-teal-dark);
+    --color-info: var(--color-gray);
+
+    --color-focus-box-shadow: rgba(var(--color-teal-dark-rgb), var(--opacity-4));
+    --focus-outline: 2px solid var(--color-primary);
+    --focus-box-shadow: 0 0 0 3px var(--color-focus-box-shadow);
+}
+
+html.dark-theme {
+    --color-background: var(--color-charcoal);
+    --color-surface: var(--color-black);
+
+    --color-text: var(--color-cream);
+    --color-text-secondary: var(--color-gray-light);
+
+    --color-primary: var(--color-teal-light);
+    --color-primary-hover: var(--color-teal-semilight);
+    --color-primary-active: var(--color-teal-semilight);
+    --color-btn-primary-text: var(--color-slate);
+
+    --color-secondary: rgba(var(--color-gray-rgb), var(--opacity-6));
+    --color-secondary-hover: rgba(var(--color-gray-rgb), var(--opacity-8));
+    --color-secondary-active: rgba(var(--color-gray-rgb), var(--opacity-8));
+
+    --color-border: rgba(var(--color-gray-rgb), var(--opacity-8));
+    --color-modal-border: rgba(var(--color-gray-rgb), var(--opacity-8));
+
+    --color-error: var(--color-red-light);
+    --color-success: var(--color-teal-light);
+    --color-info: var(--color-gray);
+
+    --color-focus-box-shadow: rgba(var(--color-teal-light-rgb), var(--opacity-4));
+    --focus-outline: 2px solid var(--color-primary);
+    --focus-box-shadow: 0 0 0 3px var(--color-focus-box-shadow);
+}
