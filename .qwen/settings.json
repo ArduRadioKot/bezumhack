@@ -9,7 +9,10 @@
       "Bash(rm *)",
       "Bash(/users/aleksandrvorobev/documents/bezumhack/.venv/bin/python *)",
       "Bash(sleep *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(pkill *)",
+      "Bash(lsof *)",
+      "Bash(xargs *)"
     ]
   },
   "$version": 3

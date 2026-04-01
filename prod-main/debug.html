@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Panel - Luxury Shop</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Courier New", monospace;
+        background: #1a1a2e;
+        color: #eee;
+        padding: 20px;
+      }
+      h1 {
+        color: #00ff88;
+        margin-bottom: 20px;
+      }
+      h2 {
+        color: #00ccff;
+        margin: 20px 0 10px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 5px;
+      }
+      .section {
+        background: #16213e;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #333;
+      }
+      th {
+        background: #0f3460;
+        color: #00ff88;
+      }
+      tr:nth-child(even) {
+        background: #1a1a2e;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+      .info-item {
+        background: #0f3460;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .info-label {
+        color: #888;
+        font-size: 12px;
+      }
+      .info-value {
+        color: #00ff88;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .flag {
+        background: #e94560;
+        color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 18px;
+      }
+      .endpoint {
+        background: #0f3460;
+        padding: 8px 12px;
+        margin: 5px 0;
+        border-radius: 4px;
+      }
+      .method {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        margin-right: 10px;
+      }
+      .get {
+        background: #00ccff;
+        color: #000;
+      }
+      .post {
+        background: #00ff88;
+        color: #000;
+      }
+      .put {
+        background: #ffaa00;
+        color: #000;
+      }
+      .delete {
+        background: #ff4444;
+        color: #fff;
+      }
+      pre {
+        background: #0a0a15;
+        padding: 10px;
+        overflow-x: auto;
+        border-radius: 4px;
+      }
+      .refresh-btn {
+        background: #00ff88;
+        color: #000;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .refresh-btn:hover {
+        background: #00cc77;
+      }
+      .empty {
+        color: #888;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Debug Panel - Luxury Shop</h1>
+
+    <button class="refresh-btn" onclick="location.reload()">
+      🔄 Refresh Data
+    </button>
+
+    <div class="section">
+      <h2>🚩 Flag</h2>
+      <div class="flag" id="flag">Loading...</div>
+    </div>
+
+    <div class="section">
+      <h2>ℹ️ System Info</h2>
+      <div class="info-grid" id="system-info">
+        <div class="info-item">
+          <div class="info-label">Python Version</div>
+          <div class="info-value" id="python-version">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Flask Version</div>
+          <div class="info-value" id="flask-version">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">SQLAlchemy Version</div>
+          <div class="info-value" id="sqlalchemy-version">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Working Directory</div>
+          <div class="info-value" id="cwd">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🗄️ Database Info</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Database URI</div>
+          <div class="info-value" id="db-uri">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Products Count</div>
+          <div class="info-value" id="products-count">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Cart Items Count</div>
+          <div class="info-value" id="cart-count">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Orders Count</div>
+          <div class="info-value" id="orders-count">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Order Items Count</div>
+          <div class="info-value" id="order-items-count">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>⚙️ App Config</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Debug Mode</div>
+          <div class="info-value" id="debug-mode">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Secret Key</div>
+          <div class="info-value" id="secret-key">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">CORS Enabled</div>
+          <div class="info-value" id="cors-enabled">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>📦 Products</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody id="products-table"></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>🛒 Cart Items</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody id="cart-table"></tbody>
+      </table>
+      <p class="empty" id="cart-empty" style="display: none">Cart is empty</p>
+    </div>
+
+    <div class="section">
+      <h2>📋 Orders</h2>
+      <div id="orders-list"></div>
+      <p class="empty" id="orders-empty" style="display: none">No orders yet</p>
+    </div>
+
+    <div class="section">
+      <h2>📦 Order Items (Database)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Order ID</th>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody id="order-items-table"></tbody>
+      </table>
+      <p class="empty" id="order-items-empty" style="display: none">
+        No order items
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>💾 Database Schema</h2>
+      <pre id="db-schema"></pre>
+    </div>
+
+    <div class="section">
+      <h2>🔌 API Endpoints</h2>
+      <div class="endpoint">
+        <span class="method get">GET</span>/api/products
+      </div>
+      <div class="endpoint">
+        <span class="method get">GET</span>/api/products/&lt;id&gt;
+      </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>/api/products
+      </div>
+      <div class="endpoint"><span class="method get">GET</span>/api/cart</div>
+      <div class="endpoint"><span class="method post">POST</span>/api/cart</div>
+      <div class="endpoint">
+        <span class="method put">PUT</span>/api/cart/&lt;item_id&gt;
+      </div>
+      <div class="endpoint">
+        <span class="method delete">DELETE</span>/api/cart/&lt;item_id&gt;
+      </div>
+      <div class="endpoint">
+        <span class="method delete">DELETE</span>/api/cart
+      </div>
+      <div class="endpoint"><span class="method get">GET</span>/api/orders</div>
+      <div class="endpoint">
+        <span class="method post">POST</span>/api/orders
+      </div>
+      <div class="endpoint"><span class="method get">GET</span>/debug</div>
+      <div class="endpoint"><span class="method get">GET</span>/debug/data</div>
+    </div>
+
+    <div class="section">
+      <h2>🗂️ Environment Variables</h2>
+      <pre id="env-vars"></pre>
+    </div>
+
+    <div class="section">
+      <h2>💾 Database Tables Schema</h2>
+      <pre>
+Product:    id, title, type, price, image, description
+CartItem:   id, product_id, quantity, created_at
+Order:      id, total, status, created_at
+OrderItem:  id, order_id, product_id, quantity, price
+        </pre
+      >
+    </div>
+
+    <script>
+      async function loadDebugData() {
+        try {
+          console.log("Loading debug data...");
+          const response = await fetch("/debug/data");
+          console.log("Response status:", response.status);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Data loaded:", data);
+
+          // Flag
+          document.getElementById("flag").textContent =
+            "FLAG = " + (data.flag || "Not set");
+
+          // System Info
+          document.getElementById("python-version").textContent =
+            data.system?.python_version || "N/A";
+          document.getElementById("flask-version").textContent =
+            data.system?.flask_version || "N/A";
+          document.getElementById("sqlalchemy-version").textContent =
+            data.system?.sqlalchemy_version || "N/A";
+          document.getElementById("cwd").textContent =
+            data.system?.cwd || "N/A";
+
+          // Database Info
+          document.getElementById("db-uri").textContent =
+            data.database?.uri || "N/A";
+          document.getElementById("products-count").textContent =
+            data.database?.products_count ?? "N/A";
+          document.getElementById("cart-count").textContent =
+            data.database?.cart_items_count ?? "N/A";
+          document.getElementById("orders-count").textContent =
+            data.database?.orders_count ?? "N/A";
+          document.getElementById("order-items-count").textContent =
+            data.database?.order_items_count ?? "N/A";
+
+          // Config
+          document.getElementById("debug-mode").textContent =
+            data.config?.debug ?? "N/A";
+          document.getElementById("secret-key").textContent =
+            data.config?.secret_key || "Not set";
+          document.getElementById("cors-enabled").textContent =
+            data.config?.cors_enabled ?? "N/A";
+
+          // Products
+          const productsTable = document.getElementById("products-table");
+          if (data.products && data.products.length > 0) {
+            productsTable.innerHTML = data.products
+              .map(
+                (p) => `
+                    <tr>
+                        <td>${p.id}</td>
+                        <td>${p.title}</td>
+                        <td>${p.type}</td>
+                        <td>$${p.price.toLocaleString()}</td>
+                    </tr>
+                `,
+              )
+              .join("");
+          } else {
+            productsTable.innerHTML =
+              '<tr><td colspan="4" class="empty">No products</td></tr>';
+          }
+
+          // Cart
+          const cartTable = document.getElementById("cart-table");
+          const cartEmpty = document.getElementById("cart-empty");
+          if (data.cart_items && data.cart_items.length > 0) {
+            cartEmpty.style.display = "none";
+            cartTable.innerHTML = data.cart_items
+              .map(
+                (item) => `
+                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.product_id}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.created_at}</td>
+                        </tr>
+                    `,
+              )
+              .join("");
+          } else {
+            cartEmpty.style.display = "block";
+            cartTable.innerHTML = "";
+          }
+
+          // Orders
+          const ordersList = document.getElementById("orders-list");
+          const ordersEmpty = document.getElementById("orders-empty");
+          if (data.orders && data.orders.length > 0) {
+            ordersEmpty.style.display = "none";
+            ordersList.innerHTML = data.orders
+              .map(
+                (order) => `
+                        <div style="background: #0f3460; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                            <strong>Order #${order.id}</strong> -
+                            Total: $${order.total.toLocaleString()} -
+                            Status: ${order.status} -
+                            ${order.created_at}
+                        </div>
+                    `,
+              )
+              .join("");
+          } else {
+            ordersEmpty.style.display = "block";
+            ordersList.innerHTML = "";
+          }
+
+          // Order Items
+          const orderItemsTable = document.getElementById("order-items-table");
+          const orderItemsEmpty = document.getElementById("order-items-empty");
+          if (data.order_items && data.order_items.length > 0) {
+            orderItemsEmpty.style.display = "none";
+            orderItemsTable.innerHTML = data.order_items
+              .map(
+                (item) => `
+                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.order_id}</td>
+                            <td>${item.product_id}</td>
+                            <td>${item.quantity}</td>
+                            <td>$${item.price.toLocaleString()}</td>
+                        </tr>
+                    `,
+              )
+              .join("");
+          } else {
+            orderItemsEmpty.style.display = "block";
+            orderItemsTable.innerHTML = "";
+          }
+
+          // Database Schema
+          const dbSchema = document.getElementById("db-schema");
+          if (data.db_schema) {
+            dbSchema.textContent = Object.entries(data.db_schema)
+              .map(([table, columns]) => `${table}: ${columns.join(", ")}`)
+              .join("\n\n");
+          } else {
+            dbSchema.textContent = "No schema data";
+          }
+
+          // Environment Variables
+          document.getElementById("env-vars").textContent =
+            data.env_vars?.join("\n") || "No environment variables";
+
+          console.log("Debug data loaded successfully");
+        } catch (error) {
+          console.error("Error loading debug data:", error);
+          document.getElementById("flag").textContent =
+            "Error: " + error.message;
+        }
+      }
+
+      loadDebugData();
+    </script>
+  </body>
+</html>

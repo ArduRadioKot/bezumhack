@@ -210,10 +210,104 @@ def create_order():
     return jsonify(order.to_dict()), 201
 
 
+# === Debug Page ===
+@app.route('/debug')
+def debug_page():
+    return send_from_directory('.', 'debug.html')
+
+
+@app.route('/debug/data')
+def debug_data():
+    from sqlalchemy import inspect
+    
+    # Database info
+    db_info = {
+        'uri': app.config['SQLALCHEMY_DATABASE_URI'],
+        'products_count': Product.query.count(),
+        'cart_items_count': CartItem.query.count(),
+        'orders_count': Order.query.count(),
+        'order_items_count': OrderItem.query.count(),
+    }
+
+    # System info
+    system_info = {
+        'python_version': os.popen('python3 --version').read().strip(),
+        'flask_version': os.popen('python3 -c "import flask; print(flask.__version__)"').read().strip(),
+        'sqlalchemy_version': os.popen('python3 -c "import sqlalchemy; print(sqlalchemy.__version__)"').read().strip(),
+        'cwd': os.getcwd(),
+        'flag': os.environ.get('FLAG', 'Not set'),
+    }
+
+    # All products
+    products = Product.query.all()
+
+    # All cart items (with products)
+    cart_items = CartItem.query.all()
+
+    # All orders (with items)
+    orders = Order.query.options(db.joinedload(Order.items)).all()
+    
+    # All order items
+    order_items = OrderItem.query.options(db.joinedload(OrderItem.product)).all()
+
+    # Config
+    config = {
+        'debug': app.debug,
+        'secret_key': str(app.secret_key) if app.secret_key else 'Not set',
+        'cors_enabled': True,
+    }
+
+    # Environment variables (filter sensitive)
+    env_vars = [f'{k} = {v}' for k, v in sorted(os.environ.items())
+                if 'SECRET' not in k.upper() and 'PASSWORD' not in k.upper()]
+    
+    # Database schema from models
+    db_schema = {
+        'Product': ['id', 'title', 'type', 'price', 'image', 'description'],
+        'CartItem': ['id', 'product_id', 'quantity', 'created_at'],
+        'Order': ['id', 'total', 'status', 'created_at'],
+        'OrderItem': ['id', 'order_id', 'product_id', 'quantity', 'price'],
+    }
+
+    return jsonify({
+        'flag': system_info['flag'],
+        'system': system_info,
+        'database': db_info,
+        'config': config,
+        'products': [p.to_dict() for p in products],
+        'cart_items': [item.to_dict() for item in cart_items],
+        'orders': [{
+            'id': o.id,
+            'total': o.total,
+            'status': o.status,
+            'created_at': o.created_at.isoformat(),
+            'items': [{
+                'id': i.id,
+                'product_id': i.product_id,
+                'quantity': i.quantity,
+                'price': i.price,
+                'product': i.product.to_dict() if i.product else None
+            } for i in o.items]
+        } for o in orders],
+        'order_items': [{
+            'id': i.id,
+            'order_id': i.order_id,
+            'product_id': i.product_id,
+            'quantity': i.quantity,
+            'price': i.price,
+            'product': i.product.to_dict() if i.product else None
+        } for i in order_items],
+        'env_vars': env_vars,
+        'db_schema': db_schema
+    })
+
+
 # === Init DB ===
 def init_db():
     with app.app_context():
         db.create_all()
+        
+        # Initialize products if empty
         if Product.query.count() == 0:
             with open('data.json', 'r') as f:
                 data = json.load(f)
@@ -221,7 +315,35 @@ def init_db():
                 product = Product(**p)
                 db.session.add(product)
             db.session.commit()
-            print('Database initialized with products from data.json')
+            print('✓ Products initialized from data.json')
+        
+        # Initialize sample orders if empty
+        if Order.query.count() == 0:
+            # Create sample order with items
+            products = Product.query.limit(3).all()
+            if products:
+                order = Order(total=sum(p.price for p in products), status='completed')
+                db.session.add(order)
+                db.session.flush()
+                
+                for p in products:
+                    order_item = OrderItem(
+                        order_id=order.id,
+                        product_id=p.id,
+                        quantity=1,
+                        price=p.price
+                    )
+                    db.session.add(order_item)
+                
+                db.session.commit()
+                print('✓ Sample orders initialized')
+        
+        # Print summary
+        print(f'\n📊 Database Summary:')
+        print(f'   Products: {Product.query.count()}')
+        print(f'   Cart Items: {CartItem.query.count()}')
+        print(f'   Orders: {Order.query.count()}')
+        print(f'   Order Items: {OrderItem.query.count()}\n')
 
 
 if __name__ == '__main__':
