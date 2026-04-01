@@ -11,19 +11,56 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
+
+        /* Тёмная тема (по умолчанию) */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #13131a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #e6b422;
+            --accent-dark: #c9991e;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(10, 10, 20, 0.65);
+            --glass-border: 1px solid rgba(230, 180, 34, 0.2);
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+            --hero-overlay: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(230,180,34,0.2) 100%);
+            --hero-bg: url('https://thumbs.dreamstime.com/b/%D0%BA%D0%B0%D1%84%D0%B5%D0%B4%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%81%D0%BE%D0%B1%D0%BE%D1%80-%D1%81%D0%B0%D0%B3%D1%80%D0%B0%D0%B4%D0%B0-%D1%84%D0%B0%D0%BC%D0%B8%D0%BB%D1%8C%D1%8F-%D0%B2-%D0%B1%D0%B0%D1%80%D1%81%D0%B5%D0%BB%D0%BE%D0%BD%D0%B5-%D0%B8%D1%81%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F-%D0%BD%D0%BE%D1%87%D0%BD%D0%BE%D0%B5-%D0%B2%D1%80%D0%B5%D0%BC%D1%8F-157116840.jpg');
+        }
+
+        /* Светлая тема */
+        body.light {
+            --bg-primary: #faf9f7;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e1e2a;
+            --text-secondary: #5a5a6e;
+            --accent: #c9a03d;
+            --accent-dark: #a87c2c;
+            --border: rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+            --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            --hero-overlay: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(201,160,61,0.3) 100%);
+            --hero-bg: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjy_FGzI63ZS_9jeZ5Wu5DjJ4qfe3S7hxI2g&s');
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #0a0a0f;
-            color: #f0f0f0;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
             overflow-x: hidden;
         }
+
         .glass {
-            background: rgba(10, 10, 20, 0.65);
+            background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(230, 180, 34, 0.2);
+            border: var(--glass-border);
             border-radius: 28px;
         }
+
         header {
             position: fixed;
             top: 0;
@@ -33,35 +70,54 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.2rem 2rem;
-            background: rgba(10, 10, 20, 0.7);
+            background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(230, 180, 34, 0.2);
+            border-bottom: var(--glass-border);
         }
+
         .logo {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: #e6b422;
+            color: var(--accent);
             text-decoration: none;
             letter-spacing: 1px;
         }
+
         .nav-links {
             display: flex;
             gap: 2rem;
             align-items: center;
         }
+
         .nav-links a {
-            color: #f0f0f0;
+            color: var(--text-primary);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
         }
+
         .nav-links a:hover {
-            color: #e6b422;
+            color: var(--accent);
         }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--accent);
+            margin-left: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+        }
+
         .btn {
             display: inline-block;
-            background: linear-gradient(135deg, #e6b422, #c9991e);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
             color: #111;
             padding: 10px 24px;
             border-radius: 40px;
@@ -69,10 +125,12 @@
             text-decoration: none;
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(230, 180, 34, 0.3);
         }
+
         .hero {
             height: 100vh;
             position: relative;
@@ -81,22 +139,23 @@
             justify-content: center;
             text-align: center;
             overflow: hidden;
-            /* Фоновое изображение: тёмные и тёплые тона */
-            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8Qst1KefgIYQO1k4G8Quavnc3fR-TUAwCDw&s');
+            background-image: var(--hero-bg);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
+
         .hero-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(230,180,34,0.2) 100%);
+            background: var(--hero-overlay);
             backdrop-filter: brightness(0.7);
             z-index: 0;
         }
+
         .hero-content {
             max-width: 800px;
             padding: 2rem;
@@ -104,6 +163,7 @@
             animation: fadeInUp 1s ease;
             position: relative;
         }
+
         .hero-content h1 {
             font-family: 'Playfair Display', serif;
             font-size: 4rem;
@@ -111,25 +171,30 @@
             letter-spacing: 2px;
             text-shadow: 0 2px 15px rgba(0,0,0,0.5);
         }
+
         .hero-content p {
             font-size: 1.2rem;
             margin-bottom: 2rem;
             color: #e0e0e0;
         }
+
         section {
             padding: 6rem 2rem;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
+
         .section-title {
             text-align: center;
             font-family: 'Playfair Display', serif;
             font-size: 2.5rem;
             margin-bottom: 3rem;
-            color: #e6b422;
+            color: var(--accent);
         }
+
         .about-text {
             font-size: 1.1rem;
             line-height: 1.6;
@@ -137,14 +202,16 @@
             max-width: 800px;
             margin: 0 auto;
         }
+
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
+
         .feature-card {
-            background: rgba(20, 20, 30, 0.6);
+            background: var(--glass-bg);
             backdrop-filter: blur(8px);
             border-radius: 28px;
             padding: 2rem;
@@ -152,26 +219,31 @@
             transition: transform 0.3s;
             border: 1px solid rgba(230, 180, 34, 0.2);
         }
+
         .feature-card:hover {
             transform: translateY(-5px);
         }
+
         .feature-card i {
             font-size: 2.5rem;
-            color: #e6b422;
+            color: var(--accent);
             margin-bottom: 1rem;
         }
+
         .feature-card h3 {
             font-size: 1.3rem;
             margin-bottom: 0.5rem;
         }
+
         .categories {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-top: 2rem;
         }
+
         .category-item {
-            background: rgba(20, 20, 30, 0.6);
+            background: var(--glass-bg);
             backdrop-filter: blur(8px);
             border-radius: 20px;
             padding: 1.5rem;
@@ -179,17 +251,20 @@
             transition: all 0.3s;
             cursor: pointer;
         }
+
         .category-item:hover {
             background: rgba(230, 180, 34, 0.2);
             transform: translateY(-3px);
         }
+
         footer {
-            background: rgba(10, 10, 20, 0.9);
+            background: var(--glass-bg);
             backdrop-filter: blur(8px);
             padding: 3rem 2rem 1rem;
-            border-top: 1px solid rgba(230, 180, 34, 0.2);
+            border-top: var(--glass-border);
             text-align: center;
         }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -200,6 +275,7 @@
                 transform: translateY(0);
             }
         }
+
         @media (max-width: 768px) {
             header {
                 padding: 1rem;
@@ -229,7 +305,10 @@
             <a href="#features">Преимущества</a>
             <a href="#categories">Категории</a>
             <a href="shop.html" class="btn">Весь ассортимент</a>
-            <a href="auth.html" class="btn" style="background: transparent; border: 1px solid #e6b422; color: #e6b422;">Войти</a>
+            <a href="auth.html" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">Войти</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </header>
 
@@ -290,27 +369,27 @@
             <h2 class="section-title">Категории товаров</h2>
             <div class="categories">
                 <div class="category-item" data-category="Yacht">
-                    <i class="fas fa-ship" style="font-size: 2rem; color: #e6b422;"></i>
+                    <i class="fas fa-ship" style="font-size: 2rem; color: var(--accent);"></i>
                     <h3>Суперяхты</h3>
                     <p>От 30 до 100+ метров</p>
                 </div>
                 <div class="category-item" data-category="Plane">
-                    <i class="fas fa-plane" style="font-size: 2rem; color: #e6b422;"></i>
+                    <i class="fas fa-plane" style="font-size: 2rem; color: var(--accent);"></i>
                     <h3>Бизнес-авиация</h3>
                     <p>Gulfstream, Bombardier, Embraer</p>
                 </div>
                 <div class="category-item" data-category="Island">
-                    <i class="fas fa-umbrella-beach" style="font-size: 2rem; color: #e6b422;"></i>
+                    <i class="fas fa-umbrella-beach" style="font-size: 2rem; color: var(--accent);"></i>
                     <h3>Частные острова</h3>
                     <p>Мальдивы, Карибы, Сейшелы</p>
                 </div>
                 <div class="category-item" data-category="Mansion">
-                    <i class="fas fa-building" style="font-size: 2rem; color: #e6b422;"></i>
+                    <i class="fas fa-building" style="font-size: 2rem; color: var(--accent);"></i>
                     <h3>Элитная недвижимость</h3>
                     <p>Пентхаусы, шале, особняки</p>
                 </div>
                 <div class="category-item" data-category="Space">
-                    <i class="fas fa-rocket" style="font-size: 2rem; color: #e6b422;"></i>
+                    <i class="fas fa-rocket" style="font-size: 2rem; color: var(--accent);"></i>
                     <h3>Космический туризм</h3>
                     <p>Суборбитальные и орбитальные туры</p>
                 </div>
@@ -321,9 +400,9 @@
     <footer>
         <div class="container">
             <div style="margin-bottom: 2rem;">
-                <i class="fab fa-instagram" style="font-size: 1.5rem; margin: 0 0.5rem; color: #e6b422;"></i>
-                <i class="fab fa-telegram" style="font-size: 1.5rem; margin: 0 0.5rem; color: #e6b422;"></i>
-                <i class="fab fa-youtube" style="font-size: 1.5rem; margin: 0 0.5rem; color: #e6b422;"></i>
+                <i class="fab fa-instagram" style="font-size: 1.5rem; margin: 0 0.5rem; color: var(--accent);"></i>
+                <i class="fab fa-telegram" style="font-size: 1.5rem; margin: 0 0.5rem; color: var(--accent);"></i>
+                <i class="fab fa-youtube" style="font-size: 1.5rem; margin: 0 0.5rem; color: var(--accent);"></i>
             </div>
             <p>© 2025 LUXARY — Элитный маркетплейс. Все права защищены.</p>
             <p style="margin-top: 0.5rem; font-size: 0.8rem;">info@luxary.com | +7 (495) 777-88-99</p>
@@ -353,6 +432,34 @@
                 }
             });
         });
+
+        // Тема
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                document.body.classList.remove('light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            localStorage.setItem('luxary_theme', theme);
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.contains('light');
+            applyTheme(isLight ? 'dark' : 'light');
+        }
+
+        // Загрузка сохранённой темы
+        const savedTheme = localStorage.getItem('luxary_theme') || 'dark';
+        applyTheme(savedTheme);
+
+        themeToggle.addEventListener('click', toggleTheme);
     </script>
 </body>
 </html>

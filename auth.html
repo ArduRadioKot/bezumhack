@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LUXARY — Авторизация</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -291,48 +294,6 @@
             margin-top: 1rem;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            max-width: 400px;
-            width: 90%;
-            border-radius: 32px;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .amount-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1.5rem 0;
-        }
-
-        .amount-btn {
-            background: var(--bg-primary);
-            border: 1px solid var(--accent);
-            padding: 10px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .amount-btn:hover {
-            background: var(--accent);
-            color: #111;
-        }
-
         footer {
             background: var(--glass-bg);
             backdrop-filter: blur(8px);
@@ -343,597 +304,560 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @media (max-width: 600px) {
-            .container { padding: 1rem; }
-            .form-pane { padding: 1.5rem; }
-            .profile-info { padding: 1.5rem; }
+            .container {
+                padding: 1rem;
+            }
+
+            .form-pane {
+                padding: 1.5rem;
+            }
+
+            .profile-info {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
+
 <body>
-<header>
-    <a href="index.html" class="logo">LUXARY</a>
-    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-</header>
+    <header>
+        <a href="index.html" class="logo">LUXARY</a>
+        <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+    </header>
 
-<div class="container">
-    <div class="auth-card" id="authCard">
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="login">Вход</button>
-            <button class="tab-btn" data-tab="register">Регистрация</button>
+    <div class="container">
+        <div class="auth-card" id="authCard">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="login">Вход</button>
+                <button class="tab-btn" data-tab="register">Регистрация</button>
+            </div>
+
+            <div id="loginPane" class="form-pane active">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required placeholder="example@mail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••">
+                    </div>
+                    <button type="submit" class="btn btn-subtle">Войти</button>
+                    <button type="button" class="btn btn-ghost" id="guestLoginBtn">Войти как гость</button>
+                    <div id="loginMessage" class="message"></div>
+                </form>
+            </div>
+
+            <div id="registerPane" class="form-pane">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Полное имя</label>
+                        <input type="text" id="regName" required placeholder="Иван Петров">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" required placeholder="ivan@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="regPassword" required placeholder="минимум 6 символов">
+                    </div>
+                    <div class="form-group">
+                        <label>Подтверждение пароля</label>
+                        <input type="password" id="regConfirmPassword" required placeholder="повторите пароль">
+                    </div>
+                    <button type="submit" class="btn">Зарегистрироваться</button>
+                    <div id="registerMessage" class="message"></div>
+                </form>
+            </div>
         </div>
 
-        <div id="loginPane" class="form-pane active">
-            <form id="loginForm">
+        <div id="profileCard" class="auth-card" style="display: none;">
+            <div class="profile-info">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <div class="profile-name" id="profileName"></div>
+                <div class="profile-email" id="profileEmail"></div>
+                <div class="profile-balance" id="profileBalance"></div>
+                <div class="profile-role" id="profileRole" style="display: none;"></div>
+
+                <div class="action-stack">
+                    <button id="topupBalanceBtn" class="btn"
+                        style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
+                        Пополнить баланс
+                    </button>
+                    <button id="goToShopBtn" class="btn">Перейти в магазин</button>
+                    <button id="editProfileBtn" class="btn"
+                        style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
+                        Редактировать профиль
+                    </button>
+                    <button id="logoutBtn" class="btn">Выйти</button>
+                </div>
+            </div>
+
+            <div id="editForm"
+                style="display: none; margin-top: 1rem; padding: 1rem 2rem 2rem; border-top: 1px solid var(--border);">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="editName">
+                </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" id="loginEmail" required placeholder="example@mail.com">
+                    <input type="email" id="editEmail">
                 </div>
                 <div class="form-group">
-                    <label>Пароль</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••">
-                </div>
-                <button type="submit" class="btn btn-subtle">Войти</button>
-                <button type="button" class="btn btn-ghost" id="guestLoginBtn">Войти как гость</button>
-                <div id="loginMessage" class="message"></div>
-            </form>
-        </div>
-
-        <div id="registerPane" class="form-pane">
-            <form id="registerForm">
-                <div class="form-group">
-                    <label>Полное имя</label>
-                    <input type="text" id="regName" required placeholder="Иван Петров">
+                    <label>Новый пароль (оставьте пустым, если не менять)</label>
+                    <input type="password" id="editPassword">
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" required placeholder="ivan@example.com">
+                    <label><input type="checkbox" id="editNotifications"> Получать уведомления</label>
                 </div>
-                <div class="form-group">
-                    <label>Пароль</label>
-                    <input type="password" id="regPassword" required placeholder="минимум 6 символов">
-                </div>
-                <div class="form-group">
-                    <label>Подтверждение пароля</label>
-                    <input type="password" id="regConfirmPassword" required placeholder="повторите пароль">
-                </div>
-                <button type="submit" class="btn">Зарегистрироваться</button>
-                <div id="registerMessage" class="message"></div>
-            </form>
-        </div>
-    </div>
-
-    <div id="profileCard" class="auth-card" style="display: none;">
-        <div class="profile-info">
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <div class="profile-name" id="profileName"></div>
-            <div class="profile-email" id="profileEmail"></div>
-            <div class="profile-balance" id="profileBalance"></div>
-            <div class="profile-role" id="profileRole" style="display: none;"></div>
-
-            <div class="action-stack">
-                <button id="topupBalanceBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
-                    Пополнить баланс
+                <button id="saveProfileChangesBtn" class="btn">Сохранить</button>
+                <button id="cancelEditBtn" type="button" class="btn-subtle" style="margin-top: 0.75rem; width: 100%;">
+                    Отмена
                 </button>
-                <button id="goToShopBtn" class="btn">Перейти в магазин</button>
-                <button id="editProfileBtn" class="btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">
-                    Редактировать профиль
-                </button>
-                <button id="logoutBtn" class="btn">Выйти</button>
             </div>
-        </div>
-
-        <div id="editForm" style="display: none; margin-top: 1rem; padding: 1rem 2rem 2rem; border-top: 1px solid var(--border);">
-            <div class="form-group">
-                <label>Имя</label>
-                <input type="text" id="editName">
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="editEmail">
-            </div>
-            <div class="form-group">
-                <label>Новый пароль (оставьте пустым, если не менять)</label>
-                <input type="password" id="editPassword">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="editNotifications"> Получать уведомления</label>
-            </div>
-            <button id="saveProfileChangesBtn" class="btn">Сохранить</button>
-            <button id="cancelEditBtn" type="button" class="btn-subtle" style="margin-top: 0.75rem; width: 100%;">
-                Отмена
-            </button>
         </div>
     </div>
-</div>
 
-<div id="topupModal" class="modal">
-    <div class="modal-content">
-        <h3>Пополнение баланса</h3>
-        <div class="amount-buttons">
-            <button class="amount-btn" data-amount="100000">100 000 ₽</button>
-            <button class="amount-btn" data-amount="500000">500 000 ₽</button>
-            <button class="amount-btn" data-amount="1000000">1 000 000 ₽</button>
-            <button class="amount-btn" data-amount="5000000">5 000 000 ₽</button>
-        </div>
-        <button id="closeTopupModal" class="btn" style="background: none; border: 1px solid var(--border); color: var(--text-primary);">
-            Отмена
-        </button>
-    </div>
-</div>
+    <footer>
+        <p>© 2025 Luxary — Премиальный маркетплейс</p>
+    </footer>
 
-<footer>
-    <p>© 2025 Luxary — Премиальный маркетплейс</p>
-</footer>
+    <script>
+        const USERS_KEY = 'luxary_users';
+        const CURRENT_USER_KEY = 'luxary_current_user';
+        const THEME_KEY = 'luxary_theme';
 
-<script>
-    const USERS_KEY = 'luxary_users';
-    const CURRENT_USER_KEY = 'luxary_current_user';
-    const THEME_KEY = 'luxary_theme';
+        const USER_MODE = {
+            AUTH: 'auth',
+            GUEST: 'guest'
+        };
 
-    const USER_MODE = {
-        AUTH: 'auth',
-        GUEST: 'guest'
-    };
+        // ========== Работа с пользователями ==========
+        function initUsers() {
+            if (!localStorage.getItem(USERS_KEY)) {
+                const demoUser = {
+                    id: 'local-admin',
+                    mode: USER_MODE.AUTH,
+                    name: 'Алексей Смирнов',
+                    email: 'admin@example.com',
+                    password: '123456',
+                    balance: 500000,
+                    notifications: true,
+                    role: 'admin',
+                    createdAt: new Date().toISOString()
+                };
+                localStorage.setItem(USERS_KEY, JSON.stringify([demoUser]));
+            } else {
+                const users = getUsers();
+                let updated = false;
+                const newUsers = users.map(u => {
+                    const next = { ...u };
+                    if (next.balance === undefined) {
+                        next.balance = 500000;
+                        updated = true;
+                    }
+                    if (!next.mode) {
+                        next.mode = USER_MODE.AUTH;
+                        updated = true;
+                    }
+                    if (!next.role) {
+                        next.role = (next.email === 'admin@example.com') ? 'admin' : 'user';
+                        updated = true;
+                    }
+                    return next;
+                });
+                if (updated) saveUsers(newUsers);
+            }
+        }
 
-    // ========== Работа с пользователями ==========
-    function initUsers() {
-        if (!localStorage.getItem(USERS_KEY)) {
-            const demoUser = {
-                id: 'local-admin',
-                mode: USER_MODE.AUTH,
-                name: 'Алексей Смирнов',
-                email: 'admin@example.com',
-                password: '123456',
-                balance: 500000,
-                notifications: true,
-                role: 'admin',
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function findUserByEmail(email) {
+            return getUsers().find(u => u.email === email);
+        }
+
+        function addUser(user) {
+            const users = getUsers();
+            if (users.some(u => u.email === user.email)) return false;
+            users.push(user);
+            saveUsers(users);
+            return true;
+        }
+
+        function updateUser(email, updatedData) {
+            const users = getUsers();
+            const index = users.findIndex(u => u.email === email);
+            if (index === -1) return false;
+            users[index] = { ...users[index], ...updatedData };
+            saveUsers(users);
+            return true;
+        }
+
+        function getCurrentUser() {
+            const raw = localStorage.getItem(CURRENT_USER_KEY);
+            return raw ? JSON.parse(raw) : null;
+        }
+
+        function setCurrentUser(user) {
+            if (user) localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+            else localStorage.removeItem(CURRENT_USER_KEY);
+        }
+
+        function isGuestUser(user = getCurrentUser()) {
+            return !!user && user.mode === USER_MODE.GUEST;
+        }
+
+        function createGuestSession() {
+            return {
+                id: 'guest-session',
+                mode: USER_MODE.GUEST,
+                name: 'Гость',
                 createdAt: new Date().toISOString()
             };
-            localStorage.setItem(USERS_KEY, JSON.stringify([demoUser]));
-        } else {
-            const users = getUsers();
-            let updated = false;
-            const newUsers = users.map(u => {
-                const next = { ...u };
-                if (next.balance === undefined) {
-                    next.balance = 500000;
-                    updated = true;
-                }
-                if (!next.mode) {
-                    next.mode = USER_MODE.AUTH;
-                    updated = true;
-                }
-                if (!next.role) {
-                    next.role = (next.email === 'admin@example.com') ? 'admin' : 'user';
-                    updated = true;
-                }
-                return next;
-            });
-            if (updated) saveUsers(newUsers);
         }
-    }
 
-    function getUsers() {
-        return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-    }
+        // ========== UI элементы ==========
+        const authCard = document.getElementById('authCard');
+        const profileCard = document.getElementById('profileCard');
+        const loginPane = document.getElementById('loginPane');
+        const registerPane = document.getElementById('registerPane');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginMessage = document.getElementById('loginMessage');
+        const registerMessage = document.getElementById('registerMessage');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const editForm = document.getElementById('editForm');
+        const saveProfileChangesBtn = document.getElementById('saveProfileChangesBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const profileNameSpan = document.getElementById('profileName');
+        const profileEmailSpan = document.getElementById('profileEmail');
+        const profileBalanceSpan = document.getElementById('profileBalance');
+        const profileRoleSpan = document.getElementById('profileRole');
+        const topupBalanceBtn = document.getElementById('topupBalanceBtn');
+        const goToShopBtn = document.getElementById('goToShopBtn');
+        const guestLoginBtn = document.getElementById('guestLoginBtn');
+        const themeToggle = document.getElementById('themeToggle');
 
-    function saveUsers(users) {
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
-
-    function findUserByEmail(email) {
-        return getUsers().find(u => u.email === email);
-    }
-
-    function addUser(user) {
-        const users = getUsers();
-        if (users.some(u => u.email === user.email)) return false;
-        users.push(user);
-        saveUsers(users);
-        return true;
-    }
-
-    function updateUser(email, updatedData) {
-        const users = getUsers();
-        const index = users.findIndex(u => u.email === email);
-        if (index === -1) return false;
-        users[index] = { ...users[index], ...updatedData };
-        saveUsers(users);
-        return true;
-    }
-
-    function getCurrentUser() {
-        const raw = localStorage.getItem(CURRENT_USER_KEY);
-        return raw ? JSON.parse(raw) : null;
-    }
-
-    function setCurrentUser(user) {
-        if (user) localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-        else localStorage.removeItem(CURRENT_USER_KEY);
-    }
-
-    function isGuestUser(user = getCurrentUser()) {
-        return !!user && user.mode === USER_MODE.GUEST;
-    }
-
-    function createGuestSession() {
-        return {
-            id: 'guest-session',
-            mode: USER_MODE.GUEST,
-            name: 'Гость',
-            createdAt: new Date().toISOString()
-        };
-    }
-
-    // ========== UI элементы ==========
-    const authCard = document.getElementById('authCard');
-    const profileCard = document.getElementById('profileCard');
-    const loginPane = document.getElementById('loginPane');
-    const registerPane = document.getElementById('registerPane');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const loginMessage = document.getElementById('loginMessage');
-    const registerMessage = document.getElementById('registerMessage');
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const editForm = document.getElementById('editForm');
-    const saveProfileChangesBtn = document.getElementById('saveProfileChangesBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const profileNameSpan = document.getElementById('profileName');
-    const profileEmailSpan = document.getElementById('profileEmail');
-    const profileBalanceSpan = document.getElementById('profileBalance');
-    const profileRoleSpan = document.getElementById('profileRole');
-    const topupBalanceBtn = document.getElementById('topupBalanceBtn');
-    const topupModal = document.getElementById('topupModal');
-    const closeTopupModal = document.getElementById('closeTopupModal');
-    const amountBtns = document.querySelectorAll('.amount-btn');
-    const goToShopBtn = document.getElementById('goToShopBtn');
-    const guestLoginBtn = document.getElementById('guestLoginBtn');
-    const themeToggle = document.getElementById('themeToggle');
-
-    // ========== Утилиты ==========
-    function switchTab(tabId) {
-        if (tabId === 'login') {
-            loginPane.classList.add('active');
-            registerPane.classList.remove('active');
-            tabBtns[0].classList.add('active');
-            tabBtns[1].classList.remove('active');
-        } else {
-            registerPane.classList.add('active');
-            loginPane.classList.remove('active');
-            tabBtns[1].classList.add('active');
-            tabBtns[0].classList.remove('active');
-        }
-        clearMessages();
-    }
-
-    function clearMessages() {
-        [loginMessage, registerMessage].forEach(el => {
-            el.textContent = '';
-            el.className = 'message';
-        });
-    }
-
-    function showMessage(element, text, type) {
-        element.textContent = text;
-        element.className = `message ${type}`;
-        setTimeout(() => {
-            if (element.textContent === text) {
-                element.textContent = '';
-                element.className = 'message';
+        // ========== Утилиты ==========
+        function switchTab(tabId) {
+            if (tabId === 'login') {
+                loginPane.classList.add('active');
+                registerPane.classList.remove('active');
+                tabBtns[0].classList.add('active');
+                tabBtns[1].classList.remove('active');
+            } else {
+                registerPane.classList.add('active');
+                loginPane.classList.remove('active');
+                tabBtns[1].classList.add('active');
+                tabBtns[0].classList.remove('active');
             }
-        }, 3500);
-    }
-
-    function setGuestUIState(isGuest) {
-        profileEmailSpan.style.display = isGuest ? 'none' : 'block';
-        profileBalanceSpan.style.display = isGuest ? 'none' : 'block';
-        profileRoleSpan.style.display = 'none';
-        topupBalanceBtn.style.display = isGuest ? 'none' : 'inline-flex';
-        editProfileBtn.style.display = isGuest ? 'none' : 'inline-flex';
-
-        if (isGuest) {
-            editForm.style.display = 'none';
-        }
-    }
-
-    function showProfilePanel(user) {
-        const guest = isGuestUser(user);
-
-        authCard.style.display = 'none';
-        profileCard.style.display = 'block';
-
-        profileNameSpan.textContent = guest ? 'Гостевой режим' : (user.name || 'Пользователь');
-        profileEmailSpan.textContent = guest ? '' : (user.email || '');
-        profileBalanceSpan.textContent = guest ? '' : `Баланс: ${(user.balance || 0).toLocaleString()} ₽`;
-        
-        if (!guest && user.role === 'admin') {
-            profileRoleSpan.textContent = 'Администратор';
-            profileRoleSpan.style.display = 'inline-block';
-        } else {
-            profileRoleSpan.style.display = 'none';
-        }
-
-        document.getElementById('editName').value = user.name || '';
-        document.getElementById('editEmail').value = user.email || '';
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editNotifications').checked = user.notifications || false;
-
-        setGuestUIState(guest);
-        editForm.style.display = 'none';
-    }
-
-    function showAuthPanel() {
-        authCard.style.display = 'block';
-        profileCard.style.display = 'none';
-
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('regName').value = '';
-        document.getElementById('regEmail').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regConfirmPassword').value = '';
-
-        clearMessages();
-    }
-
-    // ========== Бизнес-логика ==========
-    function handleLogin(email, password) {
-        if (!email || !password) {
-            showMessage(loginMessage, 'Заполните все поля', 'error');
-            return false;
-        }
-
-        const user = findUserByEmail(email);
-        if (!user || user.password !== password) {
-            showMessage(loginMessage, 'Неверный email или пароль', 'error');
-            return false;
-        }
-
-        const sessionUser = {
-            ...user,
-            mode: USER_MODE.AUTH
-        };
-
-        setCurrentUser(sessionUser);
-        showProfilePanel(sessionUser);
-        return true;
-    }
-
-    function handleRegister(name, email, password, confirm) {
-        if (!name || !email || !password || !confirm) {
-            showMessage(registerMessage, 'Заполните все поля', 'error');
-            return false;
-        }
-
-        if (password !== confirm) {
-            showMessage(registerMessage, 'Пароли не совпадают', 'error');
-            return false;
-        }
-
-        if (password.length < 6) {
-            showMessage(registerMessage, 'Пароль должен быть не менее 6 символов', 'error');
-            return false;
-        }
-
-        if (findUserByEmail(email)) {
-            showMessage(registerMessage, 'Пользователь с таким email уже существует', 'error');
-            return false;
-        }
-
-        const newUser = {
-            id: `local-${Date.now()}`,
-            mode: USER_MODE.AUTH,
-            name,
-            email,
-            password,
-            balance: 500000,
-            notifications: false,
-            role: 'user',
-            createdAt: new Date().toISOString()
-        };
-
-        if (!addUser(newUser)) {
-            showMessage(registerMessage, 'Ошибка регистрации', 'error');
-            return false;
-        }
-
-        showMessage(registerMessage, 'Регистрация успешна. Теперь войдите.', 'success');
-
-        setTimeout(() => {
-            switchTab('login');
-            document.getElementById('loginEmail').value = email;
-            document.getElementById('loginPassword').value = '';
             clearMessages();
-        }, 1200);
-
-        return true;
-    }
-
-    function logout() {
-        setCurrentUser(null);
-        showAuthPanel();
-        switchTab('login');
-    }
-
-    function toggleEditForm() {
-        const currentUser = getCurrentUser();
-        if (!currentUser || isGuestUser(currentUser)) return;
-        editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function saveProfileChanges() {
-        const currentUser = getCurrentUser();
-        if (!currentUser || isGuestUser(currentUser)) {
-            alert('Гостевой профиль нельзя редактировать');
-            return;
         }
 
-        const newName = document.getElementById('editName').value.trim();
-        const newEmail = document.getElementById('editEmail').value.trim();
-        const newPassword = document.getElementById('editPassword').value;
-        const notifications = document.getElementById('editNotifications').checked;
-
-        if (!newName || !newEmail) {
-            alert('Имя и email обязательны');
-            return;
+        function clearMessages() {
+            [loginMessage, registerMessage].forEach(el => {
+                el.textContent = '';
+                el.className = 'message';
+            });
         }
 
-        if (newEmail !== currentUser.email) {
-            const existing = findUserByEmail(newEmail);
-            if (existing && existing.email !== currentUser.email) {
-                alert('Этот email уже используется другим пользователем');
-                return;
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            setTimeout(() => {
+                if (element.textContent === text) {
+                    element.textContent = '';
+                    element.className = 'message';
+                }
+            }, 3500);
+        }
+
+        function setGuestUIState(isGuest) {
+            profileEmailSpan.style.display = isGuest ? 'none' : 'block';
+            profileBalanceSpan.style.display = isGuest ? 'none' : 'block';
+            profileRoleSpan.style.display = 'none';
+            topupBalanceBtn.style.display = isGuest ? 'none' : 'inline-flex';
+            editProfileBtn.style.display = isGuest ? 'none' : 'inline-flex';
+
+            if (isGuest) {
+                editForm.style.display = 'none';
             }
         }
 
-        const updatedData = { name: newName, email: newEmail, notifications };
+        function showProfilePanel(user) {
+            const guest = isGuestUser(user);
 
-        if (newPassword) {
-            if (newPassword.length < 6) {
-                alert('Новый пароль должен быть не менее 6 символов');
-                return;
+            authCard.style.display = 'none';
+            profileCard.style.display = 'block';
+
+            profileNameSpan.textContent = guest ? 'Гостевой режим' : (user.name || 'Пользователь');
+            profileEmailSpan.textContent = guest ? '' : (user.email || '');
+            profileBalanceSpan.textContent = guest ? '' : `Баланс: ${(user.balance || 0).toLocaleString()} ₽`;
+
+            if (!guest && user.role === 'admin') {
+                profileRoleSpan.textContent = 'Администратор';
+                profileRoleSpan.style.display = 'inline-block';
+            } else {
+                profileRoleSpan.style.display = 'none';
             }
-            updatedData.password = newPassword;
-        }
 
-        if (!updateUser(currentUser.email, updatedData)) {
-            alert('Ошибка обновления');
-            return;
-        }
-
-        const updatedUser = findUserByEmail(newEmail);
-        const sessionUser = { ...updatedUser, mode: USER_MODE.AUTH };
-        setCurrentUser(sessionUser);
-        showProfilePanel(sessionUser);
-        alert('Профиль успешно обновлён');
-    }
-
-    function topupBalance(amount) {
-        const currentUser = getCurrentUser();
-        if (!currentUser) return;
-
-        if (isGuestUser(currentUser)) {
-            alert('В гостевом режиме пополнение баланса недоступно');
-            topupModal.style.display = 'none';
-            return;
-        }
-
-        const newBalance = (currentUser.balance || 0) + amount;
-        if (!updateUser(currentUser.email, { balance: newBalance })) {
-            alert('Ошибка пополнения');
-            topupModal.style.display = 'none';
-            return;
-        }
-
-        const updatedUser = findUserByEmail(currentUser.email);
-        const sessionUser = { ...updatedUser, mode: USER_MODE.AUTH };
-        setCurrentUser(sessionUser);
-        showProfilePanel(sessionUser);
-
-        alert(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽`);
-        topupModal.style.display = 'none';
-    }
-
-    function enterGuestMode() {
-        const guestUser = createGuestSession();
-        setCurrentUser(guestUser);
-        showProfilePanel(guestUser);
-    }
-
-    // ========== Тема ==========
-    function applyTheme(theme) {
-        if (theme === 'dark') document.body.classList.add('dark');
-        else document.body.classList.remove('dark');
-        localStorage.setItem(THEME_KEY, theme);
-    }
-
-    function toggleTheme() {
-        applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
-    }
-
-    // ========== Обработчики ==========
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleLogin(
-            document.getElementById('loginEmail').value.trim(),
-            document.getElementById('loginPassword').value
-        );
-    });
-
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleRegister(
-            document.getElementById('regName').value.trim(),
-            document.getElementById('regEmail').value.trim(),
-            document.getElementById('regPassword').value,
-            document.getElementById('regConfirmPassword').value
-        );
-    });
-
-    guestLoginBtn.addEventListener('click', enterGuestMode);
-    logoutBtn.addEventListener('click', logout);
-    editProfileBtn.addEventListener('click', toggleEditForm);
-    saveProfileChangesBtn.addEventListener('click', saveProfileChanges);
-
-    cancelEditBtn.addEventListener('click', () => {
-        editForm.style.display = 'none';
-        const user = getCurrentUser();
-        if (user && !isGuestUser(user)) {
             document.getElementById('editName').value = user.name || '';
             document.getElementById('editEmail').value = user.email || '';
             document.getElementById('editPassword').value = '';
             document.getElementById('editNotifications').checked = user.notifications || false;
+
+            setGuestUIState(guest);
+            editForm.style.display = 'none';
         }
-    });
 
-    topupBalanceBtn.addEventListener('click', () => {
-        if (isGuestUser()) {
-            alert('В гостевом режиме пополнение баланса недоступно');
-            return;
+        function showAuthPanel() {
+            authCard.style.display = 'block';
+            profileCard.style.display = 'none';
+
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+
+            clearMessages();
         }
-        topupModal.style.display = 'flex';
-    });
 
-    closeTopupModal.addEventListener('click', () => {
-        topupModal.style.display = 'none';
-    });
+        // ========== Бизнес-логика ==========
+        function handleLogin(email, password) {
+            if (!email || !password) {
+                showMessage(loginMessage, 'Заполните все поля', 'error');
+                return false;
+            }
 
-    amountBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            topupBalance(parseInt(btn.dataset.amount, 10));
+            const user = findUserByEmail(email);
+            if (!user || user.password !== password) {
+                showMessage(loginMessage, 'Неверный email или пароль', 'error');
+                return false;
+            }
+
+            const sessionUser = {
+                ...user,
+                mode: USER_MODE.AUTH
+            };
+
+            setCurrentUser(sessionUser);
+            showProfilePanel(sessionUser);
+            return true;
+        }
+
+        function handleRegister(name, email, password, confirm) {
+            if (!name || !email || !password || !confirm) {
+                showMessage(registerMessage, 'Заполните все поля', 'error');
+                return false;
+            }
+
+            if (password !== confirm) {
+                showMessage(registerMessage, 'Пароли не совпадают', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showMessage(registerMessage, 'Пароль должен быть не менее 6 символов', 'error');
+                return false;
+            }
+
+            if (findUserByEmail(email)) {
+                showMessage(registerMessage, 'Пользователь с таким email уже существует', 'error');
+                return false;
+            }
+
+            const newUser = {
+                id: `local-${Date.now()}`,
+                mode: USER_MODE.AUTH,
+                name,
+                email,
+                password,
+                balance: 500000,
+                notifications: false,
+                role: 'user',
+                createdAt: new Date().toISOString()
+            };
+
+            if (!addUser(newUser)) {
+                showMessage(registerMessage, 'Ошибка регистрации', 'error');
+                return false;
+            }
+
+            showMessage(registerMessage, 'Регистрация успешна. Теперь войдите.', 'success');
+
+            setTimeout(() => {
+                switchTab('login');
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPassword').value = '';
+                clearMessages();
+            }, 1200);
+
+            return true;
+        }
+
+        function logout() {
+            setCurrentUser(null);
+            showAuthPanel();
+            switchTab('login');
+        }
+
+        function toggleEditForm() {
+            const currentUser = getCurrentUser();
+            if (!currentUser || isGuestUser(currentUser)) return;
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function saveProfileChanges() {
+            const currentUser = getCurrentUser();
+            if (!currentUser || isGuestUser(currentUser)) {
+                alert('Гостевой профиль нельзя редактировать');
+                return;
+            }
+
+            const newName = document.getElementById('editName').value.trim();
+            const newEmail = document.getElementById('editEmail').value.trim();
+            const newPassword = document.getElementById('editPassword').value;
+            const notifications = document.getElementById('editNotifications').checked;
+
+            if (!newName || !newEmail) {
+                alert('Имя и email обязательны');
+                return;
+            }
+
+            if (newEmail !== currentUser.email) {
+                const existing = findUserByEmail(newEmail);
+                if (existing && existing.email !== currentUser.email) {
+                    alert('Этот email уже используется другим пользователем');
+                    return;
+                }
+            }
+
+            const updatedData = { name: newName, email: newEmail, notifications };
+
+            if (newPassword) {
+                if (newPassword.length < 6) {
+                    alert('Новый пароль должен быть не менее 6 символов');
+                    return;
+                }
+                updatedData.password = newPassword;
+            }
+
+            if (!updateUser(currentUser.email, updatedData)) {
+                alert('Ошибка обновления');
+                return;
+            }
+
+            const updatedUser = findUserByEmail(newEmail);
+            const sessionUser = { ...updatedUser, mode: USER_MODE.AUTH };
+            setCurrentUser(sessionUser);
+            showProfilePanel(sessionUser);
+            alert('Профиль успешно обновлён');
+        }
+
+        function enterGuestMode() {
+            const guestUser = createGuestSession();
+            setCurrentUser(guestUser);
+            showProfilePanel(guestUser);
+        }
+
+        // ========== Тема ==========
+        function applyTheme(theme) {
+            if (theme === 'dark') document.body.classList.add('dark');
+            else document.body.classList.remove('dark');
+            localStorage.setItem(THEME_KEY, theme);
+        }
+
+        function toggleTheme() {
+            applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
+        }
+
+        // ========== Обработчики ==========
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleLogin(
+                document.getElementById('loginEmail').value.trim(),
+                document.getElementById('loginPassword').value
+            );
         });
-    });
 
-    window.addEventListener('click', (e) => {
-        if (e.target === topupModal) topupModal.style.display = 'none';
-    });
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleRegister(
+                document.getElementById('regName').value.trim(),
+                document.getElementById('regEmail').value.trim(),
+                document.getElementById('regPassword').value,
+                document.getElementById('regConfirmPassword').value
+            );
+        });
 
-    goToShopBtn.addEventListener('click', () => {
-        window.location.href = 'shop.html';
-    });
+        guestLoginBtn.addEventListener('click', enterGuestMode);
+        logoutBtn.addEventListener('click', logout);
+        editProfileBtn.addEventListener('click', toggleEditForm);
+        saveProfileChangesBtn.addEventListener('click', saveProfileChanges);
 
-    themeToggle.addEventListener('click', toggleTheme);
+        cancelEditBtn.addEventListener('click', () => {
+            editForm.style.display = 'none';
+            const user = getCurrentUser();
+            if (user && !isGuestUser(user)) {
+                document.getElementById('editName').value = user.name || '';
+                document.getElementById('editEmail').value = user.email || '';
+                document.getElementById('editPassword').value = '';
+                document.getElementById('editNotifications').checked = user.notifications || false;
+            }
+        });
 
-    // ========== Инициализация ==========
-    function init() {
-        initUsers();
+        topupBalanceBtn.addEventListener('click', () => {
+            if (isGuestUser()) {
+                alert('В гостевом режиме пополнение баланса недоступно');
+                return;
+            }
+            // Перенаправляем на страницу пополнения баланса
+            window.location.href = 'balance.html';
+        });
 
-        const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-        applyTheme(savedTheme);
+        goToShopBtn.addEventListener('click', () => {
+            window.location.href = 'shop.html';
+        });
 
-        const currentUser = getCurrentUser();
-        if (currentUser) showProfilePanel(currentUser);
-        else showAuthPanel();
-    }
+        themeToggle.addEventListener('click', toggleTheme);
 
-    init();
-</script>
+        // ========== Инициализация ==========
+        function init() {
+            initUsers();
+
+            const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+            applyTheme(savedTheme);
+
+            const currentUser = getCurrentUser();
+            if (currentUser) showProfilePanel(currentUser);
+            else showAuthPanel();
+        }
+
+        init();
+    </script>
 </body>
+
 </html>
