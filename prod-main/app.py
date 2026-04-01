@@ -113,11 +113,86 @@ def init_db():
         )
     ''')
 
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS consent_full_snapshot (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            consent_scope TEXT NOT NULL,
+            ip_address TEXT,
+            user_agent TEXT,
+            referrer TEXT,
+            client_payload_json TEXT NOT NULL,
+            server_snapshot_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user_device (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            browser TEXT,
+            browser_version TEXT,
+            os TEXT,
+            os_version TEXT,
+            device_type TEXT,
+            screen_resolution TEXT,
+            screen_color_depth TEXT,
+            language TEXT,
+            languages TEXT,
+            timezone TEXT,
+            timezone_offset TEXT,
+            platform TEXT,
+            cpu_cores TEXT,
+            memory TEXT,
+            gpu TEXT,
+            vendor TEXT,
+            touch_support TEXT,
+            connection_type TEXT,
+            connection_downlink TEXT,
+            connection_rtt TEXT,
+            connection_save_data TEXT,
+            ip_address TEXT,
+            user_agent TEXT,
+            do_not_track TEXT,
+            cookie_enabled TEXT,
+            java_enabled TEXT,
+            device_memory TEXT,
+            hardware_concurrency TEXT,
+            screen_avail_resolution TEXT,
+            screen_pixel_depth TEXT,
+            device_pixel_ratio TEXT,
+            memory_used TEXT,
+            memory_total TEXT,
+            memory_limit TEXT,
+            plugins TEXT,
+            canvas_fingerprint TEXT,
+            audio_fingerprint TEXT,
+            webrtc_ips TEXT,
+            collected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES user(id)
+        )
+    ''')
+
     # Migration for existing DBs
     user_columns = [row['name'] for row in c.execute("PRAGMA table_info(user)").fetchall()]
     if 'shipping_address' not in user_columns:
         c.execute('ALTER TABLE user ADD COLUMN shipping_address TEXT')
     
+    # Migration for user_device table - add new columns if they don't exist
+    device_columns = [row['name'] for row in c.execute("PRAGMA table_info(user_device)").fetchall()]
+    device_columns_dict = {col: False for col in device_columns}
+    
+    new_columns = [
+        'timezone_offset', 'screen_avail_resolution', 'screen_pixel_depth',
+        'device_pixel_ratio', 'memory_used', 'memory_total', 'memory_limit',
+        'plugins', 'canvas_fingerprint', 'audio_fingerprint', 'webrtc_ips',
+        'connection_save_data', 'collected_at'
+    ]
+    
+    for col in new_columns:
+        if col not in device_columns_dict:
+            c.execute(f'ALTER TABLE user_device ADD COLUMN {col} TEXT')
+
     db.commit()
     
     # Initialize products if empty
@@ -176,6 +251,8 @@ def init_db():
     cards_count = c.fetchone()[0]
     c.execute('SELECT COUNT(*) FROM user_favorite')
     favorites_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM consent_full_snapshot')
+    consent_snapshots_count = c.fetchone()[0]
     
     print(f'\n📊 Database Summary:')
     print(f'   Products: {products_count}')
@@ -184,7 +261,8 @@ def init_db():
     print(f'   Order Items: {order_items_count}\n')
     print(f'   Users: {users_count}\n')
     print(f'   Cards: {cards_count}')
-    print(f'   Favorites: {favorites_count}\n')
+    print(f'   Favorites: {favorites_count}')
+    print(f'   Consent snapshots: {consent_snapshots_count}\n')
     
     db.close()
 
@@ -290,6 +368,7 @@ def register_user():
     email = (data.get('email') or '').strip().lower()
     password = data.get('password') or ''
     shipping_address = (data.get('shipping_address') or '').strip() or None
+    device_data = data.get('device_data', {})
 
     if not name or not email or not password:
         return jsonify({'error': 'Missing required fields'}), 400
@@ -308,6 +387,63 @@ def register_user():
     db.commit()
 
     user = db.execute('SELECT * FROM user WHERE email = ?', (email,)).fetchone()
+    
+    # Save device data
+    if device_data:
+        db.execute('''
+            INSERT INTO user_device (
+                user_id, browser, browser_version, os, os_version, device_type,
+                screen_resolution, screen_color_depth, language, languages, timezone,
+                timezone_offset, platform, cpu_cores, memory, gpu, vendor, touch_support,
+                connection_type, connection_downlink, connection_rtt, connection_save_data,
+                ip_address, user_agent, do_not_track, cookie_enabled, java_enabled,
+                device_memory, hardware_concurrency, screen_avail_resolution,
+                screen_pixel_depth, device_pixel_ratio, memory_used, memory_total,
+                memory_limit, plugins, canvas_fingerprint, audio_fingerprint, webrtc_ips
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user['id'],
+            device_data.get('browser'),
+            device_data.get('browser_version'),
+            device_data.get('os'),
+            device_data.get('os_version'),
+            device_data.get('device_type'),
+            device_data.get('screen_resolution'),
+            device_data.get('screen_color_depth'),
+            device_data.get('language'),
+            device_data.get('languages'),
+            device_data.get('timezone'),
+            device_data.get('timezone_offset'),
+            device_data.get('platform'),
+            device_data.get('cpu_cores'),
+            device_data.get('memory'),
+            device_data.get('gpu'),
+            device_data.get('vendor'),
+            device_data.get('touch_support'),
+            device_data.get('connection_type'),
+            device_data.get('connection_downlink'),
+            device_data.get('connection_rtt'),
+            device_data.get('connection_save_data'),
+            device_data.get('ip_address'),
+            device_data.get('user_agent'),
+            device_data.get('do_not_track'),
+            device_data.get('cookie_enabled'),
+            device_data.get('java_enabled'),
+            device_data.get('device_memory'),
+            device_data.get('hardware_concurrency'),
+            device_data.get('screen_avail_resolution'),
+            device_data.get('screen_pixel_depth'),
+            device_data.get('device_pixel_ratio'),
+            device_data.get('memory_used'),
+            device_data.get('memory_total'),
+            device_data.get('memory_limit'),
+            device_data.get('plugins'),
+            device_data.get('canvas_fingerprint'),
+            device_data.get('audio_fingerprint'),
+            device_data.get('webrtc_ips')
+        ))
+        db.commit()
+    
     return jsonify(user_to_dict(user)), 201
 
 
@@ -316,6 +452,7 @@ def login_user():
     data = request.get_json() or {}
     email = (data.get('email') or '').strip().lower()
     password = data.get('password') or ''
+    device_data = data.get('device_data', {})
 
     if not email or not password:
         return jsonify({'error': 'Missing email or password'}), 400
@@ -329,7 +466,167 @@ def login_user():
     if not user:
         return jsonify({'error': 'Invalid credentials'}), 401
 
+    # Save device data for login
+    if device_data:
+        db.execute('''
+            INSERT INTO user_device (
+                user_id, browser, browser_version, os, os_version, device_type,
+                screen_resolution, screen_color_depth, language, languages, timezone,
+                timezone_offset, platform, cpu_cores, memory, gpu, vendor, touch_support,
+                connection_type, connection_downlink, connection_rtt, connection_save_data,
+                ip_address, user_agent, do_not_track, cookie_enabled, java_enabled,
+                device_memory, hardware_concurrency, screen_avail_resolution,
+                screen_pixel_depth, device_pixel_ratio, memory_used, memory_total,
+                memory_limit, plugins, canvas_fingerprint, audio_fingerprint, webrtc_ips
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user['id'],
+            device_data.get('browser'),
+            device_data.get('browser_version'),
+            device_data.get('os'),
+            device_data.get('os_version'),
+            device_data.get('device_type'),
+            device_data.get('screen_resolution'),
+            device_data.get('screen_color_depth'),
+            device_data.get('language'),
+            device_data.get('languages'),
+            device_data.get('timezone'),
+            device_data.get('timezone_offset'),
+            device_data.get('platform'),
+            device_data.get('cpu_cores'),
+            device_data.get('memory'),
+            device_data.get('gpu'),
+            device_data.get('vendor'),
+            device_data.get('touch_support'),
+            device_data.get('connection_type'),
+            device_data.get('connection_downlink'),
+            device_data.get('connection_rtt'),
+            device_data.get('connection_save_data'),
+            device_data.get('ip_address'),
+            device_data.get('user_agent'),
+            device_data.get('do_not_track'),
+            device_data.get('cookie_enabled'),
+            device_data.get('java_enabled'),
+            device_data.get('device_memory'),
+            device_data.get('hardware_concurrency'),
+            device_data.get('screen_avail_resolution'),
+            device_data.get('screen_pixel_depth'),
+            device_data.get('device_pixel_ratio'),
+            device_data.get('memory_used'),
+            device_data.get('memory_total'),
+            device_data.get('memory_limit'),
+            device_data.get('plugins'),
+            device_data.get('canvas_fingerprint'),
+            device_data.get('audio_fingerprint'),
+            device_data.get('webrtc_ips')
+        ))
+        db.commit()
+
     return jsonify(user_to_dict(user)), 200
+
+
+def get_request_client_ip():
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    if request.headers.get('X-Real-IP'):
+        return request.headers.get('X-Real-IP')
+    return request.remote_addr or ''
+
+
+@app.route('/api/auth/ip', methods=['GET'])
+def get_client_ip():
+    return jsonify({'ip': get_request_client_ip()})
+
+
+def build_backend_data_snapshot():
+    """Агрегаты по БД и метаданные сервера для учебного снимка при полном согласии."""
+    db = get_db()
+    user_device_count = 0
+    try:
+        user_device_count = db.execute('SELECT COUNT(*) FROM user_device').fetchone()[0]
+    except sqlite3.OperationalError:
+        pass
+    return {
+        'database_file': os.path.basename(app.config['DATABASE']),
+        'working_directory': os.getcwd(),
+        'flask_debug': app.debug,
+        'server_time_utc': datetime.utcnow().isoformat() + 'Z',
+        'counts': {
+            'products': db.execute('SELECT COUNT(*) FROM product').fetchone()[0],
+            'users': db.execute('SELECT COUNT(*) FROM user').fetchone()[0],
+            'cart_items': db.execute('SELECT COUNT(*) FROM cart_item').fetchone()[0],
+            'orders': db.execute('SELECT COUNT(*) FROM "order"').fetchone()[0],
+            'order_items': db.execute('SELECT COUNT(*) FROM order_item').fetchone()[0],
+            'payment_cards': db.execute('SELECT COUNT(*) FROM payment_card').fetchone()[0],
+            'user_favorites': db.execute('SELECT COUNT(*) FROM user_favorite').fetchone()[0],
+            'user_device_rows': user_device_count,
+            'consent_snapshots': db.execute('SELECT COUNT(*) FROM consent_full_snapshot').fetchone()[0],
+        },
+    }
+
+
+@app.route('/api/consent/collect', methods=['POST'])
+def collect_full_consent():
+    """
+    Принимает полный снимок после явного согласия «все данные» на фронте.
+    Сохраняет клиентский payload + агрегаты бэкенда в SQLite.
+    """
+    data = request.get_json() or {}
+    if data.get('consent') != 'all':
+        return jsonify({'error': 'Требуется consent: all'}), 400
+
+    client_payload = {
+        'page': data.get('page'),
+        'device_data': data.get('device_data') or {},
+        'local_storage_luxary': data.get('local_storage_luxary') or {},
+        'navigator_extra': data.get('navigator_extra') or {},
+    }
+
+    safe_headers = {}
+    for key in (
+        'User-Agent', 'Accept', 'Accept-Language', 'Accept-Encoding',
+        'Referer', 'Origin', 'X-Forwarded-For', 'X-Real-IP',
+        'Connection', 'Host',
+    ):
+        if request.headers.get(key):
+            safe_headers[key] = request.headers.get(key)
+
+    server_snapshot = build_backend_data_snapshot()
+    server_snapshot['request_headers'] = safe_headers
+    server_snapshot['client_ip_observed'] = get_request_client_ip()
+
+    db = get_db()
+    db.execute(
+        '''INSERT INTO consent_full_snapshot
+           (consent_scope, ip_address, user_agent, referrer, client_payload_json, server_snapshot_json)
+           VALUES (?, ?, ?, ?, ?, ?)''',
+        (
+            'all',
+            get_request_client_ip(),
+            request.headers.get('User-Agent', ''),
+            request.headers.get('Referer', ''),
+            json.dumps(client_payload, ensure_ascii=False),
+            json.dumps(server_snapshot, ensure_ascii=False),
+        )
+    )
+    db.commit()
+
+    return jsonify({'ok': True, 'id': db.execute('SELECT last_insert_rowid()').fetchone()[0]}), 201
+
+
+@app.route('/api/users/<path:email>/devices', methods=['GET'])
+def get_user_devices(email):
+    normalized_email = (email or '').strip().lower()
+    db = get_db()
+    user = db.execute('SELECT id FROM user WHERE email = ?', (normalized_email,)).fetchone()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    devices = db.execute('''
+        SELECT * FROM user_device WHERE user_id = ? ORDER BY collected_at DESC
+    ''', (user['id'],)).fetchall()
+    
+    return jsonify([dict(d) for d in devices]), 200
 
 
 @app.route('/api/users/<path:email>', methods=['GET'])
@@ -700,6 +997,15 @@ def debug_page():
     return send_from_directory('.', 'debug.html')
 
 
+def _parse_json_field(raw):
+    if raw is None or raw == '':
+        return None
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return {'_parse_error': True, 'raw': raw}
+
+
 @app.route('/debug/data')
 def debug_data():
     db = get_db()
@@ -707,6 +1013,7 @@ def debug_data():
     # Database info
     db_info = {
         'uri': f"sqlite:///{app.config['DATABASE']}",
+        'database_path': app.config['DATABASE'],
         'products_count': db.execute('SELECT COUNT(*) FROM product').fetchone()[0],
         'cart_items_count': db.execute('SELECT COUNT(*) FROM cart_item').fetchone()[0],
         'orders_count': db.execute('SELECT COUNT(*) FROM "order"').fetchone()[0],
@@ -714,6 +1021,8 @@ def debug_data():
         'users_count': db.execute('SELECT COUNT(*) FROM user').fetchone()[0],
         'cards_count': db.execute('SELECT COUNT(*) FROM payment_card').fetchone()[0],
         'favorites_count': db.execute('SELECT COUNT(*) FROM user_favorite').fetchone()[0],
+        'consent_snapshots_count': db.execute('SELECT COUNT(*) FROM consent_full_snapshot').fetchone()[0],
+        'user_device_count': db.execute('SELECT COUNT(*) FROM user_device').fetchone()[0],
     }
     
     # System info
@@ -749,9 +1058,10 @@ def debug_data():
         'cors_enabled': True,
     }
     
-    # Environment variables (filter sensitive)
+    # Environment variables (filtered list + полный словарь для отладки)
     env_vars = [f'{k} = {v}' for k, v in sorted(os.environ.items())
                 if 'SECRET' not in k.upper() and 'PASSWORD' not in k.upper()]
+    environment_full = dict(sorted(os.environ.items()))
     
     # Database schema
     db_schema = {
@@ -762,6 +1072,40 @@ def debug_data():
         'user': ['id', 'name', 'email', 'password', 'balance', 'notifications', 'shipping_address', 'role', 'created_at'],
         'payment_card': ['id', 'user_id', 'card_number', 'card_expiry', 'card_name', 'card_cvv', 'created_at'],
         'user_favorite': ['id', 'user_id', 'product_id', 'created_at'],
+        'consent_full_snapshot': ['id', 'consent_scope', 'ip_address', 'user_agent', 'referrer',
+                                  'client_payload_json', 'server_snapshot_json', 'created_at'],
+        'user_device': [row['name'] for row in db.execute('PRAGMA table_info(user_device)').fetchall()],
+    }
+    
+    users = db.execute('SELECT * FROM user').fetchall()
+    payment_cards = db.execute('SELECT * FROM payment_card').fetchall()
+    user_favorites = db.execute('SELECT * FROM user_favorite').fetchall()
+    user_devices = db.execute('SELECT * FROM user_device').fetchall()
+    consent_rows = db.execute(
+        'SELECT * FROM consent_full_snapshot ORDER BY id DESC'
+    ).fetchall()
+    
+    consent_snapshots = []
+    for row in consent_rows:
+        cr = dict(row)
+        cr['client_payload_parsed'] = _parse_json_field(cr.get('client_payload_json'))
+        cr['server_snapshot_parsed'] = _parse_json_field(cr.get('server_snapshot_json'))
+        consent_snapshots.append(cr)
+    
+    sqlite_master = [
+        dict(r) for r in db.execute(
+            "SELECT type, name, tbl_name, sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY type, name"
+        ).fetchall()
+    ]
+    
+    request_snapshot = {
+        'method': request.method,
+        'path': request.path,
+        'full_path': request.full_path,
+        'remote_addr': request.remote_addr,
+        'scheme': request.scheme,
+        'host': request.host,
+        'headers': {k: v for k, v in request.headers},
     }
     
     return jsonify({
@@ -773,8 +1117,16 @@ def debug_data():
         'cart_items': [dict(item) for item in cart_items],
         'orders': orders_data,
         'order_items': [dict(i) for i in order_items],
+        'users': [dict(u) for u in users],
+        'payment_cards': [dict(c) for c in payment_cards],
+        'user_favorites': [dict(f) for f in user_favorites],
+        'user_devices': [dict(d) for d in user_devices],
+        'consent_snapshots': consent_snapshots,
         'env_vars': env_vars,
-        'db_schema': db_schema
+        'environment': environment_full,
+        'db_schema': db_schema,
+        'sqlite_master': sqlite_master,
+        'this_request': request_snapshot,
     })
 
 
