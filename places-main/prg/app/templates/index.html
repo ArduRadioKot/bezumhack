@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body>
+    <header class="header">
+        <img src="{% static 'images/logotype.svg' %}" alt="Study Size" class="logo">
+
+        <div class="search-bar">
+            <img src="{% static 'images/union.svg' %}" alt="Search">
+            <input type="text" id="search-input" placeholder="Поиск" class="search-input" value="{{ search_query|default:'' }}">
+        </div>
+
+        <div class="header-actions">
+            <button class="profile-btn">
+                <img src="{% static 'images/profile-circle.svg' %}" alt="Profile">
+            </button>
+            {% if user.is_authenticated %}
+                {% if user.profile.role == 'executor' %}
+                    <button class="create-btn">Создать услугу</button>
+                {% endif %}
+                <button class="logout-btn">Выйти</button>
+            {% else %}
+                <button class="login-btn">Войти</button>
+            {% endif %}
+        </div>
+    </header>
+
+    <section class="questions-section">
+        <div class="questions-text">
+            <h2 class="questions-title">Остались вопросы?</h2>
+            <p class="questions-description">
+                Если у вас остались вопросы или вы хотите узнать больше о наших услугах,
+                свяжитесь с нами! Мы всегда рады помочь и предоставить всю необходимую информацию.
+            </p>
+            <p class="questions-email">Почта для связи - studystore@gmail.com</p>
+        </div>
+        <img src="{% static 'images/Question.svg' %}" alt="Questions" class="questions-image">
+    </section>
+
+    <main class="services-section">
+        <h1 class="services-title">Услуги</h1>
+
+        <div id="services-container">
+            {% for service in services %}
+            <div class="service" data-title="{{ service.title|lower }}">
+                <img src="{{ service.image.url }}" alt="{{ service.title }}" class="service-image">
+                <div class="service-info">
+                    <h3>{{ service.title }}</h3>
+                    <p class="service-price">{{ service.price }} руб.</p>
+                </div>
+                <div class="service-actions">
+                    <div class="executor-info">
+                        <span class="executor-fio">{{ service.executor.user.get_full_name }}</span>
+                        <span class="executor-email">{{ service.executor.user.email }}</span>
+                        <span class="executor-phone">{{ service.executor.phone }}</span>
+                    </div>
+                    <a href="/service/{{ service.id }}/" class="view-btn">Посмотреть</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>

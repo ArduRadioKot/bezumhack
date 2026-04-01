@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+</head>
+<body>
+    <header class="profile-header">
+        <img src="{% static 'images/logotype.svg' %}" alt="Study Size" class="logo">
+        <div class="header-actions">
+            <a href="/" class="home-link">На главную</a>
+            <a href="/logout/" class="logout-btn">Выйти</a>
+        </div>
+    </header>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Chat</h1>
+        </div>
+        <div class="chat-messages">
+
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" placeholder="Type your message...">
+            <button class="send-button">Send</button>
+        </div>
+    </div>
+</body>
+</html>

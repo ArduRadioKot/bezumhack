@@ -1,0 +1,21 @@
+{# templates/check_your_gmail.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Проверьте вашу почту</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <h1>Проверьте вашу почту</h1>
+  <p>
+    На указанный вами адрес отправлено письмо со ссылкой для активации аккаунта.
+    Пожалуйста, откройте вашу почту и перейдите по этой ссылке.
+  </p>
+  <p>
+    Если письмо не пришло, проверьте папку «Спам» или 
+    <a href="{% url 'register' %}">отправьте форму регистрации заново</a>.
+  </p>
+</body>
+</html>

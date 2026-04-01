@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мои чаты</title>
+</head>
+<body>
+    <h1>Мои чаты</h1>
+    <ul>
+        {% for chat in chats %}
+            {% for user in chat.participants.all %}
+                {% if user != request.user %}
+                    {% with users=chat.participants.all|dictsort:"username" %}
+                    <li>
+                        <a href="/chats/chat_{{ users.0.username }}_{{ users.1.username }}.html">
+                            Чат с {{ user.username }}
+                        </a>
+                    </li>
+                    {% endwith %}
+                {% endif %}
+            {% endfor %}
+        {% empty %}
+            <li>У вас пока нет чатов</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои Отзывы</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <h1>Мои Отзывы</h1>
+
+    {% if feedbacks %}
+        <ul>
+            {% for feedback in feedbacks %}
+                <li>
+                    <strong>Сервис:</strong> {{ feedback.service.title }}<br>
+                    <strong>Автор:</strong> {{ feedback.author.username }}<br>
+                    <strong>Отзыв:</strong> {{ feedback.text }}<br>
+                    <strong>Дата:</strong> {{ feedback.created_at }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет отзывов для ваших сервисов.</p>
+    {% endif %}
+</body>
+</html>
