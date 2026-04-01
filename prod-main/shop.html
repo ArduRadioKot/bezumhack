@@ -548,14 +548,13 @@
     // ========== Хранилище товаров ==========
     let products = [];
     let categories = [];
-    let favorites = JSON.parse(localStorage.getItem('luxary_fav')) || [];
+    let favorites = [];
     let currentUser = JSON.parse(localStorage.getItem('luxary_current_user')) || null;
     let activeCategory = "Все";
     let searchQuery = "";
     let sortType = "default";
-    let useLocalCart = false;
-    let localCart = JSON.parse(localStorage.getItem('luxary_local_cart')) || { items: [], total: 0 };
     let selectedProductId = null;
+    const API_BASE = '';
 
     // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Добавляем роль пользователям, у которых её нет
     if (currentUser && !currentUser.role) {
@@ -565,124 +564,50 @@
             currentUser.role = 'user';
         }
         localStorage.setItem('luxary_current_user', JSON.stringify(currentUser));
-        // также обновляем в списке всех пользователей
-        const users = JSON.parse(localStorage.getItem('luxary_users')) || [];
-        const userIndex = users.findIndex(u => u.email === currentUser.email);
-        if (userIndex !== -1) {
-            users[userIndex].role = currentUser.role;
-            localStorage.setItem('luxary_users', JSON.stringify(users));
-        }
     }
 
-    // Загрузка товаров (из localStorage или мок)
-    function loadProducts() {
-        const saved = localStorage.getItem('luxary_products');
-        if (saved) {
-            products = JSON.parse(saved);
-        } else {
-            products = [
-                { id: "yacht-001", title: "Azimut 77 Yacht", type: "Yacht", price: 3500000, image: "https://picsum.photos/id/104/400/300", description: "Роскошная 77-футовая моторная яхта с 4 каютами и джакузи на палубе." },
-                { id: "jet-001", title: "Gulfstream G700", type: "Plane", price: 75000000, image: "https://picsum.photos/id/179/400/300", description: "Бизнес-джет дальнего радиуса с салоном премиум-класса." },
-                { id: "island-001", title: "Остров Мальдивы", type: "Island", price: 12500000, image: "https://picsum.photos/id/16/400/300", description: "Частный остров 2.5 га с виллами и белоснежными пляжами." },
-                { id: "mansion-001", title: "Пентхаус в Москва-Сити", type: "Mansion", price: 3200000, image: "https://picsum.photos/id/106/400/300", description: "Эксклюзивный пентхаус с панорамным видом на Москву." },
-                { id: "space-001", title: "SpaceX Starship Tour", type: "Space", price: 55000000, image: "https://picsum.photos/id/29/400/300", description: "Суборбитальный полёт с видом на Землю из космоса." },
-            ];
-            saveProducts();
-        }
+    // Загрузка товаров с API
+    async function loadProducts() {
+        const res = await fetch(`${API_BASE}/api/products`);
+        if (!res.ok) throw new Error('Failed to load products');
+        products = await res.json();
         categories = [...new Set(products.map(p => p.type))];
     }
 
-    function saveProducts() {
-        localStorage.setItem('luxary_products', JSON.stringify(products));
-    }
-
-    // ========== Корзина (локальная или API) ==========
+    // ========== Корзина ==========
     async function fetchCart() {
-        if (useLocalCart) return localCart;
-        try {
-            const res = await fetch('http://localhost:5000/api/cart');
-            if (!res.ok) throw new Error();
-            return await res.json();
-        } catch(e) {
-            useLocalCart = true;
-            return localCart;
-        }
+        const res = await fetch(`${API_BASE}/api/cart`);
+        if (!res.ok) throw new Error('Failed to load cart');
+        return await res.json();
     }
 
     async function addToCartAPI(productId, quantity = 1) {
-        if (useLocalCart) {
-            const existing = localCart.items.find(item => item.product_id === productId);
-            const product = products.find(p => p.id === productId);
-            if (existing) {
-                existing.quantity += quantity;
-            } else {
-                localCart.items.push({
-                    id: Date.now() + Math.random(),
-                    product_id: productId,
-                    quantity: quantity,
-                    product: product
-                });
-            }
-            localCart.total = localCart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-            localStorage.setItem('luxary_local_cart', JSON.stringify(localCart));
-            await updateCartBadge();
-            return true;
-        }
-        try {
-            await fetch('http://localhost:5000/api/cart', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: productId, quantity })
-            });
-            await updateCartBadge();
-            return true;
-        } catch(e) {
-            useLocalCart = true;
-            return addToCartAPI(productId, quantity);
-        }
+        const res = await fetch(`${API_BASE}/api/cart`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, quantity })
+        });
+        if (!res.ok) throw new Error('Failed to add to cart');
+        await updateCartBadge();
+        return true;
     }
 
     async function updateCartItemAPI(itemId, quantity) {
-        if (useLocalCart) {
-            const item = localCart.items.find(i => i.id == itemId);
-            if (item) {
-                item.quantity = quantity;
-                localCart.total = localCart.items.reduce((sum, i) => sum + (i.product.price * i.quantity), 0);
-                localStorage.setItem('luxary_local_cart', JSON.stringify(localCart));
-                await renderCart();
-                await updateCartBadge();
-            }
-            return;
-        }
-        try {
-            await fetch(`http://localhost:5000/api/cart/${itemId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity })
-            });
-            await renderCart();
-        } catch(e) {
-            useLocalCart = true;
-            await updateCartItemAPI(itemId, quantity);
-        }
+        const res = await fetch(`${API_BASE}/api/cart/${itemId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantity })
+        });
+        if (!res.ok) throw new Error('Failed to update cart item');
+        await renderCart();
+        await updateCartBadge();
     }
 
     async function removeCartItemAPI(itemId) {
-        if (useLocalCart) {
-            localCart.items = localCart.items.filter(i => i.id != itemId);
-            localCart.total = localCart.items.reduce((sum, i) => sum + (i.product.price * i.quantity), 0);
-            localStorage.setItem('luxary_local_cart', JSON.stringify(localCart));
-            await renderCart();
-            await updateCartBadge();
-            return;
-        }
-        try {
-            await fetch(`http://localhost:5000/api/cart/${itemId}`, { method: 'DELETE' });
-            await renderCart();
-        } catch(e) {
-            useLocalCart = true;
-            await removeCartItemAPI(itemId);
-        }
+        const res = await fetch(`${API_BASE}/api/cart/${itemId}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to remove cart item');
+        await renderCart();
+        await updateCartBadge();
     }
 
     async function createOrderAPI() {
@@ -700,66 +625,31 @@
             return;
         }
 
-        const total = cart.total;
-
-        // Получаем актуальные данные пользователя из хранилища (могли измениться)
-        const users = JSON.parse(localStorage.getItem('luxary_users')) || [];
-        const userInStore = users.find(u => u.email === currentUser.email);
-        if (!userInStore) {
-            alert('Ошибка: пользователь не найден');
-            return;
-        }
-
-        const userBalance = userInStore.balance || 0;
-
-        // Проверка баланса
-        if (userBalance < total) {
-            alert(`Недостаточно средств. Ваш баланс: ${userBalance.toLocaleString()} ₽. Необходимо: ${total.toLocaleString()} ₽`);
-            return;
-        }
-
-        // Выполняем списание средств
-        const newBalance = userBalance - total;
-        const updatedUsers = users.map(u =>
-            u.email === currentUser.email ? { ...u, balance: newBalance } : u
-        );
-        localStorage.setItem('luxary_users', JSON.stringify(updatedUsers));
-
-        // Обновляем текущего пользователя
-        const updatedUser = updatedUsers.find(u => u.email === currentUser.email);
-        currentUser = { ...updatedUser };
-        localStorage.setItem('luxary_current_user', JSON.stringify(currentUser));
-
-        // Теперь создаём заказ (локально или через API)
-        if (useLocalCart) {
-            const order = {
-                id: Date.now(),
-                total: total,
-                status: 'completed',
-                created_at: new Date().toISOString(),
-                items: cart.items.map(item => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    price: item.product.price,
-                    product: item.product
-                }))
-            };
-            let orders = JSON.parse(localStorage.getItem('luxary_orders')) || [];
-            orders.unshift(order);
-            localStorage.setItem('luxary_orders', JSON.stringify(orders));
-            localCart.items = [];
-            localCart.total = 0;
-            localStorage.setItem('luxary_local_cart', JSON.stringify(localCart));
-            alert('Заказ оформлен!');
-        } else {
-            try {
-                const res = await fetch('http://localhost:5000/api/orders', { method: 'POST' });
-                if (res.status !== 200) throw new Error();
-                alert('Заказ оформлен');
-            } catch(e) {
-                alert('Ошибка при оформлении заказа через API');
+        try {
+            const res = await fetch(`${API_BASE}/api/orders/checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: currentUser.email })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.balance !== undefined && data.required !== undefined) {
+                    alert(`Недостаточно средств. Ваш баланс: ${Number(data.balance).toLocaleString()} ₽. Необходимо: ${Number(data.required).toLocaleString()} ₽`);
+                } else {
+                    if (String(data.error || '').toLowerCase().includes('shipping address')) {
+                        alert('Укажите адрес доставки в профиле перед оформлением заказа');
+                        return;
+                    }
+                    alert(data.error || 'Ошибка при оформлении заказа');
+                }
                 return;
             }
+            currentUser = { ...currentUser, ...data.user };
+            localStorage.setItem('luxary_current_user', JSON.stringify(currentUser));
+            alert('Заказ оформлен');
+        } catch(e) {
+            alert('Ошибка при оформлении заказа через API');
+            return;
         }
 
         // Обновляем интерфейс
@@ -782,23 +672,12 @@
     }
 
     async function fetchOrders() {
-        if (useLocalCart) {
-            const orders = JSON.parse(localStorage.getItem('luxary_orders')) || [];
-            const container = document.getElementById('ordersContainer');
-            if (orders.length === 0) { container.innerHTML = "<div style='text-align:center;'>Нет заказов</div>"; return; }
-            container.innerHTML = orders.map(order => `<div style="margin-bottom:2rem;"><h3>Заказ #${order.id} от ${new Date(order.created_at).toLocaleDateString()}</h3><p>Сумма: ${order.total.toLocaleString()} ₽</p>${order.items.map(i => `<div>${i.product.title} x ${i.quantity} = ${(i.price * i.quantity).toLocaleString()} ₽</div>`).join('')}</div>`).join('');
-            return;
-        }
-        try {
-            const res = await fetch('http://localhost:5000/api/orders');
-            const orders = await res.json();
-            const container = document.getElementById('ordersContainer');
-            if (orders.length === 0) { container.innerHTML = "<div style='text-align:center;'>Нет заказов</div>"; return; }
-            container.innerHTML = orders.map(order => `<div style="margin-bottom:2rem;"><h3>Заказ #${order.id} от ${new Date(order.created_at).toLocaleDateString()}</h3><p>Сумма: ${order.total.toLocaleString()} ₽</p>${order.items.map(i => `<div>${i.product.title} x ${i.quantity} = ${(i.price * i.quantity).toLocaleString()} ₽</div>`).join('')}</div>`).join('');
-        } catch(e) {
-            useLocalCart = true;
-            await fetchOrders();
-        }
+        const res = await fetch(`${API_BASE}/api/orders`);
+        if (!res.ok) throw new Error('Failed to load orders');
+        const orders = await res.json();
+        const container = document.getElementById('ordersContainer');
+        if (orders.length === 0) { container.innerHTML = "<div style='text-align:center;'>Нет заказов</div>"; return; }
+        container.innerHTML = orders.map(order => `<div style="margin-bottom:2rem;"><h3>Заказ #${order.id} от ${new Date(order.created_at).toLocaleDateString()}</h3><p>Сумма: ${order.total.toLocaleString()} ₽</p>${order.items.map(i => `<div>${i.product.title} x ${i.quantity} = ${(i.price * i.quantity).toLocaleString()} ₽</div>`).join('')}</div>`).join('');
     }
 
     async function renderCart() {
@@ -872,10 +751,27 @@
         attachEvents();
     }
 
-    function toggleFav(id) {
-        if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
-        else favorites.push(id);
-        localStorage.setItem('luxary_fav', JSON.stringify(favorites));
+    async function toggleFav(id) {
+        if (!currentUser || !currentUser.email) return;
+        if (favorites.includes(id)) {
+            const res = await fetch(`${API_BASE}/api/users/${encodeURIComponent(currentUser.email)}/favorites/${id}`, { method: 'DELETE' });
+            if (!res.ok) {
+                alert('Не удалось удалить из избранного');
+                return;
+            }
+            favorites = favorites.filter(f => f !== id);
+        } else {
+            const res = await fetch(`${API_BASE}/api/users/${encodeURIComponent(currentUser.email)}/favorites`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: id })
+            });
+            if (!res.ok) {
+                alert('Не удалось добавить в избранное');
+                return;
+            }
+            favorites.push(id);
+        }
         renderProducts();
         if (document.getElementById('favoritesSection').classList.contains('active')) renderFavorites();
     }
@@ -973,17 +869,24 @@
 
     function deleteProduct(id) {
         if (confirm('Удалить товар?')) {
-            products = products.filter(p => p.id !== id);
-            saveProducts();
-            loadProducts(); // обновляем categories и прочее
-            renderProducts();
-            renderCategoryChips();
-            renderAdminList();
-            if (document.getElementById('favoritesSection').classList.contains('active')) renderFavorites();
+            fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' })
+                .then(async (res) => ({ ok: res.ok, data: await res.json() }))
+                .then(async ({ ok, data }) => {
+                    if (!ok) {
+                        alert(data.error || 'Ошибка удаления');
+                        return;
+                    }
+                    await loadProducts();
+                    renderProducts();
+                    renderCategoryChips();
+                    renderAdminList();
+                    if (document.getElementById('favoritesSection').classList.contains('active')) renderFavorites();
+                })
+                .catch(() => alert('Ошибка соединения с сервером'));
         }
     }
 
-    function addOrUpdateProduct() {
+    async function addOrUpdateProduct() {
         const title = document.getElementById('adminTitle').value.trim();
         const price = parseInt(document.getElementById('adminPrice').value);
         const type = document.getElementById('adminType').value;
@@ -994,28 +897,47 @@
             return;
         }
         const editId = document.getElementById('adminAddBtn').dataset.editId;
-        if (editId) {
-            // Обновление
-            const index = products.findIndex(p => p.id === editId);
-            if (index !== -1) {
-                products[index] = { ...products[index], title, price, type, image, description };
-                saveProducts();
+        const payload = { title, price, type, image, description };
+
+        try {
+            if (editId) {
+                const res = await fetch(`${API_BASE}/api/products/${editId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.error || 'Ошибка обновления товара');
+                    return;
+                }
                 document.getElementById('adminAddBtn').innerText = 'Добавить';
                 delete document.getElementById('adminAddBtn').dataset.editId;
+            } else {
+                const newId = Date.now().toString();
+                const res = await fetch(`${API_BASE}/api/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: newId, ...payload })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.error || 'Ошибка добавления товара');
+                    return;
+                }
             }
-        } else {
-            // Добавление
-            const newId = Date.now().toString();
-            products.push({ id: newId, title, price, type, image, description });
-            saveProducts();
+        } catch (e) {
+            alert('Ошибка соединения с сервером');
+            return;
         }
+
         // Очистка формы
         document.getElementById('adminTitle').value = '';
         document.getElementById('adminPrice').value = '';
         document.getElementById('adminType').value = 'Yacht';
         document.getElementById('adminImage').value = '';
         document.getElementById('adminDescription').value = '';
-        loadProducts();
+        await loadProducts();
         renderProducts();
         renderCategoryChips();
         renderAdminList();
@@ -1059,16 +981,37 @@
     document.getElementById('themeToggle').addEventListener('click', () => { const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark'; applyTheme(newTheme); });
     const savedTheme = localStorage.getItem('luxary_theme') || 'light'; applyTheme(savedTheme);
 
+    async function loadFavorites() {
+        if (!currentUser || !currentUser.email) {
+            favorites = [];
+            return;
+        }
+        const res = await fetch(`${API_BASE}/api/users/${encodeURIComponent(currentUser.email)}/favorites`);
+        if (!res.ok) {
+            favorites = [];
+            return;
+        }
+        const favProducts = await res.json();
+        favorites = favProducts.map(p => p.id);
+    }
+
     // Запуск
-    if (!currentUser) window.location.href = 'auth.html';
-    else {
-        loadProducts();
+    async function initApp() {
+        if (!currentUser) {
+            window.location.href = 'auth.html';
+            return;
+        }
+
+        await loadProducts();
+        await loadFavorites();
         updateUserUI();
         renderProducts();
         renderCategoryChips();
         fetchOrders();
         updateCartBadge();
     }
+
+    initApp();
 </script>
 </body>
 </html>

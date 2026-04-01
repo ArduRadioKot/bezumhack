@@ -12,7 +12,23 @@
       "Bash(curl *)",
       "Bash(pkill *)",
       "Bash(lsof *)",
-      "Bash(xargs *)"
+      "Bash(xargs *)",
+      "Bash(kill *)",
+      "Bash(ls *)",
+      "Bash(sqlite3 *)",
+      "Bash(source *)",
+      "Bash(from *)",
+      "Bash(import *)",
+      "Bash(with *)",
+      "Bash(response *)",
+      "Bash('name': *)",
+      "Bash('email': *)",
+      "Bash('password': *)",
+      "Bash('shipping_address': *)",
+      "Bash(})",
+      "Bash(print)",
+      "Bash(eof)",
+      "Bash(nohup *)"
     ]
   },
   "$version": 3
