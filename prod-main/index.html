@@ -1,69 +1,104 @@
 <!doctype html>
-<html lang="ru" xmlns="http://www.w3.org/1999/html">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <link rel="stylesheet" href="styles/index.css">
-        <link rel="stylesheet" href="styles/variables.css">
-        <title>PROD 2</title>
-    </head>
-    <body>
-     <div class="header">
-        <div class="header-left">
-            <h1 class="head">Luxury</h1>
-            <a href="./index.html" data-test-id="menu-shop">
-                <img src="./images/icons/search.svg" alt="Cart"> 
-            </a>
-            <a href="./cart.html" class="cart-link" data-test-id="menu-cart">
-                <img src="./images/icons/cart.svg" alt="Cart">
-                <span class="cart-count" data-test-id="cart-badge"></span>
-            </a>
-            <a href="profile.html" data-test-id="menu-profile">
-                <img src="./images/icons/profile.svg" alt="Profile">
-            </a>
-            <a href="./history.html" data-test-id="menu-history">
-                <img src="./images/icons/history.svg" alt="History">
-            </a>
-            <div dark data-test-id="theme-toggle">
-                <img src="./images/icons/moon.svg" alt="Dark">
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="styles/variables.css" />
+    <link rel="stylesheet" href="styles/index.css" />
+    <title>Luxury</title>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="header glass">
+            <div class="header-left">
+                <h1 class="head">LUXARY</h1>
+
+                <nav class="header-nav">
+                    <a href="./index.html" class="icon-link" data-test-id="menu-shop" aria-label="Shop">
+                        <img src="./images/icons/search.svg" alt="Shop" />
+                    </a>
+
+                    <a href="./cart.html" class="icon-link cart-link" data-test-id="menu-cart" aria-label="Cart">
+                        <img src="./images/icons/cart.svg" alt="Cart" />
+                        <span class="cart-count" data-test-id="cart-badge"></span>
+                    </a>
+
+                    <a href="./profile.html" class="icon-link" data-test-id="menu-profile" aria-label="Profile">
+                        <img src="./images/icons/profile.svg" alt="Profile" />
+                    </a>
+
+                    <a href="./history.html" class="icon-link" data-test-id="menu-history" aria-label="History">
+                        <img src="./images/icons/history.svg" alt="History" />
+                    </a>
+
+                    <button class="theme-toggle" dark data-test-id="theme-toggle" aria-label="Toggle theme">
+                        <img src="./images/icons/moon.svg" alt="Dark mode" />
+                    </button>
+                </nav>
             </div>
-        </div>
-        <div class="header-right">
-            <input type="text" placeholder="Search products" class="search-input" data-test-id="search-input">
-        </div>
-     </div>
 
-     <div class="filters">
-        <label class="filter-checkbox" data-test-id="filter">
-            <input type="checkbox" name="filter" value="yachty">
-            Yachty
-        </label>
-        <label class="filter-checkbox" data-test-id="filter">
-            <input type="checkbox" name="filter" value="planety">
-            Planety
-        </label>
-        <label class="filter-checkbox" data-test-id="filter">
-            <input type="checkbox" name="filter" value="manison">
-            Manison
-        </label>
-        <label class="filter-checkbox" data-test-id="filter">
-            <input type="checkbox" name="filter" value="island">
-            Island
-        </label>
-     </div>
+            <div class="header-right">
+                <div class="search-wrap">
+                    <input
+                        type="text"
+                        placeholder="Search products"
+                        class="search-input"
+                        data-test-id="search-input"
+                    />
+                </div>
+            </div>
+        </header>
 
-     <div class="catalog" data-test-id="product-list">
-     </div>
+        <section class="hero-section">
+            <div class="hero-card">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <p class="hero-kicker">Premium Marketplace</p>
+                    <h2>Искусство роскоши</h2>
+                    <p>
+                        Яхты, джеты, острова, особняки и другие эксклюзивные предложения
+                        в едином luxury-каталоге
+                    </p>
+                </div>
+            </div>
+        </section>
 
-     <div class="modal-overlay">
-        <div class="modal" data-test-id="modal">
-            <button class="modal-close" data-test-id="modal-close">
-                <img src="./images/icons/close.svg" alt="Close">
+        <section class="filters glass">
+            <label class="filter-checkbox" data-test-id="filter">
+                <input type="checkbox" name="filter" value="yachty" />
+                <span>Yachty</span>
+            </label>
+
+            <label class="filter-checkbox" data-test-id="filter">
+                <input type="checkbox" name="filter" value="planety" />
+                <span>Planety</span>
+            </label>
+
+            <label class="filter-checkbox" data-test-id="filter">
+                <input type="checkbox" name="filter" value="manison" />
+                <span>Manison</span>
+            </label>
+
+            <label class="filter-checkbox" data-test-id="filter">
+                <input type="checkbox" name="filter" value="island" />
+                <span>Island</span>
+            </label>
+        </section>
+
+        <main class="catalog" data-test-id="product-list"></main>
+    </div>
+
+    <div class="modal-overlay">
+        <div class="modal glass" data-test-id="modal">
+            <button class="modal-close" data-test-id="modal-close" aria-label="Close modal">
+                <img src="./images/icons/close.svg" alt="Close" />
             </button>
+
             <div class="modal-image-container">
-                <img class="modal-image" src="" alt="">
+                <img class="modal-image" src="" alt="" />
             </div>
+
             <div class="modal-content">
                 <h2 class="modal-type"></h2>
                 <h1 class="modal-title" data-test-id="modal-title"></h1>
@@ -72,12 +107,11 @@
                 <button class="modal-button" data-test-id="add-to-cart"></button>
             </div>
         </div>
-     </div>
+    </div>
 
-     <div class="notification"></div>
+    <div class="notification"></div>
 
-    </body> 
     <script src="dark.js"></script>
     <script src="index.js"></script>
-    
+</body>
 </html>
