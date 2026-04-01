@@ -1,1 +1,11 @@
-sdfghn
+Pwn
+Crypto
+Forensics
+Osint
+Reverse
+Network
+Admin
+Misc/Joy
+Web
+Stegano
+PPC
