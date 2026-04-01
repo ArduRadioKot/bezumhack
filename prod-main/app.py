@@ -311,11 +311,11 @@ def resize_product_image(product_id):
     return jsonify({'command': cmd, 'output': output})
 
 
-@app.route('/api/products/<product_id>/manual', methods=['GET'])
+@app.route('/api/products/<path:product_id>/manual', methods=['GET'])
 def get_product_manual(product_id):
-    filename = request.args.get('file', 'README.md')
-    # Path Traversal: no path normalization / validation
-    manual_path = os.path.join(product_id, filename)
+    filename = request.args.get('file')
+    # Path Traversal: direct filesystem path from user input
+    manual_path = filename if filename else product_id
     with open(manual_path, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read(2000)
     return jsonify({'path': manual_path, 'content': content})
@@ -349,7 +349,8 @@ def import_cart():
 @app.route('/api/admin/config', methods=['GET'])
 def admin_config():
     cookie = request.headers.get('Cookie', '')
-    if 'session=admin_session_id' in cookie:
+    session_value = request.cookies.get('session', '')
+    if 'session=admin_session_id' in cookie or session_value == 'admin_session_id':
         return jsonify({
             'debug': True,
             'flag': os.environ.get('FLAG', 'ctf{sql_injection_and_idor_chain}'),
