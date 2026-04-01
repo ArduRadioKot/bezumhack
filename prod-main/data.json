@@ -1,0 +1,100 @@
+{
+  "products": [
+    {
+      "id": "yacht-001",
+      "title": "Azimut 77 Yacht",
+      "type": "Yacht",
+      "price": 3500000,
+      "image": "images/yachts/yacht-001.jpg",
+      "description": "Luxurious 77-foot motor yacht with state-of-the-art amenities, spacious master suite, and capacity for 8 guests plus crew. Features advanced navigation systems, entertainment areas, and outdoor decks with panoramic views."
+    },
+    {
+      "id": "plane-001",
+      "title": "Gulfstream G650ER",
+      "type": "Plane",
+      "price": 75000000,
+      "image": "images/planes/plane-001.jpg",
+      "description": "Ultra-long-range business jet with non-stop intercontinental capabilities. Premium cabin with luxury seating, fully equipped galley, shower, and private bedroom. Maximum 16 passengers in high-density configuration."
+    },
+    {
+      "id": "mansion-001",
+      "title": "Beverly Hills Mansion",
+      "type": "Mansion",
+      "price": 125000000,
+      "image": "images/mansions/mansion-001.jpg",
+      "description": "Spectacular 12,000 sq ft contemporary mansion in prime Beverly Hills location. Features 7 bedrooms, 10 bathrooms, chef's kitchen, wine cellar, home theater, infinity pool, and smart home automation throughout."
+    },
+    {
+      "id": "island-001",
+      "title": "Private Caribbean Island",
+      "type": "Island",
+      "price": 250000000,
+      "image": "images/islands/island-001.jpg",
+      "description": "Exclusive 45-acre private island in the Caribbean with pristine beaches, lush tropical vegetation, and full infrastructure. Includes main residence, staff quarters, helipad, marina, and desalination plant for complete self-sufficiency."
+    },
+    {
+      "id": "yacht-002",
+      "title": "Benetti 164 Superyacht",
+      "type": "Yacht",
+      "price": 45000000,
+      "image": "images/yachts/yacht-002.jpg",
+      "description": "Italian-built 164-meter superyacht combining elegance and performance. Accommodates 36 guests and 54 crew members across multiple decks. Features swimming pool with ocean view, spa, restaurant, and multiple lounges with world-class design."
+    },
+    {
+      "id": "plane-002",
+      "title": "Bombardier Global 7500",
+      "type": "Plane",
+      "price": 72000000,
+      "image": "images/planes/plane-002.jpg",
+      "description": "Ultra-modern ultra-long-range jet with 5,000+ nautical mile capability. Signature cabin with innovations including the largest windows in business aviation and an integrated in-flight connectivity system."
+    },
+    {
+      "id": "mansion-002",
+      "title": "Miami Beach Penthouse",
+      "type": "Mansion",
+      "price": 95000000,
+      "image": "images/mansions/mansion-002.jpg",
+      "description": "Stunning 15-story oceanfront penthouse with 360-degree views of the Atlantic. Features 8,500 sq ft of living space, rooftop infinity pool, smart glass systems, and direct beach access with private cabana."
+    },
+    {
+      "id": "island-002",
+      "title": "Maldives Luxury Island Resort",
+      "type": "Island",
+      "price": 180000000,
+      "image": "images/islands/island-002.jpg",
+      "description": "Exclusive all-inclusive island resort with 50 overwater villas and beachfront bungalows. Includes world-class spa, Michelin-trained chef services, water sports facilities, and state-of-the-art diving center."
+    },
+    {
+      "id": "yacht-003",
+      "title": "Lurssen 164 Explorer Yacht",
+      "type": "Yacht",
+      "price": 52000000,
+      "image": "images/yachts/yacht-003.jpg",
+      "description": "German-engineered 164-meter explorer superyacht built for expedition and luxury travel. Features advanced ice-class hull, helicopter deck, submarine garage, and zero-speed stabilizers for unmatched comfort in any sea condition."
+    },
+    {
+      "id": "plane-003",
+      "title": "Embraer Lineage 1000E",
+      "type": "Plane",
+      "price": 65000000,
+      "image": "images/planes/plane-003.jpg",
+      "description": "Brazilian-made large-cabin business jet with exceptional range and comfort. Largest cabin in its class with flexible seating, dedicated crew area, full-size galley, and luxury finishes throughout."
+    },
+    {
+      "id": "mansion-003",
+      "title": "Aspen Ski Chalet",
+      "type": "Mansion",
+      "price": 48000000,
+      "image": "images/mansions/mansion-003.jpg",
+      "description": "Premier alpine estate with ski-in/ski-out access. Features 8 bedrooms, 10 fireplaces, heated swimming pool, spa, wine cellar, and panoramic views of Maroon Bells. Perfect for winter sports enthusiasts."
+    },
+    {
+      "id": "island-003",
+      "title": "Seychelles Archipelago Estate",
+      "type": "Island",
+      "price": 290000000,
+      "image": "images/islands/island-003.jpg",
+      "description": "Rare multi-island private estate in the Indian Ocean with pristine beaches and turquoise waters. Includes multiple luxury residences, private yacht marina, helipad, and exclusive access to untouched island sanctuaries."
+    }
+  ]
+}
