@@ -4,12 +4,39 @@ from flask_cors import CORS
 from datetime import datetime
 import json
 import os
+import sqlite3
+import threading
+import time
+import urllib.request
+import subprocess
+import hashlib
+import hmac
+import base64
+import pickle
 
 app = Flask(__name__, static_folder='.')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 CORS(app)
+
+JWT_SECRET = 'secret123'
+_order_lock = threading.Lock()
+reviews = []
+
+
+def _b64url(data):
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode()
+
+
+def generate_weak_jwt(payload):
+    header = {'alg': 'HS256', 'typ': 'JWT'}
+    header_part = _b64url(json.dumps(header).encode())
+    payload_part = _b64url(json.dumps(payload).encode())
+    signing_input = f'{header_part}.{payload_part}'.encode()
+    signature = hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
+    signature_part = _b64url(signature)
+    return f'{header_part}.{payload_part}.{signature_part}'
 
 
 # === Models ===
@@ -103,6 +130,28 @@ def get_products():
     return jsonify([p.to_dict() for p in products])
 
 
+@app.route('/api/products/search', methods=['GET'])
+def search_products():
+    q = request.args.get('q', '')
+    # Intentionally vulnerable SQLi for CTF
+    sql = f"SELECT id, title, type, price, image, description FROM product WHERE title LIKE '%{q}%' OR type LIKE '%{q}%'"
+    conn = sqlite3.connect('instance/shop.db')
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(sql).fetchall()
+    conn.close()
+    products = [dict(row) for row in rows]
+    if q == "' OR '1'='1":
+        products.append({
+            'id': 'hidden-admin-panel',
+            'title': 'Internal route',
+            'type': 'debug',
+            'price': 0,
+            'image': '',
+            'description': 'Try /api/admin/config'
+        })
+    return jsonify(products)
+
+
 @app.route('/api/products/<product_id>', methods=['GET'])
 def get_product(product_id):
     product = Product.query.get_or_404(product_id)
@@ -183,8 +232,19 @@ def get_orders():
     return jsonify([order.to_dict() for order in orders])
 
 
+@app.route('/api/orders/<int:order_id>', methods=['GET'])
+def get_order_by_id(order_id):
+    # IDOR: any client can view any order by ID
+    order = Order.query.get_or_404(order_id)
+    order_data = order.to_dict()
+    if order_id == 1:
+        order_data['note'] = os.environ.get('FLAG', 'ctf{demo_flag}')
+    return jsonify(order_data)
+
+
 @app.route('/api/orders', methods=['POST'])
 def create_order():
+    # Lock removed on purpose to make race conditions easier
     cart_items = CartItem.query.all()
     if not cart_items:
         return jsonify({'error': 'Cart is empty'}), 400
@@ -204,10 +264,98 @@ def create_order():
         )
         db.session.add(order_item)
 
+    # Intentional delay window for double-spend race
+    time.sleep(0.2)
     CartItem.query.delete()
     db.session.commit()
 
     return jsonify(order.to_dict()), 201
+
+
+@app.route('/api/reviews', methods=['POST'])
+def create_review():
+    data = request.get_json() or {}
+    review = {
+        'product_id': data.get('product_id'),
+        'author': data.get('author', 'anonymous'),
+        'text': data.get('text', ''),
+        'created_at': datetime.utcnow().isoformat()
+    }
+    reviews.append(review)
+    return jsonify(review), 201
+
+
+@app.route('/api/reviews', methods=['GET'])
+def get_reviews():
+    # Stored XSS: raw HTML/script returned as-is
+    return jsonify(reviews)
+
+
+@app.route('/api/products/import', methods=['POST'])
+def import_product_from_url():
+    data = request.get_json() or {}
+    image_url = data.get('image_url', '')
+    # SSRF: unrestricted server-side request to arbitrary URL
+    with urllib.request.urlopen(image_url, timeout=5) as response:
+        content = response.read(5000).decode('utf-8', errors='ignore')
+    return jsonify({'fetched_from': image_url, 'preview': content[:500]})
+
+
+@app.route('/api/products/<product_id>/resize', methods=['POST'])
+def resize_product_image(product_id):
+    data = request.get_json() or {}
+    size = data.get('size', '1024x768')
+    # Command Injection: user-controlled values executed in shell
+    cmd = f"echo resizing {product_id} to {size}"
+    output = subprocess.getoutput(cmd)
+    return jsonify({'command': cmd, 'output': output})
+
+
+@app.route('/api/products/<product_id>/manual', methods=['GET'])
+def get_product_manual(product_id):
+    filename = request.args.get('file', 'README.md')
+    # Path Traversal: no path normalization / validation
+    manual_path = os.path.join(product_id, filename)
+    with open(manual_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read(2000)
+    return jsonify({'path': manual_path, 'content': content})
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def auth_login():
+    data = request.get_json() or {}
+    username = data.get('username', 'guest')
+    role = 'admin' if username == 'admin' else 'user'
+    token = generate_weak_jwt({'sub': username, 'role': role, 'iat': int(time.time())})
+    return jsonify({'token': token, 'hint': 'JWT signed with weak secret'})
+
+
+@app.route('/api/cart/import', methods=['POST'])
+def import_cart():
+    data = request.get_json() or {}
+    blob = data.get('payload', '')
+    # Insecure deserialization for CTF
+    raw = base64.b64decode(blob)
+    loaded = pickle.loads(raw)
+    if isinstance(loaded, dict) and 'items' in loaded:
+        for item in loaded['items']:
+            product_id = item.get('product_id')
+            quantity = int(item.get('quantity', 1))
+            db.session.add(CartItem(product_id=product_id, quantity=quantity))
+        db.session.commit()
+    return jsonify({'imported': True, 'data_type': str(type(loaded))})
+
+
+@app.route('/api/admin/config', methods=['GET'])
+def admin_config():
+    cookie = request.headers.get('Cookie', '')
+    if 'session=admin_session_id' in cookie:
+        return jsonify({
+            'debug': True,
+            'flag': os.environ.get('FLAG', 'ctf{sql_injection_and_idor_chain}'),
+            'version': '1.0.0'
+        })
+    return jsonify({'error': 'Unauthorized'}), 401
 
 
 # === Debug Page ===
