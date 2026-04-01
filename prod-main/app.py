@@ -1,88 +1,128 @@
-from flask import Flask, send_from_directory, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, send_from_directory, jsonify, request, g
 from flask_cors import CORS
 from datetime import datetime
 import json
 import os
+import sqlite3
 
 app = Flask(__name__, static_folder='.')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+app.config['DATABASE'] = 'shop.db'
 CORS(app)
 
 
-# === Models ===
-class Product(db.Model):
-    id = db.Column(db.String(50), primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    type = db.Column(db.String(50), nullable=False)
-    price = db.Column(db.Integer, nullable=False)
-    image = db.Column(db.String(300))
-    description = db.Column(db.Text)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'type': self.type,
-            'price': self.price,
-            'image': self.image,
-            'description': self.description
-        }
+# === Database ===
+def get_db():
+    if 'db' not in g:
+        g.db = sqlite3.connect(app.config['DATABASE'])
+        g.db.row_factory = sqlite3.Row
+    return g.db
 
 
-class CartItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.String(50), db.ForeignKey('product.id'), nullable=False)
-    quantity = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    product = db.relationship('Product', backref='cart_items')
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'product_id': self.product_id,
-            'quantity': self.quantity,
-            'product': self.product.to_dict() if self.product else None
-        }
+@app.teardown_appcontext
+def close_db(error):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 
-class Order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    total = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(20), default='pending')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    items = db.relationship('OrderItem', backref='order', lazy=True)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'total': self.total,
-            'status': self.status,
-            'created_at': self.created_at.isoformat(),
-            'items': [item.to_dict() for item in self.items]
-        }
-
-
-class OrderItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
-    product_id = db.Column(db.String(50), db.ForeignKey('product.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Integer, nullable=False)
-
-    product = db.relationship('Product')
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'product_id': self.product_id,
-            'quantity': self.quantity,
-            'price': self.price,
-            'product': self.product.to_dict() if self.product else None
-        }
+def init_db():
+    db = sqlite3.connect(app.config['DATABASE'])
+    db.row_factory = sqlite3.Row
+    c = db.cursor()
+    
+    # Create tables
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS product (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            type TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            image TEXT,
+            description TEXT
+        )
+    ''')
+    
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS cart_item (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id TEXT NOT NULL,
+            quantity INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (product_id) REFERENCES product(id)
+        )
+    ''')
+    
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS "order" (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            total INTEGER NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS order_item (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER NOT NULL,
+            product_id TEXT NOT NULL,
+            quantity INTEGER NOT NULL,
+            price INTEGER NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES "order"(id),
+            FOREIGN KEY (product_id) REFERENCES product(id)
+        )
+    ''')
+    
+    db.commit()
+    
+    # Initialize products if empty
+    c.execute('SELECT COUNT(*) FROM product')
+    if c.fetchone()[0] == 0:
+        with open('data.json', 'r') as f:
+            data = json.load(f)
+        for p in data['products']:
+            c.execute(
+                'INSERT INTO product (id, title, type, price, image, description) VALUES (?, ?, ?, ?, ?, ?)',
+                (p['id'], p['title'], p['type'], p['price'], p['image'], p['description'])
+            )
+        db.commit()
+        print('✓ Products initialized from data.json')
+    
+    # Initialize sample orders if empty
+    c.execute('SELECT COUNT(*) FROM "order"')
+    if c.fetchone()[0] == 0:
+        c.execute('SELECT id, price FROM product LIMIT 3')
+        products = c.fetchall()
+        if products:
+            total = sum(p['price'] for p in products)
+            c.execute('INSERT INTO "order" (total, status) VALUES (?, ?)', (total, 'completed'))
+            order_id = c.lastrowid
+            
+            for p in products:
+                c.execute(
+                    'INSERT INTO order_item (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
+                    (order_id, p['id'], 1, p['price'])
+                )
+            db.commit()
+            print('✓ Sample orders initialized')
+    
+    # Print summary
+    c.execute('SELECT COUNT(*) FROM product')
+    products_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM cart_item')
+    cart_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM "order"')
+    orders_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM order_item')
+    order_items_count = c.fetchone()[0]
+    
+    print(f'\n📊 Database Summary:')
+    print(f'   Products: {products_count}')
+    print(f'   Cart Items: {cart_count}')
+    print(f'   Orders: {orders_count}')
+    print(f'   Order Items: {order_items_count}\n')
+    
+    db.close()
 
 
 # === Static Files ===
@@ -99,40 +139,64 @@ def static_files(filename):
 # === API: Products ===
 @app.route('/api/products', methods=['GET'])
 def get_products():
-    products = Product.query.all()
-    return jsonify([p.to_dict() for p in products])
+    db = get_db()
+    products = db.execute('SELECT * FROM product').fetchall()
+    return jsonify([dict(p) for p in products])
 
 
 @app.route('/api/products/<product_id>', methods=['GET'])
 def get_product(product_id):
-    product = Product.query.get_or_404(product_id)
-    return jsonify(product.to_dict())
+    db = get_db()
+    product = db.execute('SELECT * FROM product WHERE id = ?', (product_id,)).fetchone()
+    if product is None:
+        return jsonify({'error': 'Product not found'}), 404
+    return jsonify(dict(product))
 
 
 @app.route('/api/products', methods=['POST'])
 def create_product():
     data = request.get_json()
-    product = Product(
-        id=data.get('id'),
-        title=data.get('title'),
-        type=data.get('type'),
-        price=data.get('price'),
-        image=data.get('image'),
-        description=data.get('description')
+    db = get_db()
+    db.execute(
+        'INSERT INTO product (id, title, type, price, image, description) VALUES (?, ?, ?, ?, ?, ?)',
+        (data.get('id'), data.get('title'), data.get('type'), data.get('price'), data.get('image'), data.get('description'))
     )
-    db.session.add(product)
-    db.session.commit()
-    return jsonify(product.to_dict()), 201
+    db.commit()
+    product = db.execute('SELECT * FROM product WHERE id = ?', (data.get('id'),)).fetchone()
+    return jsonify(dict(product)), 201
 
 
 # === API: Cart ===
 @app.route('/api/cart', methods=['GET'])
 def get_cart():
-    items = CartItem.query.all()
-    return jsonify({
-        'items': [item.to_dict() for item in items],
-        'total': sum(item.product.price * item.quantity for item in items if item.product)
-    })
+    db = get_db()
+    items = db.execute('''
+        SELECT ci.id, ci.product_id, ci.quantity, ci.created_at,
+               p.id as p_id, p.title as p_title, p.type as p_type, p.price as p_price, p.image as p_image, p.description as p_description
+        FROM cart_item ci
+        JOIN product p ON ci.product_id = p.id
+    ''').fetchall()
+    
+    cart_items = []
+    total = 0
+    for item in items:
+        cart_items.append({
+            'id': item['id'],
+            'product_id': item['product_id'],
+            'quantity': item['quantity'],
+            'created_at': item['created_at'],
+            'product': {
+                'id': item['p_id'],
+                'title': item['p_title'],
+                'type': item['p_type'],
+                'price': item['p_price'],
+                'image': item['p_image'],
+                'description': item['p_description']
+            }
+        })
+        total += item['p_price'] * item['quantity']
+    
+    return jsonify({'items': cart_items, 'total': total})
 
 
 @app.route('/api/cart', methods=['POST'])
@@ -140,74 +204,122 @@ def add_to_cart():
     data = request.get_json()
     product_id = data.get('product_id')
     quantity = data.get('quantity', 1)
-
-    cart_item = CartItem.query.filter_by(product_id=product_id).first()
+    
+    db = get_db()
+    cart_item = db.execute('SELECT * FROM cart_item WHERE product_id = ?', (product_id,)).fetchone()
+    
     if cart_item:
-        cart_item.quantity += quantity
+        db.execute('UPDATE cart_item SET quantity = quantity + ? WHERE product_id = ?', (quantity, product_id))
     else:
-        cart_item = CartItem(product_id=product_id, quantity=quantity)
-        db.session.add(cart_item)
-
-    db.session.commit()
-    return jsonify(cart_item.to_dict()), 201
+        db.execute('INSERT INTO cart_item (product_id, quantity) VALUES (?, ?)', (product_id, quantity))
+    
+    db.commit()
+    
+    item = db.execute('SELECT * FROM cart_item WHERE product_id = ?', (product_id,)).fetchone()
+    return jsonify(dict(item)), 201
 
 
 @app.route('/api/cart/<int:item_id>', methods=['PUT'])
 def update_cart_item(item_id):
     data = request.get_json()
-    cart_item = CartItem.query.get_or_404(item_id)
-    cart_item.quantity = data.get('quantity', cart_item.quantity)
-    db.session.commit()
-    return jsonify(cart_item.to_dict())
+    db = get_db()
+    db.execute('UPDATE cart_item SET quantity = ? WHERE id = ?', (data.get('quantity', 1), item_id))
+    db.commit()
+    item = db.execute('SELECT * FROM cart_item WHERE id = ?', (item_id,)).fetchone()
+    return jsonify(dict(item))
 
 
 @app.route('/api/cart/<int:item_id>', methods=['DELETE'])
 def remove_from_cart(item_id):
-    cart_item = CartItem.query.get_or_404(item_id)
-    db.session.delete(cart_item)
-    db.session.commit()
+    db = get_db()
+    db.execute('DELETE FROM cart_item WHERE id = ?', (item_id,))
+    db.commit()
     return jsonify({'message': 'Removed'}), 200
 
 
 @app.route('/api/cart', methods=['DELETE'])
 def clear_cart():
-    CartItem.query.delete()
-    db.session.commit()
+    db = get_db()
+    db.execute('DELETE FROM cart_item')
+    db.commit()
     return jsonify({'message': 'Cart cleared'}), 200
 
 
 # === API: Orders ===
 @app.route('/api/orders', methods=['GET'])
 def get_orders():
-    orders = Order.query.order_by(Order.created_at.desc()).all()
-    return jsonify([order.to_dict() for order in orders])
+    db = get_db()
+    orders = db.execute('SELECT * FROM "order" ORDER BY created_at DESC').fetchall()
+    
+    result = []
+    for order in orders:
+        items = db.execute('''
+            SELECT oi.*, p.id as p_id, p.title as p_title, p.type as p_type, p.image as p_image, p.description as p_description
+            FROM order_item oi
+            JOIN product p ON oi.product_id = p.id
+            WHERE oi.order_id = ?
+        ''', (order['id'],)).fetchall()
+        
+        order_dict = dict(order)
+        order_dict['items'] = [
+            {
+                'id': i['id'],
+                'order_id': i['order_id'],
+                'product_id': i['product_id'],
+                'quantity': i['quantity'],
+                'price': i['price'],
+                'product': {
+                    'id': i['p_id'],
+                    'title': i['p_title'],
+                    'type': i['p_type'],
+                    'image': i['p_image'],
+                    'description': i['p_description']
+                }
+            } for i in items
+        ]
+        result.append(order_dict)
+    
+    return jsonify(result)
 
 
 @app.route('/api/orders', methods=['POST'])
 def create_order():
-    cart_items = CartItem.query.all()
+    db = get_db()
+    cart_items = db.execute('SELECT * FROM cart_item').fetchall()
+    
     if not cart_items:
         return jsonify({'error': 'Cart is empty'}), 400
-
-    total = sum(item.product.price * item.quantity for item in cart_items if item.product)
-
-    order = Order(total=total, status='completed')
-    db.session.add(order)
-    db.session.flush()
-
+    
+    # Calculate total
+    total = 0
     for item in cart_items:
-        order_item = OrderItem(
-            order_id=order.id,
-            product_id=item.product_id,
-            quantity=item.quantity,
-            price=item.product.price
+        product = db.execute('SELECT price FROM product WHERE id = ?', (item['product_id'],)).fetchone()
+        total += product['price'] * item['quantity']
+    
+    # Create order
+    db.execute('INSERT INTO "order" (total, status) VALUES (?, ?)', (total, 'completed'))
+    order_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
+    
+    # Create order items
+    for item in cart_items:
+        product = db.execute('SELECT price FROM product WHERE id = ?', (item['product_id'],)).fetchone()
+        db.execute(
+            'INSERT INTO order_item (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
+            (order_id, item['product_id'], item['quantity'], product['price'])
         )
-        db.session.add(order_item)
-
-    CartItem.query.delete()
-    db.session.commit()
-
-    return jsonify(order.to_dict()), 201
+    
+    # Clear cart
+    db.execute('DELETE FROM cart_item')
+    db.commit()
+    
+    # Return order with items
+    order = db.execute('SELECT * FROM "order" WHERE id = ?', (order_id,)).fetchone()
+    items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order_id,)).fetchall()
+    
+    order_dict = dict(order)
+    order_dict['items'] = [dict(i) for i in items]
+    
+    return jsonify(order_dict), 201
 
 
 # === Debug Page ===
@@ -218,132 +330,74 @@ def debug_page():
 
 @app.route('/debug/data')
 def debug_data():
-    from sqlalchemy import inspect
+    db = get_db()
     
     # Database info
     db_info = {
-        'uri': app.config['SQLALCHEMY_DATABASE_URI'],
-        'products_count': Product.query.count(),
-        'cart_items_count': CartItem.query.count(),
-        'orders_count': Order.query.count(),
-        'order_items_count': OrderItem.query.count(),
+        'uri': f"sqlite:///{app.config['DATABASE']}",
+        'products_count': db.execute('SELECT COUNT(*) FROM product').fetchone()[0],
+        'cart_items_count': db.execute('SELECT COUNT(*) FROM cart_item').fetchone()[0],
+        'orders_count': db.execute('SELECT COUNT(*) FROM "order"').fetchone()[0],
+        'order_items_count': db.execute('SELECT COUNT(*) FROM order_item').fetchone()[0],
     }
-
+    
     # System info
     system_info = {
         'python_version': os.popen('python3 --version').read().strip(),
         'flask_version': os.popen('python3 -c "import flask; print(flask.__version__)"').read().strip(),
-        'sqlalchemy_version': os.popen('python3 -c "import sqlalchemy; print(sqlalchemy.__version__)"').read().strip(),
         'cwd': os.getcwd(),
         'flag': os.environ.get('FLAG', 'Not set'),
     }
-
+    
     # All products
-    products = Product.query.all()
-
-    # All cart items (with products)
-    cart_items = CartItem.query.all()
-
-    # All orders (with items)
-    orders = Order.query.options(db.joinedload(Order.items)).all()
+    products = db.execute('SELECT * FROM product').fetchall()
+    
+    # All cart items
+    cart_items = db.execute('SELECT * FROM cart_item').fetchall()
+    
+    # All orders with items
+    orders = db.execute('SELECT * FROM "order"').fetchall()
+    orders_data = []
+    for order in orders:
+        items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order['id'],)).fetchall()
+        order_dict = dict(order)
+        order_dict['items'] = [dict(i) for i in items]
+        orders_data.append(order_dict)
     
     # All order items
-    order_items = OrderItem.query.options(db.joinedload(OrderItem.product)).all()
-
+    order_items = db.execute('SELECT * FROM order_item').fetchall()
+    
     # Config
     config = {
         'debug': app.debug,
         'secret_key': str(app.secret_key) if app.secret_key else 'Not set',
         'cors_enabled': True,
     }
-
+    
     # Environment variables (filter sensitive)
     env_vars = [f'{k} = {v}' for k, v in sorted(os.environ.items())
                 if 'SECRET' not in k.upper() and 'PASSWORD' not in k.upper()]
     
-    # Database schema from models
+    # Database schema
     db_schema = {
-        'Product': ['id', 'title', 'type', 'price', 'image', 'description'],
-        'CartItem': ['id', 'product_id', 'quantity', 'created_at'],
-        'Order': ['id', 'total', 'status', 'created_at'],
-        'OrderItem': ['id', 'order_id', 'product_id', 'quantity', 'price'],
+        'product': ['id', 'title', 'type', 'price', 'image', 'description'],
+        'cart_item': ['id', 'product_id', 'quantity', 'created_at'],
+        'order': ['id', 'total', 'status', 'created_at'],
+        'order_item': ['id', 'order_id', 'product_id', 'quantity', 'price'],
     }
-
+    
     return jsonify({
         'flag': system_info['flag'],
         'system': system_info,
         'database': db_info,
         'config': config,
-        'products': [p.to_dict() for p in products],
-        'cart_items': [item.to_dict() for item in cart_items],
-        'orders': [{
-            'id': o.id,
-            'total': o.total,
-            'status': o.status,
-            'created_at': o.created_at.isoformat(),
-            'items': [{
-                'id': i.id,
-                'product_id': i.product_id,
-                'quantity': i.quantity,
-                'price': i.price,
-                'product': i.product.to_dict() if i.product else None
-            } for i in o.items]
-        } for o in orders],
-        'order_items': [{
-            'id': i.id,
-            'order_id': i.order_id,
-            'product_id': i.product_id,
-            'quantity': i.quantity,
-            'price': i.price,
-            'product': i.product.to_dict() if i.product else None
-        } for i in order_items],
+        'products': [dict(p) for p in products],
+        'cart_items': [dict(item) for item in cart_items],
+        'orders': orders_data,
+        'order_items': [dict(i) for i in order_items],
         'env_vars': env_vars,
         'db_schema': db_schema
     })
-
-
-# === Init DB ===
-def init_db():
-    with app.app_context():
-        db.create_all()
-        
-        # Initialize products if empty
-        if Product.query.count() == 0:
-            with open('data.json', 'r') as f:
-                data = json.load(f)
-            for p in data['products']:
-                product = Product(**p)
-                db.session.add(product)
-            db.session.commit()
-            print('✓ Products initialized from data.json')
-        
-        # Initialize sample orders if empty
-        if Order.query.count() == 0:
-            # Create sample order with items
-            products = Product.query.limit(3).all()
-            if products:
-                order = Order(total=sum(p.price for p in products), status='completed')
-                db.session.add(order)
-                db.session.flush()
-                
-                for p in products:
-                    order_item = OrderItem(
-                        order_id=order.id,
-                        product_id=p.id,
-                        quantity=1,
-                        price=p.price
-                    )
-                    db.session.add(order_item)
-                
-                db.session.commit()
-                print('✓ Sample orders initialized')
-        
-        # Print summary
-        print(f'\n📊 Database Summary:')
-        print(f'   Products: {Product.query.count()}')
-        print(f'   Cart Items: {CartItem.query.count()}')
-        print(f'   Orders: {Order.query.count()}')
-        print(f'   Order Items: {OrderItem.query.count()}\n')
 
 
 if __name__ == '__main__':
