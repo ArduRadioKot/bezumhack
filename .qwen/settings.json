@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(.venv/bin/pip *)",
+      "Bash(python3 *)",
+      "Bash(/users/aleksandrvorobev/documents/bezumhack/.venv/bin/pip *)",
+      "Bash(/users/aleksandrvorobev/documents/bezumhack/.venv/bin/django-admin *)",
+      "Bash(rm *)",
+      "Bash(/users/aleksandrvorobev/documents/bezumhack/.venv/bin/python *)",
+      "Bash(sleep *)",
+      "Bash(curl *)"
+    ]
+  },
+  "$version": 3
+}
