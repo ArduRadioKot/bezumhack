@@ -1,29 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 :root {
     /* Color Tokens */
     --color-white: rgba(255, 255, 255, 1);
-    --color-black: rgba(20, 20, 20, 1);
-    --color-cream: rgba(245, 245, 245, 1);
-    --color-gray: rgba(60, 60, 60, 1);
-    --color-gray-light: rgba(160, 160, 160, 1);
-    --color-charcoal: rgba(38, 40, 40, 1);
-    --color-slate: rgba(19, 52, 59, 1);
-    --color-teal-light: rgba(50, 184, 198, 1);
-    --color-teal-semilight: rgb(41, 159, 172);
-    --color-teal-dark: rgba(33, 128, 141, 1);
-    --color-teal-semidark: rgb(27, 105, 115);
-    --color-red-light: rgba(255, 84, 89, 1);
-    --color-red-dark: rgba(192, 21, 47, 1);
+    --color-black: rgba(10, 10, 15, 1);
+
+    --color-cream: rgba(250, 249, 247, 1);
+    --color-gray: rgba(90, 90, 110, 1);
+    --color-gray-light: rgba(176, 176, 192, 1);
+
+    --color-charcoal: rgba(19, 19, 26, 1);
+    --color-slate: rgba(30, 30, 42, 1);
+
+    --color-teal-light: rgba(230, 180, 34, 1);
+    --color-teal-semilight: rgba(214, 166, 31, 1);
+    --color-teal-dark: rgba(201, 160, 61, 1);
+    --color-teal-semidark: rgba(168, 124, 44, 1);
+
+    --color-red-light: rgba(220, 38, 38, 1);
+    --color-red-dark: rgba(185, 28, 28, 1);
 
     /* RGB versions for opacity control */
-    --color-black-rgb: 20, 20, 20;
-    --color-cream-rgb: 245, 245, 245;
-    --color-gray-rgb: 60, 60, 60;
-    --color-teal-light-rgb: 50, 184, 198;
-    --color-teal-dark-rgb: 33, 128, 141;
-    --color-red-light-rgb: 255, 84, 89;
-    --color-red-dark-rgb: 192, 21, 47;
+    --color-black-rgb: 10, 10, 15;
+    --color-cream-rgb: 250, 249, 247;
+    --color-gray-rgb: 90, 90, 110;
+    --color-teal-light-rgb: 230, 180, 34;
+    --color-teal-dark-rgb: 201, 160, 61;
+    --color-red-light-rgb: 220, 38, 38;
+    --color-red-dark-rgb: 185, 28, 28;
 
     /* Opacity */
     --opacity-2: 0.2;
@@ -32,7 +36,9 @@
     --opacity-8: 0.8;
 
     /* Typography */
-    --font-family: 'Inter', sans-serif;
+    --font-family: 'Montserrat', sans-serif;
+    --font-family-display: 'Playfair Display', serif;
+
     --font-size-sm: 12px;
     --font-size-base: 14px;
     --font-size-lg: 16px;
@@ -40,8 +46,10 @@
     --font-size-2xl: 20px;
     --font-size-3xl: 24px;
     --font-size-4xl: 30px;
+
     --font-weight-normal: 500;
     --font-weight-bold: 700;
+
     --line-height: 1.5;
     --letter-spacing-sm: 0.05em;
     --letter-spacing-md: 0.1em;
@@ -58,6 +66,11 @@
     --radius-sm: 4px;
     --radius-lg: 12px;
     --radius-full: 9999px;
+
+    /* Extra luxury radius */
+    --radius-xl: 24px;
+    --radius-2xl: 28px;
+    --radius-3xl: 32px;
 
     /* Sizing */
     --size-12: 12px;
@@ -82,10 +95,11 @@
     --size-1200: 1200px;
 
     /* Border Width */
-    --border-width: 2px;
+    --border-width: 1px;
 
     /* Shadow */
-    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    --shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+    --shadow-strong: 0 25px 40px -12px rgba(0, 0, 0, 0.22);
 }
 
 html {
@@ -98,48 +112,56 @@ html {
     --color-primary: var(--color-teal-dark);
     --color-primary-hover: var(--color-teal-semidark);
     --color-primary-active: var(--color-teal-semidark);
-    --color-btn-primary-text: var(--color-cream);
+    --color-btn-primary-text: rgba(17, 17, 17, 1);
 
-    --color-secondary: rgba(var(--color-teal-light-rgb), var(--opacity-2));
-    --color-secondary-hover: rgba(var(--color-gray-rgb), var(--opacity-4));
-    --color-secondary-active: rgba(var(--color-gray-rgb), var(--opacity-4));
+    --color-secondary: rgba(var(--color-teal-dark-rgb), 0.08);
+    --color-secondary-hover: rgba(var(--color-teal-dark-rgb), 0.14);
+    --color-secondary-active: rgba(var(--color-teal-dark-rgb), 0.18);
 
-    --color-border: rgba(var(--color-gray-rgb), var(--opacity-2));
-    --color-modal-border: rgba(var(--color-black-rgb), var(--opacity-6));
+    --color-border: rgba(0, 0, 0, 0.08);
+    --color-modal-border: rgba(0, 0, 0, 0.12);
 
     --color-error: var(--color-red-dark);
     --color-success: var(--color-teal-dark);
     --color-info: var(--color-gray);
 
-    --color-focus-box-shadow: rgba(var(--color-teal-dark-rgb), var(--opacity-4));
+    --color-focus-box-shadow: rgba(var(--color-teal-dark-rgb), 0.22);
     --focus-outline: 2px solid var(--color-primary);
-    --focus-box-shadow: 0 0 0 3px var(--color-focus-box-shadow);
+    --focus-box-shadow: 0 0 0 4px var(--color-focus-box-shadow);
+
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+    --card-bg: rgba(255, 255, 255, 0.85);
 }
 
 html.dark-theme {
-    --color-background: var(--color-charcoal);
-    --color-surface: var(--color-black);
+    --color-background: rgba(10, 10, 15, 1);
+    --color-surface: var(--color-charcoal);
 
-    --color-text: var(--color-cream);
+    --color-text: rgba(240, 240, 240, 1);
     --color-text-secondary: var(--color-gray-light);
 
     --color-primary: var(--color-teal-light);
     --color-primary-hover: var(--color-teal-semilight);
     --color-primary-active: var(--color-teal-semilight);
-    --color-btn-primary-text: var(--color-slate);
+    --color-btn-primary-text: rgba(17, 17, 17, 1);
 
-    --color-secondary: rgba(var(--color-gray-rgb), var(--opacity-6));
-    --color-secondary-hover: rgba(var(--color-gray-rgb), var(--opacity-8));
-    --color-secondary-active: rgba(var(--color-gray-rgb), var(--opacity-8));
+    --color-secondary: rgba(var(--color-teal-light-rgb), 0.12);
+    --color-secondary-hover: rgba(var(--color-teal-light-rgb), 0.18);
+    --color-secondary-active: rgba(var(--color-teal-light-rgb), 0.24);
 
-    --color-border: rgba(var(--color-gray-rgb), var(--opacity-8));
-    --color-modal-border: rgba(var(--color-gray-rgb), var(--opacity-8));
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-modal-border: rgba(255, 255, 255, 0.12);
 
     --color-error: var(--color-red-light);
     --color-success: var(--color-teal-light);
-    --color-info: var(--color-gray);
+    --color-info: var(--color-gray-light);
 
-    --color-focus-box-shadow: rgba(var(--color-teal-light-rgb), var(--opacity-4));
+    --color-focus-box-shadow: rgba(var(--color-teal-light-rgb), 0.24);
     --focus-outline: 2px solid var(--color-primary);
-    --focus-box-shadow: 0 0 0 3px var(--color-focus-box-shadow);
+    --focus-box-shadow: 0 0 0 4px var(--color-focus-box-shadow);
+
+    --glass-bg: rgba(10, 10, 20, 0.7);
+    --glass-border: 1px solid rgba(230, 180, 34, 0.2);
+    --card-bg: rgba(20, 20, 30, 0.85);
 }
