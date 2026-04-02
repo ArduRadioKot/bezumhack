@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>LUXARY — Пополнение баланса</title>
+    <title>LUXARY — Balance Top-up</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -254,12 +254,12 @@
 <div class="container">
     <div class="card">
         <div class="card-header">
-            <h1>Пополнение баланса</h1>
-            <p>Безопасный платёж через защищённый шлюз</p>
+            <h1>Balance Top-up</h1>
+            <p>Secure payment through protected gateway</p>
         </div>
         <div class="card-body">
             <div class="balance-info">
-                <div class="balance-label">Текущий баланс</div>
+                <div class="balance-label">Current Balance</div>
                 <div class="balance-amount" id="currentBalance">0 ₽</div>
             </div>
 
@@ -272,18 +272,18 @@
 
             <form id="paymentForm">
                 <div class="form-group">
-                    <label>Сумма пополнения (₽)</label>
-                    <input type="number" id="amount" placeholder="Введите сумму" required min="1000" step="1">  
+                    <label>Top-up Amount (₽)</label>
+                    <input type="number" id="amount" placeholder="Enter amount" required min="1000" step="1">  
                 </div>
 
                 <div class="form-group">
-                    <label>Номер карты</label>
+                    <label>Card Number</label>
                     <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
                 </div>
 
                 <div class="row">
                     <div class="form-group">
-                        <label>Срок действия</label>
+                        <label>Expiry Date</label>
                         <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>
                     </div>
                     <div class="form-group">
@@ -293,11 +293,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Имя владельца</label>
+                    <label>Cardholder Name</label>
                     <input type="text" id="cardName" placeholder="IVAN IVANOV" required>
                 </div>
 
-                <button type="submit" class="btn">Пополнить баланс</button>
+                <button type="submit" class="btn">Top-up Balance</button>
                 <div id="message" class="message"></div>
             </form>
         </div>
@@ -305,7 +305,7 @@
 </div>
 
 <footer>
-    <p>© 2025 Luxary — Премиальный маркетплейс</p>
+    <p>© 2025 Luxary — Premium Marketplace</p>
 </footer>
 
 <script>
@@ -313,7 +313,7 @@
     const THEME_KEY = 'luxary_theme';
     const API_BASE = '';
 
-    // ========== Получение текущего пользователя ==========
+    // ========== GET CURRENT USER ==========
     function getCurrentUser() {
         const userJson = localStorage.getItem(CURRENT_USER_KEY);
         return userJson ? JSON.parse(userJson) : null;
@@ -326,19 +326,19 @@
         }
     }
 
-    // ========== Проверка авторизации ==========
+    // ========== CHECK AUTHORIZATION ==========
     const currentUser = getCurrentUser();
     if (!currentUser || currentUser.mode === 'guest') {
-        // Если не авторизован или гость — перенаправляем на страницу входа
+        // If not authorized or guest - redirect to login page
         window.location.href = 'auth.html';
     }
 
-    // Отображаем баланс
+    // Display balance
     const balanceSpan = document.getElementById('currentBalance');
     const userBalance = currentUser.balance || 0;
     balanceSpan.innerText = `${userBalance.toLocaleString()} ₽`;
 
-    // ========== Форматирование номера карты ==========
+    // ========== CARD NUMBER FORMATTING ==========
     const cardNumberInput = document.getElementById('cardNumber');
     cardNumberInput.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
@@ -347,7 +347,7 @@
         e.target.value = formatted.trim();
     });
 
-    // ========== Форматирование срока действия ==========
+    // ========== EXPIRY DATE FORMATTING ==========
     const expiryInput = document.getElementById('cardExpiry');
     expiryInput.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
@@ -358,7 +358,7 @@
         e.target.value = value;
     });
 
-    // ========== Предустановки суммы ==========
+    // ========== AMOUNT PRESETS ==========
     const amountInput = document.getElementById('amount');
     document.querySelectorAll('.amount-preset').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -366,7 +366,7 @@
         });
     });
 
-    // ========== Обработка формы ==========
+    // ========== FORM PROCESSING ==========
     const form = document.getElementById('paymentForm');
     const messageDiv = document.getElementById('message');
 
@@ -379,19 +379,19 @@
         const cardCvv = document.getElementById('cardCvv').value;
         const cardName = document.getElementById('cardName').value.trim();
 
-        // Валидация
+        // Validation
         if (isNaN(amount) || amount < 1000) {
-            showMessage('Минимальная сумма пополнения 1000 ₽', 'error');
+            showMessage('Minimum top-up amount is 1000 ₽', 'error');
             return;
         }
 
         if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
-            showMessage('Введите корректный номер карты (16 цифр)', 'error');
+            showMessage('Enter correct card number (16 digits)', 'error');
             return;
         }
 
         if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-            showMessage('Введите срок действия в формате ММ/ГГ', 'error');
+            showMessage('Enter expiry date in MM/YY format', 'error');
             return;
         }
 
@@ -402,17 +402,17 @@
         const expMonth = parseInt(month);
 
         if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-            showMessage('Срок действия карты истёк', 'error');
+            showMessage('Card expiry date has expired', 'error');
             return;
         }
 
         if (!/^\d{3}$/.test(cardCvv)) {
-            showMessage('CVV должен состоять из 3 цифр', 'error');
+            showMessage('CVV must consist of 3 digits', 'error');
             return;
         }
 
         if (cardName.length < 2) {
-            showMessage('Введите имя владельца карты', 'error');
+            showMessage('Enter cardholder name', 'error');
             return;
         }
 
@@ -430,17 +430,17 @@
             .then(async (res) => ({ ok: res.ok, data: await res.json() }))
             .then(({ ok, data }) => {
                 if (!ok) {
-                    showMessage(data.error || 'Ошибка пополнения. Попробуйте позже.', 'error');
+                    showMessage(data.error || 'Top-up error. Please try again later.', 'error');
                     return;
                 }
                 updateUserSession(data);
-                showMessage(`Баланс успешно пополнен на ${amount.toLocaleString()} ₽! Перенаправление...`, 'success');
+                showMessage(`Balance successfully topped up by ${amount.toLocaleString()} ₽! Redirecting...`, 'success');
                 setTimeout(() => {
                     window.location.href = 'shop.html';
                 }, 2000);
             })
             .catch(() => {
-                showMessage('Ошибка соединения с сервером', 'error');
+                showMessage('Server connection error', 'error');
             });
     });
 
@@ -453,7 +453,7 @@
         }, 4000);
     }
 
-    // ========== Тема ==========
+    // ========== THEME ==========
     function applyTheme(theme) {
         if (theme === 'dark') document.body.classList.add('dark');
         else document.body.classList.remove('dark');

@@ -28,7 +28,16 @@
       "Bash(})",
       "Bash(print)",
       "Bash(eof)",
-      "Bash(nohup *)"
+      "Bash(nohup *)",
+      "Bash(do *)",
+      "Bash(done)",
+      "Bash(echo *)",
+      "Bash(grep *)",
+      "Bash(head *)",
+      "Bash(then)",
+      "Bash(wait)",
+      "Bash(else)",
+      "Bash(fi)"
     ]
   },
   "$version": 3

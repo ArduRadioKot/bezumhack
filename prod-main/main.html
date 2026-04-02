@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Web Messenger — стильный мессенджер</title>
+    <title>Web Messenger — Stylish Messenger</title>
     <!-- Font Awesome 6 (Free CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -14,7 +14,7 @@
             transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s, transform 0.1s;
         }
 
-        /* ----- ТЕМЫ (по умолчанию тёмная) ----- */
+        /* ----- THEMES (dark by default) ----- */
         body {
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
             overflow: hidden;
@@ -51,7 +51,7 @@
             color: var(--text-primary);
         }
 
-        /* Компактный режим */
+        /* Compact mode */
         body.compact .chat-item {
             padding: 8px 12px;
         }
@@ -114,7 +114,7 @@
             display: none;
         }
 
-        /* Верхняя часть левой панели */
+        /* Top part of left panel */
         .sidebar-header {
             padding: 16px;
             background-color: var(--bg-header);
@@ -222,7 +222,7 @@
             display: inline-block;
         }
 
-        /* Область сообщений */
+        /* Message area */
         .chat-header {
             padding: 12px 16px;
             background-color: var(--bg-header);
@@ -321,7 +321,7 @@
             gap: 8px;
             margin-top: 4px;
         }
-        /* Поле ввода */
+        /* Input field */
         .input-area {
             padding: 12px;
             background-color: var(--bg-header);
@@ -356,7 +356,7 @@
             padding-left: 16px;
             color: var(--text-secondary);
         }
-        /* Модальные окна */
+        /* Modal windows */
         .modal {
             display: none;
             position: fixed;
@@ -421,7 +421,7 @@
             transform: scale(1.02);
             filter: brightness(0.95);
         }
-        /* Стили профиля */
+        /* Profile styles */
         .profile-avatar-container {
             position: relative;
             width: 120px;
@@ -490,7 +490,7 @@
             max-height: 90%;
             border-radius: 16px;
         }
-        /* Контекстное меню с эмодзи */
+        /* Context menu with emojis */
         .context-menu {
             position: fixed;
             background: var(--bg-surface);
@@ -552,13 +552,13 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img id="profileAvatarSide" class="user-avatar" alt="avatar" style="width:40px;height:40px;">
-            <span id="profileNameSide" style="font-weight:500;">Алексей</span>
+            <span id="profileNameSide" style="font-weight:500;">Alexey</span>
             <div class="sidebar-actions">
                 <i class="fas fa-cog" id="settingsBtn"></i>
             </div>
         </div>
         <div class="search-box">
-            <input type="text" id="searchChats" placeholder="Поиск чатов">
+            <input type="text" id="searchChats" placeholder="Search chats">
         </div>
         <div class="chat-list" id="chatList"></div>
     </div>
@@ -577,70 +577,70 @@
         <div class="input-area">
             <button id="emojiBtn"><i class="far fa-smile"></i></button>
             <button id="attachBtn"><i class="fas fa-paperclip"></i></button>
-            <input type="text" id="messageInput" placeholder="Сообщение" autocomplete="off">
+            <input type="text" id="messageInput" placeholder="Message" autocomplete="off">
             <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 </div>
 
-<!-- Модальное окно профиля (улучшенный дизайн) -->
+<!-- Profile modal window (improved design) -->
 <div id="profileModal" class="modal">
     <div class="modal-content">
-        <h2 style="text-align:center; margin-bottom:20px;">Профиль</h2>
+        <h2 style="text-align:center; margin-bottom:20px;">Profile</h2>
         <div class="profile-avatar-container">
             <img id="modalAvatar" class="profile-avatar" alt="avatar">
             <label for="uploadAvatar" class="upload-avatar-icon"><i class="fas fa-camera"></i></label>
             <input type="file" id="uploadAvatar" accept="image/*" style="display:none;">
         </div>
         <div class="profile-field">
-            <label><i class="fas fa-user"></i> Имя</label>
-            <input type="text" id="editName" placeholder="Ваше имя">
+            <label><i class="fas fa-user"></i> Name</label>
+            <input type="text" id="editName" placeholder="Your name">
         </div>
         <div class="profile-field">
-            <label><i class="fas fa-smile"></i> Статус</label>
-            <input type="text" id="editStatus" placeholder="Чем занят?">
+            <label><i class="fas fa-smile"></i> Status</label>
+            <input type="text" id="editStatus" placeholder="What are you up to?">
         </div>
         <div class="profile-field">
-            <label><i class="fas fa-phone"></i> Телефон</label>
+            <label><i class="fas fa-phone"></i> Phone</label>
             <input type="text" id="editPhone" readonly style="background:var(--bg-header);">
         </div>
         <div class="profile-field">
-            <label><i class="fas fa-calendar-alt"></i> Дата регистрации</label>
+            <label><i class="fas fa-calendar-alt"></i> Registration Date</label>
             <input type="text" id="editReg" readonly style="background:var(--bg-header);">
         </div>
-        <button id="saveProfileBtn" style="width:100%; margin-top:10px;">Сохранить изменения</button>
+        <button id="saveProfileBtn" style="width:100%; margin-top:10px;">Save Changes</button>
     </div>
 </div>
 
-<!-- Модалка настроек (оставляем как есть, но стили уже улучшены) -->
+<!-- Settings modal (styles already improved) -->
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <div class="modal-tabs">
-            <button class="tab-btn active" data-tab="appearance">Внешний вид</button>
-            <button class="tab-btn" data-tab="privacy">Конфиденциальность</button>
-            <button class="tab-btn" data-tab="notifications">Уведомления</button>
-            <button class="tab-btn" data-tab="data">Данные</button>
+            <button class="tab-btn active" data-tab="appearance">Appearance</button>
+            <button class="tab-btn" data-tab="privacy">Privacy</button>
+            <button class="tab-btn" data-tab="notifications">Notifications</button>
+            <button class="tab-btn" data-tab="data">Data</button>
         </div>
         <div id="appearanceTab" class="tab-pane active">
-            <div class="setting-row">Тема: <select id="themeSelect"><option value="dark">Тёмная</option><option value="light">Светлая</option><option value="system">Системная</option></select></div>
-            <div class="setting-row">Размер шрифта: <select id="fontSizeSelect"><option value="small">Маленький</option><option value="medium" selected>Средний</option><option value="large">Большой</option></select></div>
-            <div class="setting-row">Компактный режим: <input type="checkbox" id="compactMode"></div>
-            <div class="setting-row">Фон чата градиент: <input type="checkbox" id="gradientBg"></div>
+            <div class="setting-row">Theme: <select id="themeSelect"><option value="dark">Dark</option><option value="light">Light</option><option value="system">System</option></select></div>
+            <div class="setting-row">Font Size: <select id="fontSizeSelect"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option></select></div>
+            <div class="setting-row">Compact Mode: <input type="checkbox" id="compactMode"></div>
+            <div class="setting-row">Chat Gradient Background: <input type="checkbox" id="gradientBg"></div>
         </div>
         <div id="privacyTab" class="tab-pane" style="display:none">
-            <div class="setting-row">Показывать статус "онлайн": <input type="checkbox" id="showOnlineStatus" checked></div>
-            <div class="setting-row">Показывать прочтение: <input type="checkbox" id="showReadReceipts" checked></div>
+            <div class="setting-row">Show "online" status: <input type="checkbox" id="showOnlineStatus" checked></div>
+            <div class="setting-row">Show read receipts: <input type="checkbox" id="showReadReceipts" checked></div>
         </div>
         <div id="notificationsTab" class="tab-pane" style="display:none">
-            <div class="setting-row">Звук сообщений: <input type="checkbox" id="soundEnabled"> <button id="testSoundBtn">Тест звука</button></div>
-            <div class="setting-row">Push-уведомления: <button id="requestNotifBtn">Разрешить</button></div>
+            <div class="setting-row">Message Sound: <input type="checkbox" id="soundEnabled"> <button id="testSoundBtn">Test Sound</button></div>
+            <div class="setting-row">Push Notifications: <button id="requestNotifBtn">Allow</button></div>
         </div>
         <div id="dataTab" class="tab-pane" style="display:none">
-            <div class="setting-row"><button id="clearAllChatsBtn">Очистить все чаты</button></div>
-            <div class="setting-row"><button id="exportDataBtn">Экспорт данных (JSON)</button></div>
-            <div class="setting-row">Размер кэша: <span id="cacheSize">0</span> KB</div>
+            <div class="setting-row"><button id="clearAllChatsBtn">Clear All Chats</button></div>
+            <div class="setting-row"><button id="exportDataBtn">Export Data (JSON)</button></div>
+            <div class="setting-row">Cache Size: <span id="cacheSize">0</span> KB</div>
         </div>
-        <button id="closeSettings" style="margin-top:15px;">Закрыть</button>
+        <button id="closeSettings" style="margin-top:15px;">Close</button>
     </div>
 </div>
 
@@ -650,41 +650,41 @@
     // ---------- DATA MODELS ----------
     let currentUser = {
         id: "me",
-        name: "Алексей",
-        avatar: "https://ui-avatars.com/api/?background=25d366&color=fff&name=Алексей",
+        name: "Alexey",
+        avatar: "https://ui-avatars.com/api/?background=25d366&color=fff&name=Alexey",
         phone: "+7 999 123 4567",
-        status: "Доступен",
-        registered: new Date().toLocaleDateString('ru-RU')
+        status: "Available",
+        registered: new Date().toLocaleDateString('en-US')
     };
     let contacts = [
-        { id: "anna", name: "Анна", avatar: "https://ui-avatars.com/api/?background=4c6a8c&color=fff&name=Анна", phone: "+7 900 111 2233", online: true, lastSeen: "онлайн" },
-        { id: "maxim", name: "Максим", avatar: "https://ui-avatars.com/api/?background=4c6a8c&color=fff&name=Максим", phone: "+7 901 222 3344", online: false, lastSeen: "был(а) 15:40" },
-        { id: "team", name: "Команда проекта", avatar: "https://ui-avatars.com/api/?background=2b5278&color=fff&name=Team", phone: "+7 912 345 6789", online: true, lastSeen: "онлайн" }
+        { id: "anna", name: "Anna", avatar: "https://ui-avatars.com/api/?background=4c6a8c&color=fff&name=Anna", phone: "+7 900 111 2233", online: true, lastSeen: "online" },
+        { id: "maxim", name: "Maxim", avatar: "https://ui-avatars.com/api/?background=4c6a8c&color=fff&name=Maxim", phone: "+7 901 222 3344", online: false, lastSeen: "last seen 15:40" },
+        { id: "team", name: "Project Team", avatar: "https://ui-avatars.com/api/?background=2b5278&color=fff&name=Team", phone: "+7 912 345 6789", online: true, lastSeen: "online" }
     ];
     let chats = {};
     let activeChatId = "anna";
     let typingTimeout = null;
     let currentSettings = { theme: "dark", fontSize: "medium", compact: false, gradientBg: false, showOnline: true, showRead: true, sound: false };
 
-    // Инициализация мок данных
+    // Initialize mock data
     function initMockData() {
         const stored = localStorage.getItem("messenger_chats");
         if(stored) { chats = JSON.parse(stored); return; }
         const now = Date.now();
         chats = {
             anna: { messages: [
-                { id: "m1", text: "Привет! Как дела?", senderId: "anna", timestamp: now-3600000, status: "read", reactions: [], type:"text" },
-                { id: "m2", text: "Отлично! А у тебя?", senderId: "me", timestamp: now-3500000, status: "read", reactions: [], type:"text" },
-                { id: "m3", text: "Тоже хорошо, встретимся позже?", senderId: "anna", timestamp: now-3000000, status: "read", reactions: [], type:"text" },
-                { id: "m4", text: "Давай в 18:00", senderId: "me", timestamp: now-2000000, status: "delivered", reactions: [], type:"text" },
+                { id: "m1", text: "Hi! How are you?", senderId: "anna", timestamp: now-3600000, status: "read", reactions: [], type:"text" },
+                { id: "m2", text: "Great! And you?", senderId: "me", timestamp: now-3500000, status: "read", reactions: [], type:"text" },
+                { id: "m3", text: "Good too, meet later?", senderId: "anna", timestamp: now-3000000, status: "read", reactions: [], type:"text" },
+                { id: "m4", text: "Let's meet at 18:00", senderId: "me", timestamp: now-2000000, status: "delivered", reactions: [], type:"text" },
             ], unread: 0, lastMsgTime: now-2000000 },
             maxim: { messages: [
-                { id: "m5", text: "Привет, скинь отчёт", senderId: "maxim", timestamp: now-86400000, status: "read", reactions: [], type:"text" },
-                { id: "m6", text: "Сейчас отправлю", senderId: "me", timestamp: now-86000000, status: "read", reactions: [], type:"text" }
+                { id: "m5", text: "Hi, send the report", senderId: "maxim", timestamp: now-86400000, status: "read", reactions: [], type:"text" },
+                { id: "m6", text: "Sending now", senderId: "me", timestamp: now-86000000, status: "read", reactions: [], type:"text" }
             ], unread: 1, lastMsgTime: now-86400000 },
             team: { messages: [
-                { id: "m7", text: "Общий созвон завтра в 12", senderId: "team", timestamp: now-172800000, status: "read", reactions: [], type:"text" },
-                { id: "m8", text: "Ок, подтверждаю", senderId: "me", timestamp: now-171000000, status: "read", reactions: [], type:"text" }
+                { id: "m7", text: "General call tomorrow at 12", senderId: "team", timestamp: now-172800000, status: "read", reactions: [], type:"text" },
+                { id: "m8", text: "Ok, confirmed", senderId: "me", timestamp: now-171000000, status: "read", reactions: [], type:"text" }
             ], unread: 0, lastMsgTime: now-171000000 }
         };
         saveChatsToLocal();
@@ -714,7 +714,7 @@
         let filtered = contacts.filter(c => c.name.toLowerCase().includes(searchTerm));
         container.innerHTML = filtered.map(contact => {
             const chat = chats[contact.id] || { messages: [], unread: 0 };
-            const lastMsg = chat.messages.length ? chat.messages[chat.messages.length-1].text : "Нет сообщений";
+            const lastMsg = chat.messages.length ? chat.messages[chat.messages.length-1].text : "No messages";
             const time = chat.lastMsgTime ? new Date(chat.lastMsgTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "";
             const unread = chat.unread || 0;
             return `<div class="chat-item ${activeChatId === contact.id ? 'active' : ''}" data-id="${contact.id}">
@@ -755,15 +755,15 @@
         document.getElementById("chatContactName").innerText = contact.name;
         document.getElementById("chatAvatar").src = contact.avatar;
         let onlineStatus = "";
-        if(currentSettings.showOnline) onlineStatus = contact.online ? "Онлайн" : (contact.lastSeen || "оффлайн");
-        else onlineStatus = "статус скрыт";
+        if(currentSettings.showOnline) onlineStatus = contact.online ? "Online" : (contact.lastSeen || "offline");
+        else onlineStatus = "status hidden";
         document.getElementById("chatStatus").innerText = onlineStatus;
     }
 
     function renderMessages() {
         const container = document.getElementById("messagesContainer");
         const chat = chats[activeChatId];
-        if(!chat || !chat.messages) { container.innerHTML = "<div style='text-align:center'>Нет сообщений</div>"; return; }
+        if(!chat || !chat.messages) { container.innerHTML = "<div style='text-align:center'>No messages</div>"; return; }
         container.innerHTML = chat.messages.map(msg => {
             const isMe = msg.senderId === "me";
             const statusIcon = isMe ? (msg.status === "read" ? "✓✓" : (msg.status==="delivered"?"✓✓":"✓")) : "";
