@@ -42,13 +42,6 @@ git: https://github.com/bezumhack/luxury-shop
 
 # Донастройка хоста
 
-## Смена FQDN
-
-```bash
-sed -i 's/luxury-shop\.city\.stf/YOUR_FQDN/g' /etc/hosts
-hostnamectl set-hostname YOUR_FQDN
-```
-
 ## Запуск backend-приложения
 
 После развёртывания образа backend запускается из виртуального окружения приложения.
@@ -58,6 +51,9 @@ cd
 source .venv/bin/activate
 cd bezumhack
 cd prod-main
+
+sqlite3 instance/shop.db "UPDATE user SET shipping_address='ctf{YOUR_FLAG_HERE}' WHERE email='admin@example.com';"
+sqlite3 instance/shop.db "UPDATE product SET description='ctf{YOUR_FLAG_HERE}' WHERE id='yacht-001';"
 python3 app.py
 ```
 
