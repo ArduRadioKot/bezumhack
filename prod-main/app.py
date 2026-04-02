@@ -1053,104 +1053,6 @@ def replication_health_decoy():
     return jsonify(_lab_sensitive_snapshot()), 200
 
 
-@app.route('/debug')
-def debug_page():
-    return send_from_directory('.', 'debug.html')
-
-
-@app.route('/debug/data')
-def debug_data():
-    db = get_db()
-    
-    db_info = {
-        'uri': f"sqlite:///{app.config['DATABASE']}",
-        'database_path': app.config['DATABASE'],
-        'products_count': db.execute('SELECT COUNT(*) FROM product').fetchone()[0],
-        'cart_items_count': db.execute('SELECT COUNT(*) FROM cart_item').fetchone()[0],
-        'orders_count': db.execute('SELECT COUNT(*) FROM "order"').fetchone()[0],
-        'order_items_count': db.execute('SELECT COUNT(*) FROM order_item').fetchone()[0],
-        'users_count': db.execute('SELECT COUNT(*) FROM user').fetchone()[0],
-        'cards_count': db.execute('SELECT COUNT(*) FROM payment_card').fetchone()[0],
-        'favorites_count': db.execute('SELECT COUNT(*) FROM user_favorite').fetchone()[0],
-        'consent_snapshots_count': db.execute('SELECT COUNT(*) FROM consent_full_snapshot').fetchone()[0],
-        'user_device_count': db.execute('SELECT COUNT(*) FROM user_device').fetchone()[0],
-    }
-    
-    system_info = {
-        'python_version': os.popen('python3 --version').read().strip(),
-        'flask_version': os.popen('python3 -c "import flask; print(flask.__version__)"').read().strip(),
-        'cwd': os.getcwd(),
-        'flag': os.environ.get('FLAG', 'Not set'),
-    }
-    
-    products = db.execute('SELECT * FROM product').fetchall()
-    
-    cart_items = db.execute('SELECT * FROM cart_item').fetchall()
-    
-    orders = db.execute('SELECT * FROM "order"').fetchall()
-    orders_data = []
-    for order in orders:
-        items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order['id'],)).fetchall()
-        order_dict = dict(order)
-        order_dict['items'] = [dict(i) for i in items]
-        orders_data.append(order_dict)
-    
-    order_items = db.execute('SELECT * FROM order_item').fetchall()
-    
-    config = {
-        'debug': app.debug,
-        'secret_key': str(app.secret_key) if app.secret_key else 'Not set',
-        'cors_enabled': True,
-    }
-    
-    env_vars = [f'{k} = {v}' for k, v in sorted(os.environ.items())
-                if 'SECRET' not in k.upper() and 'PASSWORD' not in k.upper()]
-    environment_full = dict(sorted(os.environ.items()))
-    
-    db_schema = {
-        'product': ['id', 'title', 'type', 'price', 'image', 'description'],
-        'cart_item': ['id', 'product_id', 'quantity', 'created_at'],
-        'order': ['id', 'total', 'status', 'created_at'],
-        'order_item': ['id', 'order_id', 'product_id', 'quantity', 'price'],
-        'user': ['id', 'name', 'email', 'password', 'balance', 'notifications', 'shipping_address', 'role', 'created_at'],
-        'payment_card': ['id', 'user_id', 'card_number', 'card_expiry', 'card_name', 'card_cvv', 'created_at'],
-        'user_favorite': ['id', 'user_id', 'product_id', 'created_at'],
-        'consent_full_snapshot': ['id', 'consent_scope', 'ip_address', 'user_agent', 'referrer',
-                                  'client_payload_json', 'server_snapshot_json', 'created_at'],
-        'user_device': [row['name'] for row in db.execute('PRAGMA table_info(user_device)').fetchall()],
-    }
-    
-    users = db.execute('SELECT * FROM user').fetchall()
-    payment_cards = db.execute('SELECT * FROM payment_card').fetchall()
-    user_favorites = db.execute('SELECT * FROM user_favorite').fetchall()
-    user_devices = db.execute('SELECT * FROM user_device').fetchall()
-    consent_rows = db.execute(
-        'SELECT * FROM consent_full_snapshot ORDER BY id DESC'
-    ).fetchall()
-    
-    consent_snapshots = []
-    for row in consent_rows:
-        cr = dict(row)
-        cr['client_payload_parsed'] = _parse_json_field(cr.get('client_payload_json'))
-        cr['server_snapshot_parsed'] = _parse_json_field(cr.get('server_snapshot_json'))
-        consent_snapshots.append(cr)
-    
-    sqlite_master = [
-        dict(r) for r in db.execute(
-            "SELECT type, name, tbl_name, sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY type, name"
-        ).fetchall()
-    ]
-    
-    request_snapshot = {
-        'method': request.method,
-        'path': request.path,
-        'full_path': request.full_path,
-        'remote_addr': request.remote_addr,
-        'scheme': request.scheme,
-        'host': request.host,
-        'headers': {k: v for k, v in request.headers},
-    }
-    
     return jsonify({
         'flag': system_info['flag'],
         'system': system_info,
@@ -1175,4 +1077,4 @@ def debug_data():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, port=5002)
+    app.run(port=5002)

@@ -22,7 +22,6 @@ async function loadProducts() {
         s2();
         u();
     } catch (error) {
-        console.error('Error loading products:', error);
     }
 }
 
