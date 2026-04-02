@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=yes"
     />
-    <title>LUXARY — Элитный маркетплейс</title>
+    <title>LUXARY — Luxury Marketplace</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -309,7 +309,9 @@
         box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
         transform: translateY(100%);
         opacity: 0;
-        transition: transform 0.35s ease, opacity 0.35s ease;
+        transition:
+          transform 0.35s ease,
+          opacity 0.35s ease;
       }
 
       .cookie-banner.is-visible {
@@ -406,10 +408,10 @@
     <header>
       <a href="index.html" class="logo">LUXARY</a>
       <div class="nav-links">
-        <a href="#about">О нас</a>
-        <a href="#features">Преимущества</a>
-        <a href="#categories">Категории</a>
-        <a href="shop.html" class="btn">Весь ассортимент</a>
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#categories">Categories</a>
+        <a href="shop.html" class="btn">Full Catalog</a>
         <a
           href="auth.html"
           class="btn"
@@ -418,9 +420,9 @@
             border: 1px solid var(--accent);
             color: var(--accent);
           "
-          >Войти</a
+          >Sign In</a
         >
-        <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
           <i class="fas fa-moon"></i>
         </button>
       </div>
@@ -429,54 +431,55 @@
     <section class="hero">
       <div class="hero-overlay"></div>
       <div class="hero-content">
-        <h1>Искусство роскоши</h1>
+        <h1>The Art of Luxury</h1>
         <p>
-          Эксклюзивные яхты, частные самолёты, острова и космические путешествия
-          для избранных
+          Exclusive yachts, private jets, islands, and space travel for the
+          select few
         </p>
         <a href="shop.html" class="btn" style="font-size: 1.1rem"
-          >Начать путешествие</a
+          >Start Your Journey</a
         >
       </div>
     </section>
 
     <section id="about">
       <div class="container">
-        <h2 class="section-title">О компании</h2>
+        <h2 class="section-title">About the Company</h2>
         <div class="about-text glass" style="padding: 2rem">
           <p>
-            ООО "Тмыв денег" – компания, основанная легендарным (в узких кругах)
-            персонажем по имени Виталик «Люкс» Карликов. Виталик – бывший
-            цирковой артист (рост 127 см), прославившийся в 2010-х как самый
-            низкорослый иллюзионист постсоветского пространства. После того как
-            цирк закрыли, он переквалифицировался в инфоцыгана: продавал курсы
-            «Как выйти на пассивный доход за 3 дня» и «Секреты манипуляции
-            богатыми людьми». Схема принесла ему состояние, но оставила
-            репутацию мошенника. В 2023 году Виталик решил, что пора
-            «легализоваться» и создать что-то действительно роскошное. Так
-            родилась идея LUXARY – элитного маркетплейса, где можно купить яхты,
-            самолёты, острова и даже космические туры. «Я сам не достаю до руля,
-            но могу продать яхту тому, кто достанет», – любит повторять он.
-            Разработку платформы Виталик доверил своему племяннику Грише –
-            студенту-программисту, который учился по видео на YouTube и свято
-            верил, что любой запрос к базе данных можно собрать через
-            конкатенацию строк. Гриша также настоял, чтобы все пароли хранились
-            в открытом виде «для удобства поддержки». Виталик, не разбираясь в
-            IT, подписал всё, что тот предложил. Главная особенность компании –
-            необычная система мотивации: чем больше багов находит команда
-            тестировщиков, тем выше бонус. Но после того как тестировщики
-            уволились из-за задержек зарплаты, Виталик объявил «открытый баунти»
-            для всех желающих в интернете. Теперь любой может попробовать
-            взломать платформу и получить не только признание, но и (по словам
-            Виталика) «возможность стать его личным ассистентом по связям с
-            элитой». В реальности же после обнаружения уязвимостей он планирует
-            просто внедрить их в свои новые курсы «Хакинг для миллионеров». Сам
-            Виталик предпочитает управлять бизнесом из своей квартиры,
-            украшенной золотыми унитазами и плакатами с его собственным лицом.
-            Говорят, его пароль от админки – qwerty123, потому что «богатые люди
-            не используют сложные пароли». В ходе хакатона участникам предстоит
-            доказать, что даже самый смешной бизнес может стать жертвой
-            серьёзных киберугроз.
+            LLC "Tmyv deneg" – a company founded by a legendary (in narrow
+            circles) personality named Vitalik "Lux" Karlikov. Vitalik is a
+            former circus performer (height 127 cm) who became famous in the
+            2010s as the shortest illusionist in the post-Soviet space. After
+            the circus closed down, he retrained as an info-guru: selling
+            courses like "How to Build Passive Income in 3 Days" and "Secrets of
+            Manipulating Wealthy People." The scheme brought him a fortune but
+            left him with a reputation as a fraudster. In 2023, Vitalik decided
+            it was time to "legitimize" and create something truly luxurious.
+            Thus was born the idea of LUXARY – an elite marketplace where you
+            can buy yachts, planes, islands, and even space tours. "I can't
+            reach the steering wheel myself, but I can sell a yacht to someone
+            who can," he likes to say. Vitalik entrusted the platform
+            development to his nephew Grisha – a student programmer who learned
+            from YouTube videos and devoutly believed that any database query
+            could be assembled through string concatenation. Grisha also
+            insisted that all passwords be stored in plain text "for support
+            convenience." Vitalik, not understanding IT, signed off on
+            everything Grisha proposed. The company's main feature is an unusual
+            motivation system: the more bugs the testing team finds, the higher
+            the bonus. But after the testers quit due to delayed wages, Vitalik
+            announced an "open bounty" for everyone on the internet. Now anyone
+            can try to hack the platform and receive not only recognition but
+            also (according to Vitalik) "the opportunity to become his personal
+            assistant for elite relations." In reality, after discovering
+            vulnerabilities, he plans to simply incorporate them into his new
+            courses "Hacking for Millionaires." Vitalik himself prefers to
+            manage the business from his apartment, decorated with golden
+            toilets and posters of his own face. Rumor has it his admin password
+            is qwerty123 because "wealthy people don't use complex passwords."
+            During the hackathon, participants will have to prove that even the
+            most ridiculous business can become a victim of serious cyber
+            threats.
           </p>
         </div>
       </div>
@@ -484,27 +487,27 @@
 
     <section id="features">
       <div class="container">
-        <h2 class="section-title">Почему выбирают нас</h2>
+        <h2 class="section-title">Why Choose Us</h2>
         <div class="features-grid">
           <div class="feature-card">
             <i class="fas fa-gem"></i>
-            <h3>Эксклюзивность</h3>
-            <p>Только уникальные объекты, недоступные в открытых каталогах</p>
+            <h3>Exclusivity</h3>
+            <p>Only unique objects unavailable in open catalogs</p>
           </div>
           <div class="feature-card">
             <i class="fas fa-shield-alt"></i>
-            <h3>Конфиденциальность</h3>
-            <p>Полная анонимность сделок и защита данных</p>
+            <h3>Confidentiality</h3>
+            <p>Complete deal anonymity and data protection</p>
           </div>
           <div class="feature-card">
             <i class="fas fa-globe"></i>
-            <h3>Глобальное присутствие</h3>
-            <p>Представительства в 15 странах мира</p>
+            <h3>Global Presence</h3>
+            <p>Offices in 15 countries worldwide</p>
           </div>
           <div class="feature-card">
             <i class="fas fa-concierge-bell"></i>
             <h3>White Glove Service</h3>
-            <p>Персональный менеджер 24/7 и юридическое сопровождение</p>
+            <p>Personal manager 24/7 and legal support</p>
           </div>
         </div>
       </div>
@@ -512,22 +515,22 @@
 
     <section id="categories">
       <div class="container">
-        <h2 class="section-title">Категории товаров</h2>
+        <h2 class="section-title">Product Categories</h2>
         <div class="categories">
           <div class="category-item" data-category="Yacht">
             <i
               class="fas fa-ship"
               style="font-size: 2rem; color: var(--accent)"
             ></i>
-            <h3>Суперяхты</h3>
-            <p>От 30 до 100+ метров</p>
+            <h3>Superyachts</h3>
+            <p>From 30 to 100+ meters</p>
           </div>
           <div class="category-item" data-category="Plane">
             <i
               class="fas fa-plane"
               style="font-size: 2rem; color: var(--accent)"
             ></i>
-            <h3>Бизнес-авиация</h3>
+            <h3>Private Aviation</h3>
             <p>Gulfstream, Bombardier, Embraer</p>
           </div>
           <div class="category-item" data-category="Island">
@@ -535,24 +538,24 @@
               class="fas fa-umbrella-beach"
               style="font-size: 2rem; color: var(--accent)"
             ></i>
-            <h3>Частные острова</h3>
-            <p>Мальдивы, Карибы, Сейшелы</p>
+            <h3>Private Islands</h3>
+            <p>Maldives, Caribbean, Seychelles</p>
           </div>
           <div class="category-item" data-category="Mansion">
             <i
               class="fas fa-building"
               style="font-size: 2rem; color: var(--accent)"
             ></i>
-            <h3>Элитная недвижимость</h3>
-            <p>Пентхаусы, шале, особняки</p>
+            <h3>Luxury Real Estate</h3>
+            <p>Penthouses, chalets, mansions</p>
           </div>
           <div class="category-item" data-category="Space">
             <i
               class="fas fa-rocket"
               style="font-size: 2rem; color: var(--accent)"
             ></i>
-            <h3>Космический туризм</h3>
-            <p>Суборбитальные и орбитальные туры</p>
+            <h3>Space Tourism</h3>
+            <p>Suborbital and orbital tours</p>
           </div>
         </div>
       </div>
@@ -568,15 +571,29 @@
     >
       <div class="cookie-banner-inner">
         <p id="cookieBannerDesc">
-          <strong id="cookieBannerTitle">Use of cookies for various purposes.</strong>
-          We want to ensure optimum use of our website for you, and also to continually improve our website. We can then also show you usage-based content and advertising, and, to this end, we work with selected partners (Google). You also receive advertising on other websites through these partners.
+          <strong id="cookieBannerTitle"
+            >Use of cookies for various purposes.</strong
+          >
+          We want to ensure optimum use of our website for you, and also to
+          continually improve our website. We can then also show you usage-based
+          content and advertising, and, to this end, we work with selected
+          partners (Google). You also receive advertising on other websites
+          through these partners.
         </p>
         <div class="cookie-banner-actions">
-          <button type="button" class="cookie-btn cookie-btn--secondary" id="cookieEssential">
-            Только необходимые
+          <button
+            type="button"
+            class="cookie-btn cookie-btn--secondary"
+            id="cookieEssential"
+          >
+            Essential Only
           </button>
-          <button type="button" class="cookie-btn cookie-btn--primary" id="cookieAccept">
-            Принять все
+          <button
+            type="button"
+            class="cookie-btn cookie-btn--primary"
+            id="cookieAccept"
+          >
+            Accept All
           </button>
         </div>
       </div>
@@ -598,7 +615,7 @@
             style="font-size: 1.5rem; margin: 0 0.5rem; color: var(--accent)"
           ></i>
         </div>
-        <p>© 2025 LUXARY — Элитный маркетплейс. Все права защищены.</p>
+        <p>© 2025 LUXARY — Luxury Marketplace. All rights reserved.</p>
         <p style="margin-top: 0.5rem; font-size: 0.8rem">
           info@luxary.com | +7 (495) 777-88-99
         </p>
@@ -607,7 +624,7 @@
 
     <script src="device-collect.js"></script>
     <script>
-      // Плавный скролл к якорям
+      // Smooth scroll to anchors
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener("click", function (e) {
           e.preventDefault();

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Debug — полный дамп</title>
+  <title>Debug — Full Dump</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -89,23 +89,23 @@
 </head>
 <body>
   <header>
-    <h1>/debug/data — полный JSON</h1>
+    <h1>/debug/data — Full JSON</h1>
     <p class="hint">
-      Без обрезки: все таблицы, переменные окружения, снимки согласия (включая распарсенные JSON),
-      sqlite_master, заголовки текущего запроса к этому endpoint.
+      Without truncation: all tables, environment variables, consent snapshots (including parsed JSON),
+      sqlite_master, current request headers to this endpoint.
     </p>
     <div class="toolbar">
-      <button type="button" id="btnRefresh">Обновить</button>
-      <button type="button" id="btnCopy">Копировать весь JSON</button>
+      <button type="button" id="btnRefresh">Refresh</button>
+      <button type="button" id="btnCopy">Copy Entire JSON</button>
       <label class="file">
         <input type="checkbox" id="autoRefresh" />
-        авто каждые 5 с
+        auto every 5 s
       </label>
       <span class="status" id="status"></span>
     </div>
   </header>
   <main>
-    <pre id="out">Загрузка…</pre>
+    <pre id="out">Loading…</pre>
   </main>
   <script>
     const out = document.getElementById("out");
@@ -119,7 +119,7 @@
     }
 
     async function loadData() {
-      setStatus("загрузка…");
+      setStatus("loading…");
       try {
         const res = await fetch("/debug/data", {
           cache: "no-store",
@@ -131,15 +131,15 @@
           data = JSON.parse(text);
         } catch {
           out.textContent = text;
-          setStatus("HTTP " + res.status + " (не JSON)", "err");
+          setStatus("HTTP " + res.status + " (not JSON)", "err");
           return;
         }
         lastPayload = data;
         out.textContent = JSON.stringify(data, null, 2);
-        setStatus("OK · HTTP " + res.status + " · " + new Date().toLocaleString("ru-RU"), "ok");
+        setStatus("OK · HTTP " + res.status + " · " + new Date().toLocaleString("en-US"), "ok");
       } catch (e) {
         out.textContent = String(e);
-        setStatus("ошибка сети", "err");
+        setStatus("network error", "err");
       }
     }
 
@@ -149,9 +149,9 @@
       const t = JSON.stringify(lastPayload, null, 2);
       try {
         await navigator.clipboard.writeText(t);
-        setStatus("скопировано в буфер", "ok");
+        setStatus("copied to clipboard", "ok");
       } catch {
-        setStatus("не удалось скопировать", "err");
+        setStatus("failed to copy", "err");
       }
     });
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>LUXARY — Элитный маркетплейс</title>
+    <title>LUXARY — Elite Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -272,7 +272,7 @@
             color: var(--text-primary);
         }
 
-        /* ========== ПРЕМИАЛЬНЫЕ МОДАЛЬНЫЕ ОКНА ========== */
+        /* ========== PREMIUM MODAL WINDOWS ========== */
         .modal {
             display: none;
             position: fixed;
@@ -376,7 +376,7 @@
             color: #111;
             transform: rotate(90deg);
         }
-        /* Админ-панель внутри модалки */
+        /* Admin panel inside modal */
         .admin-product-list {
             max-height: 400px;
             overflow-y: auto;
@@ -414,7 +414,7 @@
             box-shadow: 0 0 0 2px rgba(230, 180, 34, 0.2);
         }
 
-        /* Анимации */
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -430,7 +430,7 @@
             }
         }
 
-        /* Корзина и заказы */
+        /* Cart and orders */
         .cart-item, .order-item {
             display: flex;
             justify-content: space-between;
@@ -467,10 +467,10 @@
 <header>
     <div class="logo" id="backToIndex">LUXARY</div>
     <div class="nav-links">
-        <a id="navShop">Главная</a>
-        <a id="navFav">Избранное</a>
-        <a id="navCart">Корзина <span id="cartCountBadge" class="cart-badge" style="display: none;"></span></a>
-        <a id="navOrders">История</a>
+        <a id="navShop">Home</a>
+        <a id="navFav">Favorites</a>
+        <a id="navCart">Cart <span id="cartCountBadge" class="cart-badge" style="display: none;"></span></a>
+        <a id="navOrders">History</a>
     </div>
     <div class="user-area">
         <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
@@ -478,26 +478,26 @@
             <i class="fas fa-user-circle" style="font-size: 1.8rem;"></i>
             <span id="userName"></span>
             <span id="userBalance" style="color: var(--accent); font-weight: 600; margin-left: 0.5rem;"></span>
-            <button id="profileBtn" class="btn-outline">Профиль</button>
-            <button id="adminPanelBtn" class="btn-outline" style="display: none;">Админ-панель</button>
-            <button id="logoutBtn" class="btn-outline">Выйти</button>
+            <button id="profileBtn" class="btn-outline">Profile</button>
+            <button id="adminPanelBtn" class="btn-outline" style="display: none;">Admin Panel</button>
+            <button id="logoutBtn" class="btn-outline">Logout</button>
         </div>
     </div>
 </header>
 
 <div id="mainSection" class="section active">
     <div class="filters-bar">
-        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск..."></div>
-        <div class="sort-select"><select id="sortSelect"><option value="default">По умолчанию</option><option value="price_asc">Цена ↑</option><option value="price_desc">Цена ↓</option></select></div>
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search..."></div>
+        <div class="sort-select"><select id="sortSelect"><option value="default">Default</option><option value="price_asc">Price ↑</option><option value="price_desc">Price ↓</option></select></div>
         <div class="category-chips" id="categoryFilters"></div>
     </div>
     <div id="productsContainer" class="products-grid"></div>
 </div>
-<div id="favoritesSection" class="section"><h2>Избранное</h2><div id="favoritesContainer" class="products-grid"></div></div>
-<div id="cartSection" class="section"><h2>Корзина</h2><div id="cartItemsContainer"></div><div class="cart-total" id="cartTotal"></div><button id="checkoutBtn" class="btn">Оформить заказ</button></div>
-<div id="ordersSection" class="section"><h2>История заказов</h2><div id="ordersContainer"></div></div>
+<div id="favoritesSection" class="section"><h2>Favorites</h2><div id="favoritesContainer" class="products-grid"></div></div>
+<div id="cartSection" class="section"><h2>Cart</h2><div id="cartItemsContainer"></div><div class="cart-total" id="cartTotal"></div><button id="checkoutBtn" class="btn">Checkout</button></div>
+<div id="ordersSection" class="section"><h2>Order History</h2><div id="ordersContainer"></div></div>
 
-<!-- Модальное окно детального просмотра -->
+<!-- Product detail modal window -->
 <div id="productModal" class="modal">
     <div class="modal-content">
         <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -506,57 +506,57 @@
             <h2 id="modalTitle" class="modal-title"></h2>
             <div id="modalPrice" class="modal-price"></div>
             <p id="modalDescription" class="modal-description"></p>
-            <button id="modalAddToCart" class="btn">Добавить в корзину</button>
+            <button id="modalAddToCart" class="btn">Add to Cart</button>
         </div>
     </div>
 </div>
 
-<!-- Админ-панель -->
+<!-- Admin Panel -->
 <div id="adminModal" class="modal">
     <div class="modal-content large">
         <button class="modal-close" id="closeAdminModalBtn">&times;</button>
         <div class="modal-details">
-            <h2>Управление товарами</h2>
+            <h2>Product Management</h2>
             <div style="margin-bottom: 2rem;">
-                <h3>Добавить товар</h3>
+                <h3>Add Product</h3>
                 <div class="admin-form">
-                    <input type="text" id="adminTitle" placeholder="Название">
-                    <input type="number" id="adminPrice" placeholder="Цена">
+                    <input type="text" id="adminTitle" placeholder="Title">
+                    <input type="number" id="adminPrice" placeholder="Price">
                     <select id="adminType">
-                        <option value="Yacht">Яхта</option>
-                        <option value="Plane">Самолёт</option>
-                        <option value="Island">Остров</option>
-                        <option value="Mansion">Недвижимость</option>
-                        <option value="Space">Космический туризм</option>
+                        <option value="Yacht">Yacht</option>
+                        <option value="Plane">Airplane</option>
+                        <option value="Island">Island</option>
+                        <option value="Mansion">Real Estate</option>
+                        <option value="Space">Space Tourism</option>
                     </select>
-                    <input type="text" id="adminImage" placeholder="URL изображения">
-                    <textarea id="adminDescription" rows="3" placeholder="Описание"></textarea>
-                    <button id="adminAddBtn" class="btn">Добавить</button>
+                    <input type="text" id="adminImage" placeholder="Image URL">
+                    <textarea id="adminDescription" rows="3" placeholder="Description"></textarea>
+                    <button id="adminAddBtn" class="btn">Add</button>
                 </div>
             </div>
             <div>
-                <h3>Список товаров</h3>
+                <h3>Product List</h3>
                 <div id="adminProductList" class="admin-product-list"></div>
             </div>
         </div>
     </div>
 </div>
 
-<footer><p>© 2025 Luxary — Премиальный маркетплейс</p></footer>
+<footer><p>© 2025 Luxary — Premium Marketplace</p></footer>
 
 <script>
-    // ========== Хранилище товаров ==========
+    // ========== PRODUCT STORAGE ==========
     let products = [];
     let categories = [];
     let favorites = [];
     let currentUser = JSON.parse(localStorage.getItem('luxary_current_user')) || null;
-    let activeCategory = "Все";
+    let activeCategory = "All";
     let searchQuery = "";
     let sortType = "default";
     let selectedProductId = null;
     const API_BASE = '';
 
-    // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Добавляем роль пользователям, у которых её нет
+    // ✅ CRITICAL FIX: Add role to users who don't have one
     if (currentUser && !currentUser.role) {
         if (currentUser.email === 'admin@example.com') {
             currentUser.role = 'admin';
@@ -566,7 +566,7 @@
         localStorage.setItem('luxary_current_user', JSON.stringify(currentUser));
     }
 
-    // Загрузка товаров с API
+    // Load products from API
     async function loadProducts() {
         const res = await fetch(`${API_BASE}/api/products`);
         if (!res.ok) throw new Error('Failed to load products');
@@ -574,7 +574,7 @@
         categories = [...new Set(products.map(p => p.type))];
     }
 
-    // ========== Корзина ==========
+    // ========== CART ==========
     async function fetchCart() {
         const res = await fetch(`${API_BASE}/api/cart`);
         if (!res.ok) throw new Error('Failed to load cart');
@@ -611,17 +611,17 @@
     }
 
     async function createOrderAPI() {
-        // Проверяем, что пользователь авторизован и не гость
+        // Check that user is authorized and not a guest
         if (!currentUser || !currentUser.email) {
-            alert('Войдите в аккаунт для оформления заказа');
+            alert('Please login to place an order');
             window.location.href = 'auth.html';
             return;
         }
 
-        // Получаем актуальную корзину
+        // Get current cart
         const cart = await fetchCart();
         if (!cart.items || cart.items.length === 0) {
-            alert('Корзина пуста');
+            alert('Cart is empty');
             return;
         }
 

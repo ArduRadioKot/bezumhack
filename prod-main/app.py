@@ -231,7 +231,7 @@ def init_db():
     if c.fetchone()[0] == 0:
         c.execute(
             'INSERT INTO user (name, email, password, balance, notifications, role) VALUES (?, ?, ?, ?, ?, ?)',
-            ('Алексей Смирнов', 'admin@example.com', '123456', 500000, 1, 'admin')
+            ('Alexey Smirnov', 'admin@example.com', '123456', 500000, 1, 'admin')
         )
         db.commit()
         print('✓ Default admin user initialized')

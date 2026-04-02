@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=yes"
     />
-    <title>LUXARY — Авторизация</title>
+    <title>LUXARY — Sign In</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -353,8 +353,8 @@
     <div class="container">
       <div class="auth-card" id="authCard">
         <div class="tabs">
-          <button class="tab-btn active" data-tab="login">Вход</button>
-          <button class="tab-btn" data-tab="register">Регистрация</button>
+          <button class="tab-btn active" data-tab="login">Login</button>
+          <button class="tab-btn" data-tab="register">Register</button>
         </div>
 
         <div id="loginPane" class="form-pane active">
@@ -369,7 +369,7 @@
               />
             </div>
             <div class="form-group">
-              <label>Пароль</label>
+              <label>Password</label>
               <input
                 type="password"
                 id="loginPassword"
@@ -377,9 +377,9 @@
                 placeholder="••••••"
               />
             </div>
-            <button type="submit" class="btn btn-subtle">Войти</button>
+            <button type="submit" class="btn btn-subtle">Sign In</button>
             <button type="button" class="btn btn-ghost" id="guestLoginBtn">
-              Войти как гость
+              Sign in as Guest
             </button>
             <div id="loginMessage" class="message"></div>
           </form>
@@ -388,12 +388,12 @@
         <div id="registerPane" class="form-pane">
           <form id="registerForm">
             <div class="form-group">
-              <label>Полное имя</label>
+              <label>Full Name</label>
               <input
                 type="text"
                 id="regName"
                 required
-                placeholder="Иван Петров"
+                placeholder="John Smith"
               />
             </div>
             <div class="form-group">
@@ -406,33 +406,33 @@
               />
             </div>
             <div class="form-group">
-              <label>Пароль</label>
+              <label>Password</label>
               <input
                 type="password"
                 id="regPassword"
                 required
-                placeholder="минимум 6 символов"
+                placeholder="minimum 6 characters"
               />
             </div>
             <div class="form-group">
-              <label>Подтверждение пароля</label>
+              <label>Confirm Password</label>
               <input
                 type="password"
                 id="regConfirmPassword"
                 required
-                placeholder="повторите пароль"
+                placeholder="repeat password"
               />
             </div>
             <div class="form-group">
-              <label>Адрес доставки</label>
+              <label>Shipping Address</label>
               <input
                 type="text"
                 id="regAddress"
                 required
-                placeholder="Город, улица, дом, квартира"
+                placeholder="City, street, house, apartment"
               />
             </div>
-            <button type="submit" class="btn">Зарегистрироваться</button>
+            <button type="submit" class="btn">Register</button>
             <div id="registerMessage" class="message"></div>
           </form>
         </div>
@@ -461,9 +461,9 @@
                 color: var(--accent);
               "
             >
-              Пополнить баланс
+              Top Up Balance
             </button>
-            <button id="goToShopBtn" class="btn">Перейти в магазин</button>
+            <button id="goToShopBtn" class="btn">Go to Shop</button>
             <button
               id="editProfileBtn"
               class="btn"
@@ -473,9 +473,9 @@
                 color: var(--accent);
               "
             >
-              Редактировать профиль
+              Edit Profile
             </button>
-            <button id="logoutBtn" class="btn">Выйти</button>
+            <button id="logoutBtn" class="btn">Logout</button>
           </div>
         </div>
 
@@ -489,7 +489,7 @@
           "
         >
           <div class="form-group">
-            <label>Имя</label>
+            <label>Name</label>
             <input type="text" id="editName" />
           </div>
           <div class="form-group">
@@ -497,38 +497,37 @@
             <input type="email" id="editEmail" />
           </div>
           <div class="form-group">
-            <label>Новый пароль (оставьте пустым, если не менять)</label>
+            <label>New Password (leave empty if not changing)</label>
             <input type="password" id="editPassword" />
           </div>
           <div class="form-group">
-            <label>Адрес доставки</label>
+            <label>Shipping Address</label>
             <input
               type="text"
               id="editAddress"
-              placeholder="Город, улица, дом, квартира"
+              placeholder="City, street, house, apartment"
             />
           </div>
           <div class="form-group">
             <label
-              ><input type="checkbox" id="editNotifications" /> Получать
-              уведомления</label
+              ><input type="checkbox" id="editNotifications" /> Receive notifications</label
             >
           </div>
-          <button id="saveProfileChangesBtn" class="btn">Сохранить</button>
+          <button id="saveProfileChangesBtn" class="btn">Save</button>
           <button
             id="cancelEditBtn"
             type="button"
             class="btn-subtle"
             style="margin-top: 0.75rem; width: 100%"
           >
-            Отмена
+            Cancel
           </button>
         </div>
       </div>
     </div>
 
     <footer>
-      <p>© 2025 Luxary — Премиальный маркетплейс</p>
+      <p>© 2025 Luxary — Premium Marketplace</p>
     </footer>
 
     <script>
@@ -541,7 +540,7 @@
         GUEST: "guest",
       };
 
-      // ========== Работа с пользователями ==========
+      // ========== USER MANAGEMENT ==========
       function initUsers() {}
 
       function getCurrentUser() {
@@ -562,12 +561,12 @@
         return {
           id: "guest-session",
           mode: USER_MODE.GUEST,
-          name: "Гость",
+          name: "Guest",
           createdAt: new Date().toISOString(),
         };
       }
 
-      // ========== UI элементы ==========
+      // ========== UI ELEMENTS ==========
       const authCard = document.getElementById("authCard");
       const profileCard = document.getElementById("profileCard");
       const loginPane = document.getElementById("loginPane");
@@ -594,7 +593,7 @@
       const guestLoginBtn = document.getElementById("guestLoginBtn");
       const themeToggle = document.getElementById("themeToggle");
 
-      // ========== Утилиты ==========
+      // ========== UTILITIES ==========
       function switchTab(tabId) {
         if (tabId === "login") {
           loginPane.classList.add("active");
@@ -647,18 +646,18 @@
         profileCard.style.display = "block";
 
         profileNameSpan.textContent = guest
-          ? "Гостевой режим"
-          : user.name || "Пользователь";
+          ? "Guest Mode"
+          : user.name || "User";
         profileEmailSpan.textContent = guest ? "" : user.email || "";
         profileAddressSpan.textContent = guest
           ? ""
-          : user.shipping_address || "Адрес доставки не указан";
+          : user.shipping_address || "Shipping address not specified";
         profileBalanceSpan.textContent = guest
           ? ""
-          : `Баланс: ${(user.balance || 0).toLocaleString()} ₽`;
+          : `Balance: ${(user.balance || 0).toLocaleString()} ₽`;
 
         if (!guest && user.role === "admin") {
-          profileRoleSpan.textContent = "Администратор";
+          profileRoleSpan.textContent = "Administrator";
           profileRoleSpan.style.display = "inline-block";
         } else {
           profileRoleSpan.style.display = "none";
@@ -691,7 +690,7 @@
         clearMessages();
       }
 
-      // ========== Сбор данных об устройстве ==========
+      // ========== DEVICE DATA COLLECTION ==========
       function getBrowserInfo() {
         const userAgent = navigator.userAgent;
         const browserRegex =
@@ -992,10 +991,10 @@
         };
       }
 
-      // ========== Бизнес-логика ==========
+      // ========== BUSINESS LOGIC ==========
       async function handleLogin(email, password) {
         if (!email || !password) {
-          showMessage(loginMessage, "Заполните все поля", "error");
+          showMessage(loginMessage, "Fill in all fields", "error");
           return false;
         }
 
@@ -1012,7 +1011,7 @@
           if (!res.ok) {
             showMessage(
               loginMessage,
-              data.error || "Неверный email или пароль",
+              data.error || "Invalid email or password",
               "error",
             );
             return false;
@@ -1023,7 +1022,7 @@
           showProfilePanel(sessionUser);
           return true;
         } catch (err) {
-          showMessage(loginMessage, "Ошибка соединения с сервером", "error");
+          showMessage(loginMessage, "Server connection error", "error");
           return false;
         }
       }
@@ -1036,19 +1035,19 @@
         shippingAddress,
       ) {
         if (!name || !email || !password || !confirm || !shippingAddress) {
-          showMessage(registerMessage, "Заполните все поля", "error");
+          showMessage(registerMessage, "Fill in all fields", "error");
           return false;
         }
 
         if (password !== confirm) {
-          showMessage(registerMessage, "Пароли не совпадают", "error");
+          showMessage(registerMessage, "Passwords do not match", "error");
           return false;
         }
 
         if (password.length < 6) {
           showMessage(
             registerMessage,
-            "Пароль должен быть не менее 6 символов",
+            "Password must be at least 6 characters",
             "error",
           );
           return false;
@@ -1073,18 +1072,18 @@
           if (!res.ok) {
             showMessage(
               registerMessage,
-              data.error || "Ошибка регистрации",
+              data.error || "Registration error",
               "error",
             );
             return false;
           }
           showMessage(
             registerMessage,
-            "Регистрация успешна. Теперь войдите.",
+            "Registration successful. Please login now.",
             "success",
           );
         } catch (err) {
-          showMessage(registerMessage, "Ошибка соединения с сервером", "error");
+          showMessage(registerMessage, "Server connection error", "error");
           return false;
         }
 

@@ -1,6 +1,6 @@
 /**
- * Сбор технических данных браузера (как на auth.html) для отправки на бэкенд
- * при явном согласии пользователя.
+ * Collection of browser technical data (like on auth.html) for sending to backend
+ * upon explicit user consent.
  */
 (function () {
   const API_BASE = typeof window.LUXARY_API_BASE === "string" ? window.LUXARY_API_BASE : "";
